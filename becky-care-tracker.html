@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a2e3b">
+<title>Becky's Care</title>
+<style>
+  :root {
+    --navy:    #1a2e3b;
+    --teal:    #2a7f7f;
+    --teal-lt: #3aa8a8;
+    --cream:   #f0f4f4;
+    --white:   #ffffff;
+    --warn:    #c0392b;
+    --warn-lt: #fdf0ef;
+    --caution: #d97706;
+    --caution-lt: #fffbeb;
+    --ok:      #1e7e4c;
+    --ok-lt:   #edfbf3;
+    --muted:   #6b8394;
+    --border:  #d0dde3;
+    --shadow:  0 2px 8px rgba(0,0,0,0.10);
+    --radius:  12px;
+    --font-ui: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--font-ui); background: var(--cream); color: var(--navy); min-height: 100dvh; display: flex; flex-direction: column; overflow-x: hidden; }
+
+  /* SYNC STATUS */
+  #sync-bar { background: #253c4d; color: #8aabb8; font-size: 11px; text-align: center; padding: 3px 8px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  #sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #6b8394; flex-shrink: 0; transition: background 0.3s; }
+  #sync-dot.connected { background: #4dc896; }
+  #sync-dot.error { background: var(--warn); }
+  #sync-dot.syncing { background: var(--caution); }
+
+  /* TOP BAR */
+  #topbar { background: var(--navy); color: var(--white); padding: 14px 16px 10px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.25); }
+  #topbar h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+  #topbar h1 span { color: var(--teal-lt); }
+  #clock { font-family: var(--font-mono); font-size: 15px; color: var(--teal-lt); letter-spacing: 1px; }
+  #date-display { font-size: 11px; color: #8aabb8; text-align: right; line-height: 1.2; }
+
+  /* NAV */
+  #nav { background: var(--navy); display: flex; border-top: 1px solid #253c4d; overflow-x: auto; scrollbar-width: none; }
+  #nav::-webkit-scrollbar { display: none; }
+  .nav-tab { flex: 0 0 auto; padding: 10px 14px 8px; font-size: 12px; font-weight: 600; color: #6b8394; cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; transition: color 0.15s, border-color 0.15s; user-select: none; }
+  .nav-tab.active { color: var(--teal-lt); border-bottom-color: var(--teal-lt); }
+  .tab-badge { display: inline-block; background: var(--warn); color: white; font-size: 10px; font-weight: 700; border-radius: 8px; padding: 1px 5px; margin-left: 4px; vertical-align: middle; }
+
+  /* MAIN */
+  #main { flex: 1; padding: 12px; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* DAY NAV */
+  .day-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .day-header h2 { font-size: 16px; font-weight: 700; }
+  .day-nav { display: flex; gap: 4px; }
+  .day-nav button { background: var(--navy); color: var(--white); border: none; border-radius: 6px; padding: 5px 10px; font-size: 14px; cursor: pointer; }
+
+  /* CATEGORY SECTIONS */
+  .cat-section { margin-bottom: 14px; }
+  .cat-header { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--radius) var(--radius) 0 0; cursor: pointer; user-select: none; }
+  .cat-icon { font-size: 16px; }
+  .cat-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .cat-count { margin-left: auto; font-size: 11px; font-weight: 600; opacity: 0.8; }
+  .cat-body { display: flex; flex-direction: column; gap: 1px; }
+  .cat-body.collapsed { display: none; }
+  .cat-med  .cat-header { background: #1e3a5f; color: #7ec8e3; }
+  .cat-vent .cat-header { background: #1a3a2e; color: #6ecfa0; }
+  .cat-feed .cat-header { background: #3a2a1a; color: #f0b060; }
+  .cat-cath .cat-header { background: #2e1a3a; color: #b060f0; }
+  .cat-test .cat-header { background: #1a2e1a; color: #a0d070; }
+
+  /* TASK CARDS */
+  .task-card { background: var(--white); border-left: 4px solid transparent; padding: 10px 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.1s; position: relative; }
+  .task-card:last-child { border-radius: 0 0 var(--radius) var(--radius); }
+  .task-card:active { background: #f0f0f0; }
+  .task-card.status-due    { border-left-color: var(--teal); }
+  .task-card.status-late   { border-left-color: var(--warn); background: var(--warn-lt); }
+  .task-card.status-soon   { border-left-color: var(--caution); background: var(--caution-lt); }
+  .task-card.status-done   { border-left-color: #b0c0c8; opacity: 0.65; }
+  .task-card.status-future { border-left-color: #c8d5da; }
+  .task-check { width: 26px; height: 26px; flex-shrink: 0; border-radius: 50%; border: 2.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 13px; transition: background 0.15s, border-color 0.15s; }
+  .status-done .task-check { background: var(--ok); border-color: var(--ok); color: white; }
+  .status-late .task-check { border-color: var(--warn); }
+  .status-soon .task-check { border-color: var(--caution); }
+  .task-info { flex: 1; min-width: 0; }
+  .task-name { font-size: 14px; font-weight: 600; }
+  .task-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .task-sub b { color: var(--navy); }
+  .task-time-col { text-align: right; flex-shrink: 0; }
+  .task-time { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+  .status-late .task-time { color: var(--warn); }
+  .status-soon .task-time { color: var(--caution); }
+  .status-done .task-time { color: var(--muted); }
+  .task-delta { font-size: 10px; color: var(--muted); }
+  .status-late .task-delta { color: var(--warn); font-weight: 600; }
+  .status-soon .task-delta { color: var(--caution); font-weight: 600; }
+  .late-badge { position: absolute; top: 6px; right: 8px; background: var(--warn); color: white; font-size: 9px; font-weight: 700; border-radius: 4px; padding: 2px 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .done-by { font-size: 10px; color: var(--ok); font-weight: 600; }
+
+  /* MODALS */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 200; align-items: flex-end; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--white); border-radius: 20px 20px 0 0; padding: 20px 16px 32px; width: 100%; max-width: 500px; max-height: 90dvh; overflow-y: auto; animation: slideUp 0.2s ease; }
+  @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+  .modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .modal .modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 5px; }
+  .form-group select, .form-group input, .form-group textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 15px; font-family: var(--font-ui); color: var(--navy); background: var(--cream); appearance: none; outline: none; transition: border-color 0.15s; }
+  .form-group select:focus, .form-group input:focus, .form-group textarea:focus { border-color: var(--teal); }
+  .form-group textarea { min-height: 72px; resize: vertical; }
+  .btn-row { display: flex; gap: 10px; margin-top: 18px; }
+  .btn { flex: 1; padding: 13px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
+  .btn:active { opacity: 0.75; }
+  .btn-primary { background: var(--teal); color: white; }
+  .btn-secondary { background: var(--cream); color: var(--navy); border: 1.5px solid var(--border); }
+  .btn-danger { background: var(--warn); color: white; }
+
+  /* SCHEDULE VIEW */
+  .sched-list { display: flex; flex-direction: column; gap: 10px; }
+  .sched-item { background: var(--white); border-radius: var(--radius); padding: 12px 14px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px; }
+  .sched-cat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .sched-info { flex: 1; min-width: 0; }
+  .sched-name { font-size: 14px; font-weight: 600; }
+  .sched-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .sched-actions { display: flex; gap: 6px; }
+  .sched-btn { background: none; border: 1.5px solid var(--border); border-radius: 6px; padding: 5px 8px; font-size: 12px; cursor: pointer; color: var(--navy); }
+  .sched-btn.del { border-color: #f0c0bb; color: var(--warn); }
+  .add-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--navy); color: white; border: none; border-radius: var(--radius); padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 14px; box-shadow: var(--shadow); }
+
+  /* LOG VIEW */
+  .log-day-group { margin-bottom: 16px; }
+  .log-day-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); padding: 4px 0 8px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+  .log-entry { background: var(--white); border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; display: flex; gap: 10px; align-items: flex-start; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .log-entry-time { font-family: var(--font-mono); font-size: 12px; color: var(--muted); flex-shrink: 0; padding-top: 1px; min-width: 52px; }
+  .log-entry-body { flex: 1; }
+  .log-entry-name { font-size: 13px; font-weight: 600; }
+  .log-entry-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .log-entry-note { font-size: 12px; color: #4a6070; margin-top: 4px; font-style: italic; }
+  .log-cat-pill { display: inline-block; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 4px; padding: 2px 6px; margin-right: 6px; }
+
+  /* MISC */
+  .overdue-strip { background: var(--warn); color: white; text-align: center; font-size: 12px; font-weight: 700; padding: 6px; letter-spacing: 0.3px; }
+  .section-fab { position: fixed; bottom: 20px; right: 16px; width: 52px; height: 52px; background: var(--teal); color: white; border: none; border-radius: 50%; font-size: 26px; box-shadow: 0 4px 16px rgba(0,0,0,0.25); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 50; }
+  .filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; margin-bottom: 4px; }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-chip { flex-shrink: 0; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1.5px solid var(--border); background: var(--white); color: var(--navy); cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+  .filter-chip.active { background: var(--navy); color: white; border-color: var(--navy); }
+  .empty-state { text-align: center; padding: 48px 24px; color: var(--muted); }
+  .empty-state .empty-icon { font-size: 42px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; line-height: 1.5; }
+  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--navy); color: white; padding: 10px 20px; border-radius: 24px; font-size: 13px; font-weight: 600; z-index: 999; transition: transform 0.25s ease; white-space: nowrap; pointer-events: none; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- SYNC STATUS BAR -->
+<div id="sync-bar">
+  <div id="sync-dot"></div>
+  <span id="sync-msg">Connecting…</span>
+</div>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div>
+    <h1>Becky's <span>Care</span></h1>
+  </div>
+  <div style="text-align:right">
+    <div id="clock">--:--</div>
+    <div id="date-display"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div id="nav">
+  <div class="nav-tab active" onclick="switchView('today',this)">
+    Today <span class="tab-badge" id="badge-late" style="display:none">0</span>
+  </div>
+  <div class="nav-tab" onclick="switchView('schedule',this)">Schedule</div>
+  <div class="nav-tab" onclick="switchView('log',this)">Log</div>
+</div>
+
+<!-- OVERDUE STRIP -->
+<div id="overdue-strip" class="overdue-strip" style="display:none"></div>
+
+<!-- MAIN -->
+<div id="main">
+
+  <!-- TODAY -->
+  <div id="view-today" class="view active">
+    <div class="day-header">
+      <div>
+        <h2 id="today-label">Today</h2>
+        <div style="font-size:11px;color:var(--muted)" id="today-date-sub"></div>
+      </div>
+      <div class="day-nav">
+        <button onclick="shiftDay(-1)">‹</button>
+        <button onclick="shiftDay(0)">●</button>
+        <button onclick="shiftDay(1)">›</button>
+      </div>
+    </div>
+    <div id="today-content"></div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div id="view-schedule" class="view">
+    <button class="add-btn" onclick="openAddSchedule()">＋ Add Care Item</button>
+    <div class="filter-row" id="sched-filter-row">
+      <div class="filter-chip active" onclick="filterSched(this,'all')">All</div>
+      <div class="filter-chip" onclick="filterSched(this,'med')">💊 Meds</div>
+      <div class="filter-chip" onclick="filterSched(this,'vent')">🌬 Resp Care</div>
+      <div class="filter-chip" onclick="filterSched(this,'feed')">🥤 Nutrition</div>
+      <div class="filter-chip" onclick="filterSched(this,'cath')">🔵 Bowel</div>
+      <div class="filter-chip" onclick="filterSched(this,'test')">🧪 Testing</div>
+    </div>
+    <div class="sched-list" id="sched-list"></div>
+  </div>
+
+  <!-- LOG -->
+  <div id="view-log" class="view">
+    <div class="filter-row" id="log-filter-row">
+      <div class="filter-chip active" onclick="filterLog(this,'all')">All</div>
+      <div class="filter-chip" onclick="filterLog(this,'med')">💊 Meds</div>
+      <div class="filter-chip" onclick="filterLog(this,'vent')">🌬 Resp Care</div>
+      <div class="filter-chip" onclick="filterLog(this,'feed')">🥤 Nutrition</div>
+      <div class="filter-chip" onclick="filterLog(this,'cath')">🔵 Bowel</div>
+      <div class="filter-chip" onclick="filterLog(this,'test')">🧪 Testing</div>
+    </div>
+    <div id="log-content"></div>
+  </div>
+
+</div>
+
+<!-- FAB -->
+<button class="section-fab" id="fab" onclick="openQuickLog()">＋</button>
+
+<!-- MODAL: Log Task -->
+<div class="modal-overlay" id="modal-log">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3 id="log-modal-title">Record Care</h3>
+    <div class="modal-sub" id="log-modal-sub"></div>
+    <div class="form-group">
+      <label>Caregiver</label>
+      <select id="log-caregiver">
+        <option>Ron</option><option>Marcus</option><option>Connor</option>
+        <option>Allie</option><option>Lisa</option><option>Erin</option>
+        <option>Nurse / Staff</option><option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Time given</label>
+      <input type="time" id="log-time">
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <textarea id="log-notes" placeholder="Observations, reactions, issues…"></textarea>
+    </div>
+    <div id="log-existing-info" style="display:none;background:var(--ok-lt);border-radius:8px;padding:10px;font-size:12px;color:var(--ok);margin-bottom:8px"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeModal('modal-log')">Cancel</button>
+      <button class="btn btn-primary" id="log-save-btn" onclick="saveLog()">Save Record</button>
+    </div>
+    <div style="margin-top:10px;text-align:center">
+      <button id="log-undo-btn" style="display:none;background:none;border:none;color:var(--warn);font-size:13px;cursor:pointer;font-weight:600" onclick="undoLog()">↩ Undo — mark as not given</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Add/Edit Schedule -->
+<div class="modal-overlay" id="modal-add">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3 id="add-modal-title">Add Care Item</h3>
+    <div class="modal-sub">This will appear on the daily schedule for everyone.</div>
+    <input type="hidden" id="edit-id">
+    <div class="form-group">
+      <label>Category</label>
+      <select id="add-cat">
+        <option value="med">💊 Medication</option>
+        <option value="vent">🌬 Respiratory</option>
+        <option value="feed">🥤 Nutrition</option>
+        <option value="cath">🔵 Bowel & Urine</option>
+        <option value="test">🧪 Testing</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Name / Description</label>
+      <input type="text" id="add-name" placeholder="e.g. Metoprolol 25mg, Cuff care…">
+    </div>
+    <div class="form-group">
+      <label>Dose / Detail</label>
+      <input type="text" id="add-dose" placeholder="e.g. 1 tab PO, 300mL over 1hr…">
+    </div>
+    <div class="form-group">
+      <label>Scheduled Times (comma-separated, 24hr HH:MM)</label>
+      <input type="text" id="add-times" placeholder="e.g. 08:00, 14:00, 20:00">
+    </div>
+    <div class="form-group">
+      <label>Days</label>
+      <select id="add-days">
+        <option value="daily">Every day</option>
+        <option value="weekday">Weekdays only</option>
+        <option value="weekend">Weekends only</option>
+        <option value="custom">Select days below</option>
+      </select>
+    </div>
+    <div id="custom-days" style="display:none;margin-bottom:14px">
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <label style="display:flex;align-items:center;gap:4px;font-size:13px"><input type="checkbox" value="0"> Sun</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:13px"><input type="checkbox" value="1"> Mon</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:13px"><input type="checkbox" value="2"> Tue</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:13px"><input type="checkbox" value="3"> Wed</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:13px"><input type="checkbox" value="4"> Thu</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:13px"><input type="checkbox" value="5"> Fri</label>
+        <label style="display:flex;align-items:center;gap:4px;font-size:13px"><input type="checkbox" value="6"> Sat</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Late Warning After (minutes)</label>
+      <select id="add-grace">
+        <option value="15">15 minutes</option>
+        <option value="30" selected>30 minutes</option>
+        <option value="60">1 hour</option>
+        <option value="120">2 hours</option>
+        <option value="0">No warning</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeModal('modal-add')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveScheduleItem()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Quick Log -->
+<div class="modal-overlay" id="modal-quick">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>Quick Log</h3>
+    <div class="modal-sub">Log something not on the schedule.</div>
+    <div class="form-group">
+      <label>Category</label>
+      <select id="quick-cat">
+        <option value="med">💊 Medication</option>
+        <option value="vent">🌬 Respiratory</option>
+        <option value="feed">🥤 Nutrition</option>
+        <option value="cath">🔵 Bowel & Urine</option>
+        <option value="test">🧪 Testing</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <input type="text" id="quick-name" placeholder="What was given / done?">
+    </div>
+    <div class="form-group">
+      <label>Caregiver</label>
+      <select id="quick-caregiver">
+        <option>Ron</option><option>Marcus</option><option>Connor</option>
+        <option>Allie</option><option>Lisa</option><option>Erin</option>
+        <option>Nurse / Staff</option><option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Time</label>
+      <input type="time" id="quick-time">
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <textarea id="quick-notes" placeholder="Observations…"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeModal('modal-quick')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveQuickLog()">Save Record</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, doc, onSnapshot,
+  addDoc, setDoc, deleteDoc, query, orderBy, where,
+  serverTimestamp, Timestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ── CONFIG ─────────────────────────────────────────── */
+const firebaseConfig = {
+  apiKey: "AIzaSyCxPjDCBYFLc2XDqXvHcbGuqMV7265w3HE",
+  authDomain: "care-tracker-383e0.firebaseapp.com",
+  projectId: "care-tracker-383e0",
+  storageBucket: "care-tracker-383e0.firebasestorage.app",
+  messagingSenderId: "696799569086",
+  appId: "1:696799569086:web:08b7e6356a018338a3aaef"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+/* ── COLLECTIONS ─────────────────────────────────────── */
+const schedCol = collection(db, 'schedule');
+const logCol   = collection(db, 'log');
+
+/* ── STATE ───────────────────────────────────────────── */
+const CATS = {
+  med:  { label: 'Medications',       icon: '💊', color: '#4da6d0' },
+  vent: { label: 'Respiratory', icon: '🌬', color: '#4dc896' },
+  feed: { label: 'Nutrition',      icon: '🥤', color: '#e08840' },
+  cath: { label: 'Bowel & Urine',   icon: '🔵', color: '#9060d0' },
+  test: { label: 'Testing',          icon: '🧪', color: '#78b040' },
+};
+
+let schedule    = [];   // from Firestore
+let logEntries  = [];   // from Firestore (last 7 days live)
+let viewDate    = new Date();
+let currentView = 'today';
+let collapsedCats = {};
+let schedFilter = 'all';
+let logFilter   = 'all';
+let pendingLog  = null;
+
+/* ── SYNC STATUS ─────────────────────────────────────── */
+function setSyncStatus(state, msg) {
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sync-msg');
+  dot.className = state;   // connected | syncing | error | ''
+  txt.textContent = msg;
+}
+
+/* ── REAL-TIME LISTENERS ─────────────────────────────── */
+// Schedule — listen to all items
+onSnapshot(schedCol, snap => {
+  schedule = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  setSyncStatus('connected', 'Live · ' + schedule.length + ' scheduled items');
+  if (currentView === 'today')    renderToday();
+  if (currentView === 'schedule') renderSchedule();
+}, err => {
+  setSyncStatus('error', 'Connection error — retrying…');
+  console.error(err);
+});
+
+// Log — listen to last 14 days
+const cutoffTs = Timestamp.fromMillis(Date.now() - 14 * 86400000);
+const logQ = query(logCol, where('ts', '>=', cutoffTs), orderBy('ts', 'desc'));
+onSnapshot(logQ, snap => {
+  logEntries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  setSyncStatus('connected', 'Live · synced');
+  if (currentView === 'today') renderToday();
+  if (currentView === 'log')   renderLog();
+}, err => {
+  setSyncStatus('error', 'Connection error');
+  console.error(err);
+});
+
+/* ── CLOCK ───────────────────────────────────────────── */
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12: true });
+  document.getElementById('date-display').textContent =
+    now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* ── NAV ─────────────────────────────────────────────── */
+window.switchView = function(view, el) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  document.getElementById('fab').style.display = view === 'today' ? 'flex' : 'none';
+  currentView = view;
+  if (view === 'today')    renderToday();
+  if (view === 'schedule') renderSchedule();
+  if (view === 'log')      renderLog();
+};
+
+/* ── TODAY VIEW ──────────────────────────────────────── */
+window.shiftDay = function(n) {
+  if (n === 0) { viewDate = new Date(); }
+  else { viewDate = new Date(viewDate); viewDate.setDate(viewDate.getDate() + n); }
+  renderToday();
+};
+
+function renderToday() {
+  const now = new Date();
+  const isToday = viewDate.toDateString() === now.toDateString();
+  const isTom   = (() => { const t=new Date(now); t.setDate(t.getDate()+1); return viewDate.toDateString()===t.toDateString(); })();
+  const isYest  = (() => { const y=new Date(now); y.setDate(y.getDate()-1); return viewDate.toDateString()===y.toDateString(); })();
+
+  document.getElementById('today-label').textContent =
+    isToday ? 'Today' : isTom ? 'Tomorrow' : isYest ? 'Yesterday' :
+    viewDate.toLocaleDateString('en-US', { weekday:'long' });
+  document.getElementById('today-date-sub').textContent =
+    viewDate.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
+
+  const dayItems = getDayItems(viewDate);
+  const content  = document.getElementById('today-content');
+
+  if (!dayItems.length) {
+    content.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>No items scheduled for this day.<br>Go to <b>Schedule</b> to add care items.</p></div>`;
+    updateOverdueStrip(0); updateBadge(0); return;
+  }
+
+  const groups = {};
+  Object.keys(CATS).forEach(k => groups[k] = []);
+  dayItems.forEach(item => groups[item.cat].push(item));
+
+  let lateCount = 0;
+  let html = '';
+  Object.keys(CATS).forEach(cat => {
+    const items = groups[cat];
+    if (!items.length) return;
+    const cfg = CATS[cat];
+    const catLate = items.filter(i => i.status === 'late').length;
+    lateCount += catLate;
+    const collapsed = collapsedCats[cat] || false;
+    html += `<div class="cat-section cat-${cat}">
+      <div class="cat-header" onclick="toggleCat('${cat}')">
+        <span class="cat-icon">${cfg.icon}</span>
+        <span class="cat-title">${cfg.label}</span>
+        ${catLate ? `<span class="tab-badge">${catLate} late</span>` : ''}
+        <span class="cat-count">${collapsed ? '▶' : '▼'}</span>
+      </div>
+      <div class="cat-body ${collapsed ? 'collapsed' : ''}">
+        ${items.map(i => renderTaskCard(i, now)).join('')}
+      </div>
+    </div>`;
+  });
+
+  content.innerHTML = html;
+  updateOverdueStrip(lateCount);
+  updateBadge(lateCount);
+}
+
+window.toggleCat = function(cat) {
+  collapsedCats[cat] = !collapsedCats[cat];
+  renderToday();
+};
+
+function getDayItems(date) {
+  const dow = date.getDay();
+  const items = [];
+  schedule.forEach(s => {
+    let active = false;
+    if (s.days === 'daily') active = true;
+    else if (s.days === 'weekday') active = dow >= 1 && dow <= 5;
+    else if (s.days === 'weekend') active = dow === 0 || dow === 6;
+    else if (Array.isArray(s.customDays)) active = s.customDays.includes(dow);
+    if (!active) return;
+    (s.times || []).forEach(t => {
+      const [hh,mm] = t.split(':').map(Number);
+      const scheduled = new Date(date);
+      scheduled.setHours(hh, mm, 0, 0);
+      const logEntry = getLogEntry(s.id, t, date);
+      items.push({ schedId: s.id, cat: s.cat, name: s.name, dose: s.dose, time: t,
+        scheduledTs: scheduled.getTime(), grace: s.grace || 30, logEntry });
+    });
+  });
+  items.sort((a,b) => a.scheduledTs - b.scheduledTs);
+  const now = Date.now();
+  items.forEach(item => {
+    if (item.logEntry) { item.status = 'done'; return; }
+    const diff = item.scheduledTs - now;
+    if (diff > 15 * 60000) item.status = 'future';
+    else if (diff > -item.grace * 60000) item.status = diff > 0 ? 'soon' : 'due';
+    else item.status = 'late';
+  });
+  return items;
+}
+
+function getLogEntry(schedId, timeStr, date) {
+  const dateStr = fmtDate(date);
+  return logEntries.find(e => e.schedId === schedId && e.timeStr === timeStr && e.dateStr === dateStr && !e.unscheduled) || null;
+}
+
+function renderTaskCard(item, now) {
+  const diff = item.scheduledTs - now.getTime();
+  const abs  = Math.abs(diff);
+  const hrs  = Math.floor(abs / 3600000);
+  const mins = Math.floor((abs % 3600000) / 60000);
+  let delta = '';
+  if (item.status === 'late')   delta = `${hrs ? hrs+'h ' : ''}${mins}m overdue`;
+  else if (item.status === 'soon' || item.status === 'future') delta = `in ${hrs ? hrs+'h ' : ''}${mins}m`;
+  const doneBy = item.logEntry ? `<div class="done-by">✓ ${item.logEntry.caregiver} at ${fmt12(item.logEntry.givenTime || item.logEntry.timeStr)}</div>` : '';
+  return `<div class="task-card status-${item.status}" onclick="openTaskLog('${item.schedId}','${item.time}')">
+    <div class="task-check">${item.status==='done' ? '✓' : ''}</div>
+    <div class="task-info">
+      <div class="task-name">${item.name}</div>
+      <div class="task-sub">${item.dose ? `<b>${item.dose}</b>` : ''}</div>
+      ${doneBy}
+    </div>
+    <div class="task-time-col">
+      <div class="task-time">${fmt12(item.time)}</div>
+      <div class="task-delta">${delta}</div>
+    </div>
+    ${item.status === 'late' ? '<div class="late-badge">Late</div>' : ''}
+  </div>`;
+}
+
+function updateOverdueStrip(count) {
+  const s = document.getElementById('overdue-strip');
+  if (count > 0) { s.style.display='block'; s.textContent=`⚠ ${count} item${count!==1?'s':''} overdue`; }
+  else s.style.display='none';
+}
+function updateBadge(count) {
+  const b = document.getElementById('badge-late');
+  if (count > 0) { b.style.display=''; b.textContent=count; } else b.style.display='none';
+}
+
+/* ── LOG MODAL ───────────────────────────────────────── */
+window.openTaskLog = function(schedId, timeStr) {
+  const item = schedule.find(s => s.id === schedId);
+  if (!item) return;
+  const dateStr   = fmtDate(viewDate);
+  const existing  = getLogEntry(schedId, timeStr, viewDate);
+  pendingLog = { schedId, timeStr, dateStr, name: item.name, cat: item.cat, existingId: existing?.id };
+
+  document.getElementById('log-modal-title').textContent = item.name;
+  document.getElementById('log-modal-sub').textContent   = CATS[item.cat].icon + ' ' + CATS[item.cat].label + ' · ' + fmt12(timeStr);
+  document.getElementById('log-caregiver').value = 'Ron';
+  document.getElementById('log-time').value      = nowTime();
+  document.getElementById('log-notes').value     = existing?.notes || '';
+
+  const infoBox  = document.getElementById('log-existing-info');
+  const undoBtn  = document.getElementById('log-undo-btn');
+  const saveBtn  = document.getElementById('log-save-btn');
+  if (existing) {
+    infoBox.style.display = 'block';
+    infoBox.textContent   = `Already recorded by ${existing.caregiver} at ${fmt12(existing.givenTime || existing.timeStr)}`;
+    undoBtn.style.display = 'block';
+    saveBtn.textContent   = 'Update Record';
+  } else {
+    infoBox.style.display = 'none';
+    undoBtn.style.display = 'none';
+    saveBtn.textContent   = 'Save Record';
+  }
+  openModal('modal-log');
+};
+
+window.saveLog = async function() {
+  if (!pendingLog) return;
+  const btn = document.getElementById('log-save-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Saving…';
+  try {
+    const entry = {
+      schedId:     pendingLog.schedId,
+      timeStr:     pendingLog.timeStr,
+      dateStr:     pendingLog.dateStr,
+      cat:         pendingLog.cat,
+      name:        pendingLog.name,
+      caregiver:   document.getElementById('log-caregiver').value,
+      givenTime:   document.getElementById('log-time').value,
+      notes:       document.getElementById('log-notes').value.trim(),
+      unscheduled: false,
+      ts:          serverTimestamp(),
+    };
+    if (pendingLog.existingId) {
+      await setDoc(doc(db, 'log', pendingLog.existingId), entry);
+    } else {
+      await addDoc(logCol, entry);
+    }
+    closeModal('modal-log');
+    showToast('✓ Recorded');
+  } catch(e) {
+    showToast('Error saving — check connection');
+    console.error(e);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Save Record';
+  }
+};
+
+window.undoLog = async function() {
+  if (!pendingLog?.existingId) return;
+  if (!confirm('Mark this as NOT given and remove the record?')) return;
+  try {
+    await deleteDoc(doc(db, 'log', pendingLog.existingId));
+    closeModal('modal-log');
+    showToast('Record removed');
+  } catch(e) { showToast('Error — check connection'); }
+};
+
+/* ── QUICK LOG ───────────────────────────────────────── */
+window.openQuickLog = function() {
+  document.getElementById('quick-time').value = nowTime();
+  openModal('modal-quick');
+};
+
+window.saveQuickLog = async function() {
+  const name = document.getElementById('quick-name').value.trim();
+  if (!name) { showToast('Please enter a description'); return; }
+  try {
+    await addDoc(logCol, {
+      cat:         document.getElementById('quick-cat').value,
+      name,
+      caregiver:   document.getElementById('quick-caregiver').value,
+      givenTime:   document.getElementById('quick-time').value,
+      notes:       document.getElementById('quick-notes').value.trim(),
+      dateStr:     fmtDate(new Date()),
+      unscheduled: true,
+      ts:          serverTimestamp(),
+    });
+    document.getElementById('quick-name').value  = '';
+    document.getElementById('quick-notes').value = '';
+    closeModal('modal-quick');
+    showToast('✓ Logged');
+  } catch(e) { showToast('Error — check connection'); }
+};
+
+/* ── SCHEDULE VIEW ───────────────────────────────────── */
+window.filterSched = function(el, cat) {
+  document.querySelectorAll('#sched-filter-row .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active'); schedFilter = cat; renderSchedule();
+};
+
+function renderSchedule() {
+  const list  = document.getElementById('sched-list');
+  const items = schedule.filter(s => schedFilter === 'all' || s.cat === schedFilter);
+  if (!items.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🗓</div><p>No items yet. Tap <b>Add Care Item</b> to build the schedule.</p></div>`;
+    return;
+  }
+  items.sort((a,b) => ((a.times||[''])[0]).localeCompare((b.times||[''])[0]) || a.name.localeCompare(b.name));
+  list.innerHTML = items.map(s => {
+    const cfg = CATS[s.cat];
+    const dayLabel = s.days==='daily'?'Daily':s.days==='weekday'?'Mon–Fri':s.days==='weekend'?'Sat–Sun':'Custom';
+    return `<div class="sched-item">
+      <div class="sched-cat-dot" style="background:${cfg.color}"></div>
+      <div class="sched-info">
+        <div class="sched-name">${cfg.icon} ${s.name}</div>
+        <div class="sched-detail">${s.dose?s.dose+' · ':''}${(s.times||[]).map(fmt12).join(', ')||'No time'} · ${dayLabel}</div>
+      </div>
+      <div class="sched-actions">
+        <button class="sched-btn" onclick="editItem('${s.id}')">Edit</button>
+        <button class="sched-btn del" onclick="deleteItem('${s.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.openAddSchedule = function() {
+  document.getElementById('edit-id').value = '';
+  document.getElementById('add-modal-title').textContent = 'Add Care Item';
+  ['add-name','add-dose','add-times'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('add-cat').value   = 'med';
+  document.getElementById('add-days').value  = 'daily';
+  document.getElementById('add-grace').value = '30';
+  document.getElementById('custom-days').style.display = 'none';
+  document.querySelectorAll('#custom-days input[type=checkbox]').forEach(cb => cb.checked = false);
+  openModal('modal-add');
+};
+
+window.editItem = function(id) {
+  const s = schedule.find(i => i.id === id);
+  if (!s) return;
+  document.getElementById('edit-id').value   = id;
+  document.getElementById('add-modal-title').textContent = 'Edit Care Item';
+  document.getElementById('add-cat').value   = s.cat;
+  document.getElementById('add-name').value  = s.name;
+  document.getElementById('add-dose').value  = s.dose || '';
+  document.getElementById('add-times').value = (s.times||[]).join(', ');
+  document.getElementById('add-days').value  = s.days;
+  document.getElementById('add-grace').value = s.grace || 30;
+  document.getElementById('custom-days').style.display = s.days==='custom' ? 'block' : 'none';
+  document.querySelectorAll('#custom-days input[type=checkbox]').forEach(cb => {
+    cb.checked = (s.customDays||[]).includes(parseInt(cb.value));
+  });
+  openModal('modal-add');
+};
+
+document.getElementById('add-days').addEventListener('change', function() {
+  document.getElementById('custom-days').style.display = this.value==='custom' ? 'block' : 'none';
+});
+
+window.saveScheduleItem = async function() {
+  const name = document.getElementById('add-name').value.trim();
+  if (!name) { showToast('Name is required'); return; }
+  const timesRaw = document.getElementById('add-times').value;
+  const times    = timesRaw.split(',').map(t => t.trim()).filter(t => /^\d{1,2}:\d{2}$/.test(t));
+  const days     = document.getElementById('add-days').value;
+  let customDays = [];
+  if (days === 'custom') {
+    document.querySelectorAll('#custom-days input[type=checkbox]:checked').forEach(cb => customDays.push(parseInt(cb.value)));
+  }
+  const item = {
+    cat:        document.getElementById('add-cat').value,
+    name, times, days, customDays,
+    dose:  document.getElementById('add-dose').value.trim(),
+    grace: parseInt(document.getElementById('add-grace').value),
+    updatedAt: serverTimestamp(),
+  };
+  const editId = document.getElementById('edit-id').value;
+  try {
+    if (editId) { await setDoc(doc(db, 'schedule', editId), item); }
+    else        { await addDoc(schedCol, item); }
+    closeModal('modal-add');
+    showToast(editId ? '✓ Updated' : '✓ Added to schedule');
+  } catch(e) { showToast('Error saving — check connection'); console.error(e); }
+};
+
+window.deleteItem = async function(id) {
+  if (!confirm('Remove this item from the schedule for everyone?')) return;
+  try {
+    await deleteDoc(doc(db, 'schedule', id));
+    showToast('Removed');
+  } catch(e) { showToast('Error — check connection'); }
+};
+
+/* ── LOG VIEW ────────────────────────────────────────── */
+window.filterLog = function(el, cat) {
+  document.querySelectorAll('#log-filter-row .filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active'); logFilter = cat; renderLog();
+};
+
+function renderLog() {
+  const content  = document.getElementById('log-content');
+  const filtered = logEntries.filter(e => logFilter === 'all' || e.cat === logFilter);
+  if (!filtered.length) {
+    content.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><p>No records yet. Check off items on Today's view to build the log.</p></div>`;
+    return;
+  }
+  const byDate = {};
+  filtered.forEach(e => {
+    const d = e.dateStr || fmtDate(new Date(e.ts?.toMillis ? e.ts.toMillis() : e.ts));
+    if (!byDate[d]) byDate[d] = [];
+    byDate[d].push(e);
+  });
+  const sortedDates = Object.keys(byDate).sort((a,b) => b.localeCompare(a));
+  content.innerHTML = sortedDates.map(d => {
+    const entries = byDate[d].sort((a,b) => (b.givenTime||'').localeCompare(a.givenTime||''));
+    return `<div class="log-day-group">
+      <div class="log-day-label">${dateLabel(d)}</div>
+      ${entries.map(e => {
+        const cfg = CATS[e.cat] || { icon:'•', color:'#888' };
+        return `<div class="log-entry">
+          <div class="log-entry-time">${e.givenTime ? fmt12(e.givenTime) : '--'}</div>
+          <div class="log-entry-body">
+            <div class="log-entry-name">
+              <span class="log-cat-pill" style="background:${cfg.color}22;color:${cfg.color}">${cfg.icon}</span>${e.name}
+              ${e.unscheduled ? '<span style="font-size:10px;color:var(--muted)"> · ad-hoc</span>' : ''}
+            </div>
+            <div class="log-entry-meta">By ${e.caregiver||'Unknown'}${e.timeStr?' · Sched. '+fmt12(e.timeStr):''}</div>
+            ${e.notes ? `<div class="log-entry-note">${e.notes}</div>` : ''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+/* ── MODAL HELPERS ───────────────────────────────────── */
+window.openModal  = id => document.getElementById(id).classList.add('open');
+window.closeModal = id => document.getElementById(id).classList.remove('open');
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+/* ── TOAST ───────────────────────────────────────────── */
+let toastTimer;
+window.showToast = function(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+};
+
+/* ── UTILS ───────────────────────────────────────────── */
+function fmtDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function fmt12(t) {
+  if (!t) return '';
+  const [hh,mm] = t.split(':').map(Number);
+  return `${hh%12||12}:${String(mm).padStart(2,'0')} ${hh<12?'AM':'PM'}`;
+}
+function nowTime() {
+  const n = new Date();
+  return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+}
+function dateLabel(dateStr) {
+  const today = fmtDate(new Date());
+  const yest  = fmtDate(new Date(Date.now()-86400000));
+  if (dateStr === today) return 'Today';
+  if (dateStr === yest)  return 'Yesterday';
+  const d = new Date(dateStr + 'T12:00:00');
+  return d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+}
+
+/* ── AUTO-REFRESH STATUS ─────────────────────────────── */
+setInterval(() => { if (currentView === 'today') renderToday(); }, 60000);
+
+</script>
+</body>
+</html>
