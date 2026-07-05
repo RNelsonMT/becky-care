@@ -1021,27 +1021,41 @@ window.deleteLogEntry = async function() {
 };
 
 /* ── SETTINGS VIEW ───────────────────────────────────── */
+let collapsedSettings = { med:false, vent:true, feed:true, cath:true, test:true };
+
+window.toggleSettingsCat = function(cat) {
+  collapsedSettings[cat] = !collapsedSettings[cat];
+  renderSettings();
+};
+
 function renderSettings() {
   const content=document.getElementById('settings-content');
-  let html='<div style="margin-bottom:8px"><h2 style="font-size:17px;font-weight:700">Description Presets</h2><p style="font-size:12px;color:var(--muted);margin-top:4px">Tap presets in the Quick Log and Schedule forms. Add or remove here — changes sync to everyone instantly.</p></div>';
+  let html='<div style="margin-bottom:16px"><h2 style="font-size:17px;font-weight:700">Description Presets</h2><p style="font-size:12px;color:var(--muted);margin-top:4px">Tap presets in the Quick Log and Schedule forms. Add or remove here — changes sync to everyone instantly.</p></div>';
 
   Object.keys(CATS).forEach(cat=>{
     const cfg=CATS[cat];
     const catPresets=presets[cat]||[];
+    const collapsed=collapsedSettings[cat]||false;
     html+=`<div class="settings-section">
-      <div class="settings-section-title">
-        <span class="cat-badge" style="background:${cfg.color}22;color:${cfg.color}">${cfg.icon} ${cfg.label}</span>
+      <div onclick="toggleSettingsCat('${cat}')" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;border-radius:${collapsed?'12px':'12px 12px 0 0'};background:${cfg.hdrBg};color:${cfg.hdrColor};margin-bottom:${collapsed?'10px':'0'};user-select:none;">
+        <span style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">${cfg.icon} ${cfg.label}</span>
+        <span style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;opacity:.8">${catPresets.length} preset${catPresets.length!==1?'s':''}</span>
+          <span style="font-size:13px">${collapsed?'▶':'▼'}</span>
+        </span>
       </div>
-      ${catPresets.length===0?`<div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-style:italic">No presets yet — add one below.</div>`:''}
-      ${catPresets.map(p=>`
-        <div class="preset-list-item">
-          <span class="preset-list-item-name">${p.name}</span>
-          <button class="preset-del-btn" onclick="deletePreset('${p.id}')" title="Delete">×</button>
-        </div>`).join('')}
-      <div class="preset-add-row">
-        <input type="text" id="new-preset-${cat}" placeholder="Add preset…" onkeydown="if(event.key==='Enter')addPreset('${cat}')">
-        <button class="preset-add-btn" onclick="addPreset('${cat}')">Add</button>
-      </div>
+      ${collapsed?'':`<div style="background:#fff;border-radius:0 0 12px 12px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">
+        ${catPresets.length===0?'<div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-style:italic">No presets yet — add one below.</div>':''}
+        ${catPresets.map(p=>`
+          <div class="preset-list-item">
+            <span class="preset-list-item-name">${p.name}</span>
+            <button class="preset-del-btn" onclick="deletePreset('${p.id}')" title="Delete">×</button>
+          </div>`).join('')}
+        <div class="preset-add-row">
+          <input type="text" id="new-preset-${cat}" placeholder="Add preset…" onkeydown="if(event.key==='Enter')addPreset('${cat}')">
+          <button class="preset-add-btn" onclick="addPreset('${cat}')">Add</button>
+        </div>
+      </div>`}
     </div>`;
   });
   content.innerHTML=html;
