@@ -1021,7 +1021,7 @@ window.deleteLogEntry = async function() {
 };
 
 /* ── SETTINGS VIEW ───────────────────────────────────── */
-let collapsedSettings = { med:false, vent:true, feed:true, cath:true, test:true };
+let collapsedSettings = { med:true, vent:true, feed:true, cath:true, test:true };
 
 window.toggleSettingsCat = function(cat) {
   collapsedSettings[cat] = !collapsedSettings[cat];
@@ -1037,7 +1037,7 @@ function renderSettings() {
     const catPresets=presets[cat]||[];
     const collapsed=collapsedSettings[cat]||false;
     html+=`<div class="settings-section">
-      <div onclick="toggleSettingsCat('${cat}')" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;border-radius:${collapsed?'12px':'12px 12px 0 0'};background:${cfg.hdrBg};color:${cfg.hdrColor};margin-bottom:${collapsed?'10px':'0'};user-select:none;">
+      <div data-toggle-cat="${cat}" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;border-radius:${collapsed?'12px':'12px 12px 0 0'};background:${cfg.hdrBg};color:${cfg.hdrColor};margin-bottom:${collapsed?'10px':'0'};user-select:none;">
         <span style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">${cfg.icon} ${cfg.label}</span>
         <span style="display:flex;align-items:center;gap:8px">
           <span style="font-size:11px;opacity:.8">${catPresets.length} preset${catPresets.length!==1?'s':''}</span>
@@ -1049,11 +1049,11 @@ function renderSettings() {
         ${catPresets.map(p=>`
           <div class="preset-list-item">
             <span class="preset-list-item-name">${p.name}</span>
-            <button class="preset-del-btn" onclick="deletePreset('${p.id}')" title="Delete">×</button>
+            <button class="preset-del-btn" data-delete-preset="${p.id}" title="Delete">×</button>
           </div>`).join('')}
         <div class="preset-add-row">
-          <input type="text" id="new-preset-${cat}" placeholder="Add preset…" onkeydown="if(event.key==='Enter')addPreset('${cat}')">
-          <button class="preset-add-btn" onclick="addPreset('${cat}')">Add</button>
+          <input type="text" id="new-preset-${cat}" placeholder="Add preset…" data-add-cat="${cat}">
+          <button class="preset-add-btn" data-add-preset="${cat}">Add</button>
         </div>
       </div>`}
     </div>`;
@@ -1061,22 +1061,53 @@ function renderSettings() {
   content.innerHTML=html;
 }
 
-window.addPreset = async function(cat) {
-  const input=document.getElementById('new-preset-'+cat);
-  const name=input.value.trim();
-  if (!name){showToast('Please enter a name');return;}
-  const order=(presets[cat]||[]).length;
-  try {
-    await addDoc(presetsCol,{cat,name,order});
-    input.value=''; showToast('✓ Preset added');
-  } catch(e){showToast('Error — check connection');}
-};
+// addPreset and deletePreset handled via event delegation on #settings-content
 
-window.deletePreset = async function(id) {
-  if (!confirm('Remove this preset?')) return;
-  try { await deleteDoc(doc(db,'presets',id)); showToast('Preset removed'); }
-  catch(e){showToast('Error — check connection');}
-};
+/* ── SETTINGS EVENT DELEGATION ──────────────────────── */
+document.getElementById('settings-content').addEventListener('click', async function(e) {
+  // Toggle category collapse
+  const toggleEl = e.target.closest('[data-toggle-cat]');
+  if (toggleEl) {
+    const cat = toggleEl.dataset.toggleCat;
+    collapsedSettings[cat] = !collapsedSettings[cat];
+    renderSettings();
+    return;
+  }
+  // Delete preset button
+  const delBtn = e.target.closest('[data-delete-preset]');
+  if (delBtn) {
+    const id = delBtn.dataset.deletePreset;
+    if (!confirm('Remove this preset?')) return;
+    try { await deleteDoc(doc(db,'presets',id)); showToast('Preset removed'); }
+    catch(err) { showToast('Error — check connection'); }
+    return;
+  }
+  // Add preset button
+  const addBtn = e.target.closest('[data-add-preset]');
+  if (addBtn) {
+    const cat = addBtn.dataset.addPreset;
+    const input = document.getElementById('new-preset-'+cat);
+    const name = input.value.trim();
+    if (!name) { showToast('Please enter a name'); return; }
+    const order = (presets[cat]||[]).length;
+    try { await addDoc(presetsCol,{cat,name,order}); input.value=''; showToast('✓ Preset added'); }
+    catch(err) { showToast('Error — check connection'); }
+    return;
+  }
+});
+
+// Enter key on preset add inputs
+document.getElementById('settings-content').addEventListener('keydown', async function(e) {
+  if (e.key !== 'Enter') return;
+  const input = e.target.closest('[data-add-cat]');
+  if (!input) return;
+  const cat = input.dataset.addCat;
+  const name = input.value.trim();
+  if (!name) { showToast('Please enter a name'); return; }
+  const order = (presets[cat]||[]).length;
+  try { await addDoc(presetsCol,{cat,name,order}); input.value=''; showToast('✓ Preset added'); }
+  catch(err) { showToast('Error — check connection'); }
+});
 
 /* ── MODAL HELPERS ───────────────────────────────────── */
 window.openModal  = id => document.getElementById(id).classList.add('open');
