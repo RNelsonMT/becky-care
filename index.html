@@ -546,7 +546,25 @@ onSnapshot(logQ, snap => {
   if (currentView==='log')   renderLog();
 }, err => console.error(err));
 
-onSnapshot(presetsCol, async snap => {
+// Seed all presets in one shot before listener starts
+async function seedPresetsIfEmpty() {
+  if (presetsSeeded) return;
+  presetsSeeded = true;
+  const { getDocs } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  const snap = await getDocs(presetsCol);
+  if (!snap.empty) return;
+  setSyncStatus('syncing', 'Loading presets…');
+  let order = 0;
+  for (const [cat, names] of Object.entries(DEFAULT_PRESETS)) {
+    for (const name of names) {
+      await addDoc(presetsCol, { cat, name, order: order++ });
+    }
+  }
+  setSyncStatus('connected', 'Live · synced');
+}
+seedPresetsIfEmpty();
+
+onSnapshot(presetsCol, snap => {
   presets = {};
   Object.keys(CATS).forEach(k => presets[k] = []);
   snap.docs.forEach(d => {
@@ -554,20 +572,6 @@ onSnapshot(presetsCol, async snap => {
     if (presets[data.cat]) presets[data.cat].push({ id:d.id, name:data.name, order:data.order||0 });
   });
   Object.keys(presets).forEach(k => presets[k].sort((a,b) => a.order - b.order));
-
-  // Seed defaults if Firestore presets collection is empty
-  if (!presetsSeeded && snap.empty) {
-    presetsSeeded = true;
-    let order = 0;
-    for (const [cat, names] of Object.entries(DEFAULT_PRESETS)) {
-      for (const name of names) {
-        await addDoc(presetsCol, { cat, name, order: order++ });
-      }
-    }
-  } else {
-    presetsSeeded = true;
-  }
-
   if (currentView==='settings') renderSettings();
 }, err => console.error(err));
 
