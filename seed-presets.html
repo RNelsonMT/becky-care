@@ -114,11 +114,21 @@ window.runSeed = async function() {
   btn.disabled = true; btn.textContent = 'Seeding…';
   statusDiv.style.display = 'block'; logDiv.innerHTML = '';
 
+  // Clear ALL existing presets in multiple passes until collection is empty
   logDiv.innerHTML += '<div class="item">🗑 Clearing existing presets…</div>';
   try {
-    const existing = await getDocs(presetsCol);
-    for (const d of existing.docs) await deleteDoc(doc(db, 'presets', d.id));
-    logDiv.innerHTML += `<div class="item ok">✓ Cleared ${existing.size} existing presets</div>`;
+    let totalCleared = 0;
+    let pass = 0;
+    while (true) {
+      pass++;
+      const existing = await getDocs(presetsCol);
+      if (existing.empty) break;
+      logDiv.innerHTML += `<div class="item">  Pass ${pass}: deleting ${existing.size} docs…</div>`;
+      for (const d of existing.docs) await deleteDoc(doc(db, 'presets', d.id));
+      totalCleared += existing.size;
+      if (pass > 10) break; // safety limit
+    }
+    logDiv.innerHTML += `<div class="item ok">✓ Cleared ${totalCleared} existing presets in ${pass} pass(es)</div>`;
   } catch(e) {
     logDiv.innerHTML += `<div class="item err">✗ Error clearing: ${e.message}</div>`;
   }
