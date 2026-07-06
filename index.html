@@ -470,51 +470,72 @@ const CATS = {
 const DEFAULT_PRESETS = {
   med: [
     // Scheduled
-    'Baclofen 10mg — G tube, bedtime',
-    'CefTRIAXone 2g — IV every 24hr',
-    'Celecoxib 100mg — G tube, bedtime',
-    'Citalopram 40mg — G tube, once daily',
-    'ClonazePAM 0.25mg — G tube, bedtime',
-    'Enoxaparin 40mg — subcutaneous every 24hr',
-    'Famotidine 40mg — PEG tube, once daily',
-    'Gabapentin 600mg — G tube, twice daily',
-    'Gabapentin 900mg — G tube, nightly 9pm',
-    'GuaiFENesin 400mg — G tube, 4x daily',
-    'Melatonin 6mg — feeding tube, bedtime',
-    'Midodrine 5mg — G tube, with lunch',
-    'Multivitamin 15mL — by mouth, noon',
-    'OxyCODONE 5mg — feeding tube, bedtime',
-    'QUEtiapine 25mg — G tube, bedtime',
-    'TraZODone 150mg — G tube, bedtime',
-    'Wheat Dextrin 8g — G tube, once daily',
+    { name:'Baclofen (Lioresal)',         timing:'Scheduled', instructions:'10 mg by G tube daily at bedtime',                              url:'https://connect.medlineplus.gov/application?mainSearchCriteria.v.cs=2.16.840.1.113883.6.88&mainSearchCriteria.v.c=1831&mainSearchCriteria.v.dn=baclofen&knowledgeResponseType=application/json' },
+    { name:'CefTRIAXone (Rocephin)',      timing:'Scheduled', instructions:'2 gram IV every 24 hours',                                       url:'https://connect.medlineplus.gov/application?mainSearchCriteria.v.cs=2.16.840.1.113883.6.88&mainSearchCriteria.v.c=25255&mainSearchCriteria.v.dn=ceftriaxone&knowledgeResponseType=application/json' },
+    { name:'Celecoxib (Celebrex)',        timing:'Scheduled', instructions:'100 mg by G tube daily at bedtime',                              url:'https://medlineplus.gov/druginfo/meds/a699022.html' },
+    { name:'Citalopram (Celexa)',         timing:'Scheduled', instructions:'40 mg by G tube once daily',                                     url:'https://medlineplus.gov/druginfo/meds/a699001.html' },
+    { name:'ClonazePAM (Klonopin)',       timing:'Scheduled', instructions:'0.25 mg by G tube daily at bedtime',                             url:'https://medlineplus.gov/druginfo/meds/a682279.html' },
+    { name:'Enoxaparin (Lovenox)',        timing:'Scheduled', instructions:'40 mg subcutaneously every 24 hours',                            url:'https://medlineplus.gov/druginfo/meds/a696006.html' },
+    { name:'Famotidine (Pepcid)',         timing:'Scheduled', instructions:'40 mg by PEG Tube once daily',                                   url:'https://medlineplus.gov/druginfo/meds/a687011.html' },
+    { name:'Gabapentin 600mg (Neurontin)',timing:'Scheduled', instructions:'600 mg by feeding tube 2 times daily',                           url:'https://medlineplus.gov/druginfo/meds/a694007.html' },
+    { name:'Gabapentin 900mg (Neurontin)',timing:'Scheduled', instructions:'900 mg by G tube nightly at 9 pm',                               url:'https://medlineplus.gov/druginfo/meds/a694007.html' },
+    { name:'GuaiFENesin (Q-Tussin)',      timing:'Scheduled', instructions:'400 mg by G tube 4 times daily',                                 url:'https://medlineplus.gov/druginfo/meds/a682494.html' },
+    { name:'Melatonin',                   timing:'Scheduled', instructions:'6 mg by feeding tube daily at bedtime',                          url:'https://medlineplus.gov/druginfo/meds/a682045.html' },
+    { name:'Midodrine (Proamatine)',      timing:'Scheduled', instructions:'5 mg by G tube daily with lunch',                                url:'https://medlineplus.gov/druginfo/meds/a697017.html' },
+    { name:'Multivitamin & Mineral',      timing:'Scheduled', instructions:'15 mL by mouth daily at noon',                                   url:'https://medlineplus.gov/druginfo/meds/a601082.html' },
+    { name:'OxyCODONE (Roxicodone)',      timing:'Scheduled', instructions:'5 mg by feeding tube daily at bedtime',                          url:'https://medlineplus.gov/druginfo/meds/a682132.html' },
+    { name:'QUEtiapine (Seroquel)',       timing:'Scheduled', instructions:'25 mg by G tube daily at bedtime',                               url:'https://medlineplus.gov/druginfo/meds/a698019.html' },
+    { name:'TraZODone 150mg (Desyrel)',   timing:'Scheduled', instructions:'150 mg by G tube daily at bedtime',                              url:'https://medlineplus.gov/druginfo/meds/a681038.html' },
+    { name:'Wheat Dextrin (Benefiber)',   timing:'Scheduled', instructions:'8 gram by G tube once daily',                                    url:'https://medlineplus.gov/druginfo/meds/a601112.html' },
     // As Needed
-    'Acetaminophen 650mg — PRN pain (1st)',
-    'Baclofen 5mg — PRN spasms',
-    'Balsam Peru/Castor Oil — PRN dry skin',
-    'Bisacodyl 10mg — PRN constipation',
-    'Carboxymethylcellulose 0.5% — PRN dry eyes',
-    'Celecoxib 100mg — PRN pain (1st)',
-    'ClonazePAM 0.25mg — PRN anxiety',
-    'Gabapentin 300mg — PRN 3x daily',
-    'HydrOXYzine 25mg — PRN anxiety/itching',
-    'Lidocaine patch — PRN adjunctive pain',
-    'Lidocaine topical — PRN',
-    'Lidocaine jelly 2% — PRN urethral pain',
-    'Menthol/Methyl Salicylate — PRN pain',
-    'Menthol/Zinc Oxide — PRN topical',
-    'Midodrine 5mg — PRN low BP',
-    'Ondansetron 4mg — PRN nausea',
-    'Ophthalmic Lubricating Ointment — PRN dry eyes',
-    'OxyCODONE 5mg — PRN pain (3rd)',
-    'Phenol — PRN sore throat',
-    'Polyethylene Glycol 17g — PRN constipation',
-    'TraZODone 50mg — PRN insomnia',
-    'Zinc Oxide 40% — PRN irritation/rash',
+    { name:'Acetaminophen (Tylenol)',     timing:'As Needed', instructions:'650 mg by mouth every 6 hrs as needed for pain (1st choice)',    url:'https://medlineplus.gov/druginfo/meds/a681004.html' },
+    { name:'Baclofen 5mg (Lioresal)',     timing:'As Needed', instructions:'5 mg by G tube 2x daily as needed for spasms',                  url:'https://medlineplus.gov/druginfo/meds/a682609.html' },
+    { name:'Balsam Peru/Castor Oil',      timing:'As Needed', instructions:'Topically as needed for dry skin',                               url:'https://medlineplus.gov/druginfo/meds/a601117.html' },
+    { name:'Bisacodyl (Dulcolax)',        timing:'As Needed', instructions:'10 mg rectally daily as needed for constipation',                url:'https://medlineplus.gov/druginfo/meds/a601112.html' },
+    { name:'Carboxymethylcellulose (Refresh Plus)', timing:'As Needed', instructions:'1 drop both eyes 4x daily as needed for dry eyes',    url:'https://medlineplus.gov/druginfo/meds/a606008.html' },
+    { name:'Celecoxib PRN (Celebrex)',    timing:'As Needed', instructions:'100 mg by G tube daily as needed for pain (1st choice)',         url:'https://medlineplus.gov/druginfo/meds/a699022.html' },
+    { name:'ClonazePAM PRN (Klonopin)',   timing:'As Needed', instructions:'0.25 mg by G tube at bedtime as needed for anxiety',             url:'https://medlineplus.gov/druginfo/meds/a682279.html' },
+    { name:'Gabapentin 300mg PRN',        timing:'As Needed', instructions:'300 mg by G tube 3x daily as needed',                           url:'https://medlineplus.gov/druginfo/meds/a694007.html' },
+    { name:'HydrOXYzine (Atarax)',        timing:'As Needed', instructions:'25 mg by mouth every 6 hrs as needed for anxiety/itching',       url:'https://medlineplus.gov/druginfo/meds/a682866.html' },
+    { name:'Lidocaine Patch',             timing:'As Needed', instructions:'1 patch topically every 24 hrs as needed for adjunctive pain',   url:'https://medlineplus.gov/druginfo/meds/a603026.html' },
+    { name:'Lidocaine Topical',           timing:'As Needed', instructions:'Topically as needed',                                            url:'https://medlineplus.gov/druginfo/meds/a603026.html' },
+    { name:'Lidocaine Jelly 2% (Glydo)', timing:'As Needed', instructions:'11 mL into urethra as needed for adjunctive pain',               url:'https://medlineplus.gov/druginfo/meds/a603026.html' },
+    { name:'Menthol/Methyl Salicylate',   timing:'As Needed', instructions:'Topically 3x daily as needed for adjunctive pain',               url:'https://medlineplus.gov/druginfo/meds/a682619.html' },
+    { name:'Menthol/Zinc Oxide',          timing:'As Needed', instructions:'Topically 4x daily as needed',                                   url:'https://medlineplus.gov/druginfo/meds/a682619.html' },
+    { name:'Midodrine PRN (Proamatine)',  timing:'As Needed', instructions:'5 mg by G tube 2x daily as needed for low blood pressure',       url:'https://medlineplus.gov/druginfo/meds/a697017.html' },
+    { name:'Ondansetron ODT',             timing:'As Needed', instructions:'4 mg by G tube every 6 hrs as needed for nausea/vomiting',       url:'https://medlineplus.gov/druginfo/meds/a601209.html' },
+    { name:'Ophthalmic Lubricating Ointment', timing:'As Needed', instructions:'Into both eyes as needed for dry eyes',                     url:'https://medlineplus.gov/druginfo/meds/a606008.html' },
+    { name:'OxyCODONE PRN (Roxicodone)', timing:'As Needed', instructions:'5 mg by G tube every 6 hrs as needed for pain (3rd choice)',     url:'https://medlineplus.gov/druginfo/meds/a682132.html' },
+    { name:'Phenol (Chloraseptic)',       timing:'As Needed', instructions:'By mouth as needed for sore throat',                             url:'https://medlineplus.gov/druginfo/meds/a601117.html' },
+    { name:'Polyethylene Glycol (Miralax)',timing:'As Needed', instructions:'17 gram by feeding tube daily as needed for constipation',      url:'https://medlineplus.gov/druginfo/meds/a601112.html' },
+    { name:'TraZODone 50mg PRN (Desyrel)',timing:'As Needed', instructions:'50 mg by G tube at bedtime as needed for insomnia',              url:'https://medlineplus.gov/druginfo/meds/a681038.html' },
+    { name:'Zinc Oxide 40% (Desitin)',    timing:'As Needed', instructions:'Topically as needed for irritation/rash',                        url:'https://medlineplus.gov/druginfo/meds/a682619.html' },
   ],
-  vent: ['Suction','Cough Assist','Trach Care','HME Change'],
-  feed: ['Bolus Feed','Continuous Feed','Water Flush','Residual Check','Self Feed'],
-  cath: ['Straight Cath','Bowel Program','Output Check'],
-  test: ['SpO2 Check','CO2 Check','Blood Pressure','Temperature','Blood Sugar'],
+  vent: [
+    { name:'Suction',       timing:'', instructions:'', url:'' },
+    { name:'Cough Assist',  timing:'', instructions:'', url:'' },
+    { name:'Trach Care',    timing:'', instructions:'', url:'' },
+    { name:'HME Change',    timing:'', instructions:'', url:'' },
+  ],
+  feed: [
+    { name:'Bolus Feed',      timing:'', instructions:'', url:'' },
+    { name:'Continuous Feed', timing:'', instructions:'', url:'' },
+    { name:'Water Flush',     timing:'', instructions:'', url:'' },
+    { name:'Residual Check',  timing:'', instructions:'', url:'' },
+    { name:'Self Feed',       timing:'', instructions:'', url:'' },
+  ],
+  cath: [
+    { name:'Straight Cath',   timing:'', instructions:'', url:'' },
+    { name:'Bowel Program',   timing:'', instructions:'', url:'' },
+    { name:'Output Check',    timing:'', instructions:'', url:'' },
+  ],
+  test: [
+    { name:'SpO2 Check',    timing:'', instructions:'', url:'' },
+    { name:'CO2 Check',     timing:'', instructions:'', url:'' },
+    { name:'Blood Pressure',timing:'', instructions:'', url:'' },
+    { name:'Temperature',   timing:'', instructions:'', url:'' },
+    { name:'Blood Sugar',   timing:'', instructions:'', url:'' },
+  ],
 };
 
 /* ── STATE ───────────────────────────────────────────── */
@@ -560,9 +581,12 @@ async function seedPresetsIfEmpty() {
   if (!snap.empty) return;
   setSyncStatus('syncing', 'Loading presets…');
   let order = 0;
-  for (const [cat, names] of Object.entries(DEFAULT_PRESETS)) {
-    for (const name of names) {
-      await addDoc(presetsCol, { cat, name, order: order++ });
+  for (const [cat, items] of Object.entries(DEFAULT_PRESETS)) {
+    for (const item of items) {
+      const data = typeof item === 'string'
+        ? { cat, name:item, timing:'', instructions:'', url:'', order:order++ }
+        : { cat, name:item.name, timing:item.timing||'', instructions:item.instructions||'', url:item.url||'', order:order++ };
+      await addDoc(presetsCol, data);
     }
   }
   setSyncStatus('connected', 'Live · synced');
@@ -765,23 +789,63 @@ window.undoLog = async function() {
 };
 
 /* ── PRESET PICKER HELPERS ───────────────────────────── */
-function renderPresetGrid(gridId, inputId, cat) {
+let medFilterState = { add: 'all', quick: 'all' };
+
+function renderPresetGrid(gridId, inputId, cat, context) {
   const grid = document.getElementById(gridId);
   const input = document.getElementById(inputId);
-  const catPresets = presets[cat] || [];
+  let catPresets = presets[cat] || [];
   grid.innerHTML = '';
 
+  // For medications: show Scheduled/As Needed filter tabs
+  if (cat === 'med') {
+    const filterKey = context || 'quick';
+    const activeFilter = medFilterState[filterKey] || 'all';
+    const filterBar = document.createElement('div');
+    filterBar.style.cssText = 'display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap';
+    [['all','All'],['Scheduled','Scheduled'],['As Needed','As Needed']].forEach(([val,lbl]) => {
+      const chip = document.createElement('div');
+      chip.textContent = lbl;
+      chip.style.cssText = `flex-shrink:0;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid ${activeFilter===val?'#1a2e3b':'#d0dde3'};background:${activeFilter===val?'#1a2e3b':'#fff'};color:${activeFilter===val?'#fff':'#1a2e3b'};cursor:pointer;white-space:nowrap`;
+      chip.onclick = () => { medFilterState[filterKey] = val; renderPresetGrid(gridId, inputId, cat, context); };
+      filterBar.appendChild(chip);
+    });
+    grid.appendChild(filterBar);
+    if (activeFilter !== 'all') catPresets = catPresets.filter(p => p.timing === activeFilter);
+  }
+
   catPresets.forEach(p => {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'width:100%;margin-bottom:6px';
     const btn = document.createElement('button');
-    btn.type='button'; btn.className='preset-btn'; btn.textContent=p.name;
+    btn.type='button'; btn.className='preset-btn';
+    btn.style.cssText = 'width:100%;text-align:left;border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:2px;white-space:normal';
+    const nameLine = document.createElement('div');
+    nameLine.style.cssText = 'font-size:13px;font-weight:600';
+    nameLine.textContent = p.name;
+    btn.appendChild(nameLine);
+    if (p.instructions) {
+      const instrLine = document.createElement('div');
+      instrLine.style.cssText = 'font-size:11px;color:#6b8394;padding-left:8px';
+      instrLine.textContent = p.instructions;
+      btn.appendChild(instrLine);
+    }
+    if (p.url) {
+      const link = document.createElement('a');
+      link.href = p.url; link.target = '_blank';
+      link.style.cssText = 'font-size:11px;color:#2a7f7f;font-weight:600;padding-left:8px;text-decoration:none';
+      link.textContent = 'ℹ️ Medication info ↗';
+      link.onclick = e => e.stopPropagation();
+      btn.appendChild(link);
+    }
     btn.onclick = () => {
-      // Deselect all, select this
       grid.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
       input.value = p.name;
       input.style.display = 'none';
     };
-    grid.appendChild(btn);
+    wrap.appendChild(btn);
+    grid.appendChild(wrap);
   });
 
   // Other button
@@ -796,7 +860,6 @@ function renderPresetGrid(gridId, inputId, cat) {
   };
   grid.appendChild(otherBtn);
 
-  // Start with input hidden; show if no presets
   input.style.display = catPresets.length ? 'none' : 'block';
   if (!catPresets.length) input.placeholder = 'Type description…';
 }
@@ -804,13 +867,13 @@ function renderPresetGrid(gridId, inputId, cat) {
 window.updateAddPresets = function() {
   const cat = document.getElementById('add-cat').value;
   document.getElementById('add-name').value = '';
-  renderPresetGrid('add-preset-grid','add-name',cat);
+  renderPresetGrid('add-preset-grid','add-name',cat,'add');
 };
 
 window.updateQuickPresets = function() {
   const cat = document.getElementById('quick-cat').value;
   document.getElementById('quick-name').value = '';
-  renderPresetGrid('quick-preset-grid','quick-name',cat);
+  renderPresetGrid('quick-preset-grid','quick-name',cat,'quick');
 };
 
 /* ── QUICK LOG ───────────────────────────────────────── */
@@ -1052,11 +1115,17 @@ function renderSettings() {
       ${collapsed?'':`<div style="background:#fff;border-radius:0 0 12px 12px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">
         ${catPresets.length===0?'<div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-style:italic">No presets yet — add one below.</div>':''}
         ${catPresets.map(p=>`
-          <div class="preset-list-item" id="preset-row-${p.id}">
-            <span class="preset-list-item-name">${p.name}</span>
-            <div style="display:flex;gap:2px;flex-shrink:0">
-              <button class="preset-edit-btn" data-edit-preset="${p.id}" data-edit-name="${p.name.replace(/"/g,'&quot;')}" title="Edit">✏️</button>
-              <button class="preset-del-btn" data-delete-preset="${p.id}" title="Delete">×</button>
+          <div class="preset-list-item" id="preset-row-${p.id}" style="flex-direction:column;align-items:stretch;gap:4px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="flex:1;min-width:0">
+                <div style="font-size:14px;font-weight:600">${p.name}${p.timing?` <span style="font-size:10px;font-weight:700;border-radius:4px;padding:2px 6px;background:${p.timing==='Scheduled'?'#e8f4fc':'#fef3e2'};color:${p.timing==='Scheduled'?'#1a5a8a':'#a05000'}">${p.timing}</span>`:''}</div>
+                ${p.instructions?`<div style="font-size:11px;color:var(--muted);margin-top:2px;padding-left:8px">${p.instructions}</div>`:''}
+                ${p.url?`<div style="margin-top:3px;padding-left:8px"><a href="${p.url}" target="_blank" style="font-size:11px;color:var(--teal);text-decoration:none;font-weight:600">ℹ️ Medication info ↗</a></div>`:''}
+              </div>
+              <div style="display:flex;gap:2px;flex-shrink:0;align-self:flex-start">
+                <button class="preset-edit-btn" data-edit-preset="${p.id}" data-edit-name="${p.name.replace(/"/g,'&quot;')}" title="Edit">✏️</button>
+                <button class="preset-del-btn" data-delete-preset="${p.id}" title="Delete">×</button>
+              </div>
             </div>
           </div>`).join('')}
         <div class="preset-add-row">

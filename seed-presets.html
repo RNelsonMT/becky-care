@@ -6,7 +6,7 @@
 <style>
   body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f0f4f4; color: #1a2e3b; }
   h1 { font-size: 22px; margin-bottom: 8px; }
-  .status { background: #fff; border-radius: 12px; padding: 20px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+  .status { background: #fff; border-radius: 12px; padding: 20px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.1); max-height:400px; overflow-y:auto; }
   .item { font-size: 13px; padding: 3px 0; border-bottom: 1px solid #f0f4f4; }
   .item.ok { color: #1e7e4c; }
   .item.err { color: #c0392b; }
@@ -17,7 +17,7 @@
 </head>
 <body>
 <h1>🌱 Becky's Care — Preset Seeder</h1>
-<p>Click the button below to load all presets into Firestore. <b>Only run this once after clearing the presets collection.</b></p>
+<p>Click the button below to load all presets into Firestore. This will <b>clear existing presets first</b> then reload all of them.</p>
 <button id="seedBtn" onclick="runSeed()">Seed All Presets Now</button>
 <div class="status" id="status" style="display:none">
   <div id="log"></div>
@@ -43,67 +43,67 @@ const presetsCol = collection(db, 'presets');
 
 const PRESETS = [
   // MEDICATIONS — Scheduled
-  { cat:'med', name:'Baclofen 10mg — G tube, bedtime' },
-  { cat:'med', name:'CefTRIAXone 2g — IV every 24hr' },
-  { cat:'med', name:'Celecoxib 100mg — G tube, bedtime' },
-  { cat:'med', name:'Citalopram 40mg — G tube, once daily' },
-  { cat:'med', name:'ClonazePAM 0.25mg — G tube, bedtime' },
-  { cat:'med', name:'Enoxaparin 40mg — subcutaneous every 24hr' },
-  { cat:'med', name:'Famotidine 40mg — PEG tube, once daily' },
-  { cat:'med', name:'Gabapentin 600mg — G tube, twice daily' },
-  { cat:'med', name:'Gabapentin 900mg — G tube, nightly 9pm' },
-  { cat:'med', name:'GuaiFENesin 400mg — G tube, 4x daily' },
-  { cat:'med', name:'Melatonin 6mg — feeding tube, bedtime' },
-  { cat:'med', name:'Midodrine 5mg — G tube, with lunch' },
-  { cat:'med', name:'Multivitamin 15mL — by mouth, noon' },
-  { cat:'med', name:'OxyCODONE 5mg — feeding tube, bedtime' },
-  { cat:'med', name:'QUEtiapine 25mg — G tube, bedtime' },
-  { cat:'med', name:'TraZODone 150mg — G tube, bedtime' },
-  { cat:'med', name:'Wheat Dextrin 8g — G tube, once daily' },
+  { cat:'med', timing:'Scheduled', name:'Baclofen (Lioresal)',          instructions:'10 mg by G tube daily at bedtime',                           url:'https://medlineplus.gov/druginfo/meds/a682609.html' },
+  { cat:'med', timing:'Scheduled', name:'CefTRIAXone (Rocephin)',       instructions:'2 gram IV every 24 hours',                                    url:'https://medlineplus.gov/druginfo/meds/a685032.html' },
+  { cat:'med', timing:'Scheduled', name:'Celecoxib (Celebrex)',         instructions:'100 mg by G tube daily at bedtime',                           url:'https://medlineplus.gov/druginfo/meds/a699022.html' },
+  { cat:'med', timing:'Scheduled', name:'Citalopram (Celexa)',          instructions:'40 mg by G tube once daily',                                  url:'https://medlineplus.gov/druginfo/meds/a699001.html' },
+  { cat:'med', timing:'Scheduled', name:'ClonazePAM (Klonopin)',        instructions:'0.25 mg by G tube daily at bedtime',                          url:'https://medlineplus.gov/druginfo/meds/a682279.html' },
+  { cat:'med', timing:'Scheduled', name:'Enoxaparin (Lovenox)',         instructions:'40 mg subcutaneously every 24 hours',                         url:'https://medlineplus.gov/druginfo/meds/a696006.html' },
+  { cat:'med', timing:'Scheduled', name:'Famotidine (Pepcid)',          instructions:'40 mg by PEG Tube once daily',                                url:'https://medlineplus.gov/druginfo/meds/a687011.html' },
+  { cat:'med', timing:'Scheduled', name:'Gabapentin 600mg (Neurontin)', instructions:'600 mg by feeding tube 2 times daily',                        url:'https://medlineplus.gov/druginfo/meds/a694007.html' },
+  { cat:'med', timing:'Scheduled', name:'Gabapentin 900mg (Neurontin)', instructions:'900 mg by G tube nightly at 9 pm',                            url:'https://medlineplus.gov/druginfo/meds/a694007.html' },
+  { cat:'med', timing:'Scheduled', name:'GuaiFENesin (Q-Tussin)',       instructions:'400 mg by G tube 4 times daily',                              url:'https://medlineplus.gov/druginfo/meds/a682494.html' },
+  { cat:'med', timing:'Scheduled', name:'Melatonin',                    instructions:'6 mg by feeding tube daily at bedtime',                       url:'https://medlineplus.gov/druginfo/meds/a682045.html' },
+  { cat:'med', timing:'Scheduled', name:'Midodrine (Proamatine)',       instructions:'5 mg by G tube daily with lunch',                             url:'https://medlineplus.gov/druginfo/meds/a697017.html' },
+  { cat:'med', timing:'Scheduled', name:'Multivitamin & Mineral',       instructions:'15 mL by mouth daily at noon',                                url:'https://medlineplus.gov/druginfo/meds/a601082.html' },
+  { cat:'med', timing:'Scheduled', name:'OxyCODONE (Roxicodone)',       instructions:'5 mg by feeding tube daily at bedtime',                       url:'https://medlineplus.gov/druginfo/meds/a682132.html' },
+  { cat:'med', timing:'Scheduled', name:'QUEtiapine (Seroquel)',        instructions:'25 mg by G tube daily at bedtime',                            url:'https://medlineplus.gov/druginfo/meds/a698019.html' },
+  { cat:'med', timing:'Scheduled', name:'TraZODone 150mg (Desyrel)',    instructions:'150 mg by G tube daily at bedtime',                           url:'https://medlineplus.gov/druginfo/meds/a681038.html' },
+  { cat:'med', timing:'Scheduled', name:'Wheat Dextrin (Benefiber)',    instructions:'8 gram by G tube once daily',                                 url:'https://medlineplus.gov/druginfo/meds/a601112.html' },
   // MEDICATIONS — As Needed
-  { cat:'med', name:'Acetaminophen 650mg — PRN pain (1st)' },
-  { cat:'med', name:'Baclofen 5mg — PRN spasms' },
-  { cat:'med', name:'Balsam Peru/Castor Oil — PRN dry skin' },
-  { cat:'med', name:'Bisacodyl 10mg — PRN constipation' },
-  { cat:'med', name:'Carboxymethylcellulose 0.5% — PRN dry eyes' },
-  { cat:'med', name:'Celecoxib 100mg — PRN pain (1st)' },
-  { cat:'med', name:'ClonazePAM 0.25mg — PRN anxiety' },
-  { cat:'med', name:'Gabapentin 300mg — PRN 3x daily' },
-  { cat:'med', name:'HydrOXYzine 25mg — PRN anxiety/itching' },
-  { cat:'med', name:'Lidocaine patch — PRN adjunctive pain' },
-  { cat:'med', name:'Lidocaine topical — PRN' },
-  { cat:'med', name:'Lidocaine jelly 2% — PRN urethral pain' },
-  { cat:'med', name:'Menthol/Methyl Salicylate — PRN pain' },
-  { cat:'med', name:'Menthol/Zinc Oxide — PRN topical' },
-  { cat:'med', name:'Midodrine 5mg — PRN low BP' },
-  { cat:'med', name:'Ondansetron 4mg — PRN nausea' },
-  { cat:'med', name:'Ophthalmic Lubricating Ointment — PRN dry eyes' },
-  { cat:'med', name:'OxyCODONE 5mg — PRN pain (3rd)' },
-  { cat:'med', name:'Phenol — PRN sore throat' },
-  { cat:'med', name:'Polyethylene Glycol 17g — PRN constipation' },
-  { cat:'med', name:'TraZODone 50mg — PRN insomnia' },
-  { cat:'med', name:'Zinc Oxide 40% — PRN irritation/rash' },
+  { cat:'med', timing:'As Needed', name:'Acetaminophen (Tylenol)',      instructions:'650 mg by mouth every 6 hrs as needed for pain (1st choice)', url:'https://medlineplus.gov/druginfo/meds/a681004.html' },
+  { cat:'med', timing:'As Needed', name:'Baclofen 5mg (Lioresal)',      instructions:'5 mg by G tube 2x daily as needed for spasms',                url:'https://medlineplus.gov/druginfo/meds/a682609.html' },
+  { cat:'med', timing:'As Needed', name:'Balsam Peru/Castor Oil',       instructions:'Topically as needed for dry skin',                            url:'https://medlineplus.gov/druginfo/meds/a601117.html' },
+  { cat:'med', timing:'As Needed', name:'Bisacodyl (Dulcolax)',         instructions:'10 mg rectally daily as needed for constipation',             url:'https://medlineplus.gov/druginfo/meds/a601112.html' },
+  { cat:'med', timing:'As Needed', name:'Carboxymethylcellulose (Refresh Plus)', instructions:'1 drop both eyes 4x daily as needed for dry eyes',  url:'https://medlineplus.gov/druginfo/meds/a606008.html' },
+  { cat:'med', timing:'As Needed', name:'Celecoxib PRN (Celebrex)',     instructions:'100 mg by G tube daily as needed for pain (1st choice)',      url:'https://medlineplus.gov/druginfo/meds/a699022.html' },
+  { cat:'med', timing:'As Needed', name:'ClonazePAM PRN (Klonopin)',    instructions:'0.25 mg by G tube at bedtime as needed for anxiety',          url:'https://medlineplus.gov/druginfo/meds/a682279.html' },
+  { cat:'med', timing:'As Needed', name:'Gabapentin 300mg PRN',         instructions:'300 mg by G tube 3x daily as needed',                         url:'https://medlineplus.gov/druginfo/meds/a694007.html' },
+  { cat:'med', timing:'As Needed', name:'HydrOXYzine (Atarax)',         instructions:'25 mg by mouth every 6 hrs as needed for anxiety/itching',    url:'https://medlineplus.gov/druginfo/meds/a682866.html' },
+  { cat:'med', timing:'As Needed', name:'Lidocaine Patch',              instructions:'1 patch topically every 24 hrs as needed for adjunctive pain',url:'https://medlineplus.gov/druginfo/meds/a603026.html' },
+  { cat:'med', timing:'As Needed', name:'Lidocaine Topical',            instructions:'Topically as needed',                                         url:'https://medlineplus.gov/druginfo/meds/a603026.html' },
+  { cat:'med', timing:'As Needed', name:'Lidocaine Jelly 2% (Glydo)',   instructions:'11 mL into urethra as needed for adjunctive pain',            url:'https://medlineplus.gov/druginfo/meds/a603026.html' },
+  { cat:'med', timing:'As Needed', name:'Menthol/Methyl Salicylate',    instructions:'Topically 3x daily as needed for adjunctive pain',            url:'https://medlineplus.gov/druginfo/meds/a682619.html' },
+  { cat:'med', timing:'As Needed', name:'Menthol/Zinc Oxide',           instructions:'Topically 4x daily as needed',                                url:'https://medlineplus.gov/druginfo/meds/a682619.html' },
+  { cat:'med', timing:'As Needed', name:'Midodrine PRN (Proamatine)',   instructions:'5 mg by G tube 2x daily as needed for low blood pressure',    url:'https://medlineplus.gov/druginfo/meds/a697017.html' },
+  { cat:'med', timing:'As Needed', name:'Ondansetron ODT',              instructions:'4 mg by G tube every 6 hrs as needed for nausea/vomiting',    url:'https://medlineplus.gov/druginfo/meds/a601209.html' },
+  { cat:'med', timing:'As Needed', name:'Ophthalmic Lubricating Ointment', instructions:'Into both eyes as needed for dry eyes',                    url:'https://medlineplus.gov/druginfo/meds/a606008.html' },
+  { cat:'med', timing:'As Needed', name:'OxyCODONE PRN (Roxicodone)',   instructions:'5 mg by G tube every 6 hrs as needed for pain (3rd choice)', url:'https://medlineplus.gov/druginfo/meds/a682132.html' },
+  { cat:'med', timing:'As Needed', name:'Phenol (Chloraseptic)',        instructions:'By mouth as needed for sore throat',                          url:'https://medlineplus.gov/druginfo/meds/a601117.html' },
+  { cat:'med', timing:'As Needed', name:'Polyethylene Glycol (Miralax)',instructions:'17 gram by feeding tube daily as needed for constipation',    url:'https://medlineplus.gov/druginfo/meds/a601112.html' },
+  { cat:'med', timing:'As Needed', name:'TraZODone 50mg PRN (Desyrel)', instructions:'50 mg by G tube at bedtime as needed for insomnia',           url:'https://medlineplus.gov/druginfo/meds/a681038.html' },
+  { cat:'med', timing:'As Needed', name:'Zinc Oxide 40% (Desitin)',     instructions:'Topically as needed for irritation/rash',                     url:'https://medlineplus.gov/druginfo/meds/a682619.html' },
   // RESPIRATORY
-  { cat:'vent', name:'Suction' },
-  { cat:'vent', name:'Cough Assist' },
-  { cat:'vent', name:'Trach Care' },
-  { cat:'vent', name:'HME Change' },
+  { cat:'vent', timing:'', name:'Suction',       instructions:'', url:'' },
+  { cat:'vent', timing:'', name:'Cough Assist',  instructions:'', url:'' },
+  { cat:'vent', timing:'', name:'Trach Care',    instructions:'', url:'' },
+  { cat:'vent', timing:'', name:'HME Change',    instructions:'', url:'' },
   // NUTRITION
-  { cat:'feed', name:'Bolus Feed' },
-  { cat:'feed', name:'Continuous Feed' },
-  { cat:'feed', name:'Water Flush' },
-  { cat:'feed', name:'Residual Check' },
-  { cat:'feed', name:'Self Feed' },
+  { cat:'feed', timing:'', name:'Bolus Feed',      instructions:'', url:'' },
+  { cat:'feed', timing:'', name:'Continuous Feed', instructions:'', url:'' },
+  { cat:'feed', timing:'', name:'Water Flush',     instructions:'', url:'' },
+  { cat:'feed', timing:'', name:'Residual Check',  instructions:'', url:'' },
+  { cat:'feed', timing:'', name:'Self Feed',       instructions:'', url:'' },
   // BOWEL & URINE
-  { cat:'cath', name:'Straight Cath' },
-  { cat:'cath', name:'Bowel Program' },
-  { cat:'cath', name:'Output Check' },
+  { cat:'cath', timing:'', name:'Straight Cath',  instructions:'', url:'' },
+  { cat:'cath', timing:'', name:'Bowel Program',  instructions:'', url:'' },
+  { cat:'cath', timing:'', name:'Output Check',   instructions:'', url:'' },
   // TESTING
-  { cat:'test', name:'SpO2 Check' },
-  { cat:'test', name:'CO2 Check' },
-  { cat:'test', name:'Blood Pressure' },
-  { cat:'test', name:'Temperature' },
-  { cat:'test', name:'Blood Sugar' },
+  { cat:'test', timing:'', name:'SpO2 Check',    instructions:'', url:'' },
+  { cat:'test', timing:'', name:'CO2 Check',     instructions:'', url:'' },
+  { cat:'test', timing:'', name:'Blood Pressure',instructions:'', url:'' },
+  { cat:'test', timing:'', name:'Temperature',   instructions:'', url:'' },
+  { cat:'test', timing:'', name:'Blood Sugar',   instructions:'', url:'' },
 ];
 
 window.runSeed = async function() {
@@ -111,43 +111,34 @@ window.runSeed = async function() {
   const statusDiv = document.getElementById('status');
   const logDiv = document.getElementById('log');
   const summaryDiv = document.getElementById('summary');
+  btn.disabled = true; btn.textContent = 'Seeding…';
+  statusDiv.style.display = 'block'; logDiv.innerHTML = '';
 
-  btn.disabled = true;
-  btn.textContent = 'Seeding…';
-  statusDiv.style.display = 'block';
-  logDiv.innerHTML = '';
-
-  // First clear any existing presets
-  logDiv.innerHTML += `<div class="item">🗑 Clearing existing presets…</div>`;
+  logDiv.innerHTML += '<div class="item">🗑 Clearing existing presets…</div>';
   try {
     const existing = await getDocs(presetsCol);
-    for (const d of existing.docs) {
-      await deleteDoc(doc(db, 'presets', d.id));
-    }
+    for (const d of existing.docs) await deleteDoc(doc(db, 'presets', d.id));
     logDiv.innerHTML += `<div class="item ok">✓ Cleared ${existing.size} existing presets</div>`;
   } catch(e) {
     logDiv.innerHTML += `<div class="item err">✗ Error clearing: ${e.message}</div>`;
   }
 
-  // Now seed all presets
   let ok = 0, fail = 0;
   for (let i = 0; i < PRESETS.length; i++) {
     const p = PRESETS[i];
     try {
-      await addDoc(presetsCol, { cat: p.cat, name: p.name, order: i });
+      await addDoc(presetsCol, { ...p, order: i });
       logDiv.innerHTML += `<div class="item ok">✓ [${p.cat}] ${p.name}</div>`;
       ok++;
     } catch(e) {
       logDiv.innerHTML += `<div class="item err">✗ [${p.cat}] ${p.name} — ${e.message}</div>`;
       fail++;
     }
-    // Scroll to bottom as items load
     logDiv.scrollTop = logDiv.scrollHeight;
   }
-
   summaryDiv.innerHTML = fail === 0
     ? `✅ Done! ${ok} presets loaded successfully. You can close this page.`
-    : `⚠ ${ok} succeeded, ${fail} failed. Check errors above.`;
+    : `⚠ ${ok} succeeded, ${fail} failed.`;
   btn.textContent = 'Done';
 };
 </script>
