@@ -612,6 +612,17 @@ function updateClock() {
 }
 setInterval(updateClock,1000); updateClock();
 
+/* back button handler */
+const _origSwitchView = window.switchView;
+function pushViewState(view) { history.pushState({ view }, '', '#' + view); }
+window.switchView = function(view, el) { _origSwitchView(view, el); pushViewState(view); };
+window.addEventListener('popstate', function(e) {
+  const view = e.state?.view || 'today';
+  const tab = document.querySelector('.nav-tab[onclick*=\"' + view + '\"]');
+  if (tab) _origSwitchView(view, tab);
+});
+pushViewState('today');
+
 /* ── NAV ─────────────────────────────────────────────── */
 window.switchView = function(view, el) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
