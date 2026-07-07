@@ -1182,7 +1182,7 @@ document.getElementById('settings-content').addEventListener('click', async func
     if (!name) { showToast('Name cannot be empty'); return; }
     try {
       await setDoc(doc(db,'presets',id), {
-        ...( (() => { const p = Object.values(presets).flat().find(x=>x.id===id); return p ? {cat:p.cat, order:p.order} : {}; })() ),
+        cat: existing?.cat || "", order: existing?.order || 0, timing: existing?.timing || "", instructions: existing?.instructions || "", url: existing?.url || "",
         name
       });
       showToast('✓ Preset updated');
