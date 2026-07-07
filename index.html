@@ -598,7 +598,7 @@ onSnapshot(presetsCol, snap => {
   Object.keys(CATS).forEach(k => presets[k] = []);
   snap.docs.forEach(d => {
     const data = d.data();
-    if (presets[data.cat]) presets[data.cat].push({ id:d.id, name:data.name, order:data.order||0 });
+    if (presets[data.cat]) presets[data.cat].push({ id:d.id, name:data.name, order:data.order||0, timing:data.timing||'', instructions:data.instructions||'', url:data.url||'' });
   });
   Object.keys(presets).forEach(k => presets[k].sort((a,b) => a.order - b.order));
   if (currentView==='settings') renderSettings();
