@@ -64,6 +64,7 @@
   .cat-feed .cat-header{background:#3a2a1a;color:#f0b060}
   .cat-cath .cat-header{background:#2e1a3a;color:#b060f0}
   .cat-test .cat-header{background:#1a2e1a;color:#a0d070}
+  .cat-ther .cat-header{background:#2a1a3a;color:#d090f0}
 
   /* TASK CARDS */
   .task-card{background:#fff;border-left:4px solid transparent;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .1s;position:relative}
@@ -186,7 +187,8 @@
   <div class="nav-tab active" onclick="switchView('today',this)">Today <span class="tab-badge" id="badge-late" style="display:none">0</span></div>
   <div class="nav-tab" onclick="switchView('schedule',this)">Schedule</div>
   <div class="nav-tab" onclick="switchView('log',this)">Log</div>
-  <div class="nav-tab" onclick="switchView('settings',this)">⚙ Settings</div>
+  <div class="nav-tab" onclick="switchView('settings',this)">⚙ Care Items</div>
+  <div class="nav-tab" onclick="switchView('therapy',this)">🏃 Therapy</div>
   <button id="nav-add-btn" onclick="openQuickLog()">+ Add Record</button>
 </div>
 
@@ -220,6 +222,7 @@
       <div class="filter-chip" onclick="filterSched(this,'feed')">🥤 Nutrition</div>
       <div class="filter-chip" onclick="filterSched(this,'cath')">🔵 Bowel</div>
       <div class="filter-chip" onclick="filterSched(this,'test')">🧪 Testing</div>
+      <div class="filter-chip" onclick="filterSched(this,'ther')">🏃 Therapy</div>
     </div>
     <div class="sched-list" id="sched-list"></div>
   </div>
@@ -233,6 +236,7 @@
       <div class="filter-chip" onclick="filterLog(this,'feed')">🥤 Nutrition</div>
       <div class="filter-chip" onclick="filterLog(this,'cath')">🔵 Bowel</div>
       <div class="filter-chip" onclick="filterLog(this,'test')">🧪 Testing</div>
+      <div class="filter-chip" onclick="filterLog(this,'ther')">🏃 Therapy</div>
     </div>
     <div id="log-content"></div>
   </div>
@@ -240,6 +244,11 @@
   <!-- SETTINGS -->
   <div id="view-settings" class="view">
     <div id="settings-content"></div>
+  </div>
+
+  <!-- THERAPY -->
+  <div id="view-therapy" class="view">
+    <div id="therapy-content"></div>
   </div>
 
 </div>
@@ -294,6 +303,7 @@
         <option value="feed">🥤 Nutrition</option>
         <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
+        <option value="ther">🏃 Therapy</option>
       </select>
     </div>
     <div class="form-group">
@@ -360,6 +370,7 @@
         <option value="feed">🥤 Nutrition</option>
         <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
+        <option value="ther">🏃 Therapy</option>
       </select>
     </div>
     <div class="form-group">
@@ -405,6 +416,7 @@
         <option value="feed">🥤 Nutrition</option>
         <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
+        <option value="ther">🏃 Therapy</option>
       </select>
     </div>
     <div class="form-group">
@@ -472,6 +484,7 @@ const CATS = {
   feed: { label:'Nutrition',     icon:'🥤', color:'#e08840', hdrBg:'#3a2a1a', hdrColor:'#f0b060' },
   cath: { label:'Bowel & Urine', icon:'🔵', color:'#9060d0', hdrBg:'#2e1a3a', hdrColor:'#b060f0' },
   test: { label:'Testing',       icon:'🧪', color:'#78b040', hdrBg:'#1a2e1a', hdrColor:'#a0d070' },
+  ther: { label:'Therapy',        icon:'🏃', color:'#9060d0', hdrBg:'#2a1a3a', hdrColor:'#d090f0' },
 };
 
 /* ── DEFAULT PRESETS (seeded to Firestore on first load) ─ */
@@ -536,6 +549,10 @@ const DEFAULT_PRESETS = {
     { name:'Straight Cath',   timing:'', instructions:'', url:'' },
     { name:'Bowel Program',   timing:'', instructions:'', url:'' },
     { name:'Output Check',    timing:'', instructions:'', url:'' },
+  ],
+  ther: [
+    { name:'Physical Therapy',     timing:'', instructions:'', url:'' },
+    { name:'Occupational Therapy', timing:'', instructions:'', url:'' },
   ],
   test: [
     { name:'SpO2 Check',    timing:'', instructions:'', url:'' },
@@ -625,7 +642,7 @@ function pushViewState(view) {
   history.pushState({ view }, '', '#' + view);
 }
 function activateView(view) {
-  const viewMap = { today:0, schedule:1, log:2, settings:3 };
+  const viewMap = { today:0, schedule:1, log:2, settings:3, therapy:4 };
   const tabs = document.querySelectorAll('.nav-tab');
   const idx = viewMap[view];
   if (idx === undefined || !tabs[idx]) return;
@@ -638,6 +655,7 @@ function activateView(view) {
   if (view==='schedule') renderSchedule();
   if (view==='log') renderLog();
   if (view==='settings') renderSettings();
+  if (view==='therapy')  renderTherapy();
 }
 let backPressedOnce = false;
 let backPressTimer = null;
@@ -683,6 +701,7 @@ window.switchView = function(view, el) {
   if (view==='schedule') renderSchedule();
   if (view==='log')      renderLog();
   if (view==='settings') renderSettings();
+  if (view==='therapy')  renderTherapy();
   pushViewState(view);
 };
 
@@ -1150,7 +1169,7 @@ window.deleteLogEntry = async function() {
 };
 
 /* ── SETTINGS VIEW ───────────────────────────────────── */
-let collapsedSettings = { med:true, vent:true, feed:true, cath:true, test:true };
+let collapsedSettings = { med:true, vent:true, feed:true, cath:true, test:true, ther:true };
 
 window.toggleSettingsCat = function(cat) {
   collapsedSettings[cat] = !collapsedSettings[cat];
