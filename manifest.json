@@ -1,0 +1,25 @@
+{
+  "name": "Becky's Care",
+  "short_name": "Becky's Care",
+  "description": "Care tracker for Becky Nelson",
+  "start_url": "/becky-care/",
+  "scope": "/becky-care/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a2e3b",
+  "theme_color": "#1a2e3b",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

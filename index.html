@@ -7,6 +7,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1a2e3b">
 <title>Becky's Care</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Becky's Care">
 <style>
   :root {
     --navy:#1a2e3b; --teal:#2a7f7f; --teal-lt:#3aa8a8; --cream:#f0f4f4;
@@ -33,7 +38,7 @@
 
   /* NAV */
   #nav{background:var(--navy);display:flex;border-top:1px solid #253c4d;overflow-x:auto;scrollbar-width:none;align-items:center}
-  #nav-add-btn{flex-shrink:0;margin-left:auto;margin-right:10px;background:var(--teal);color:#fff;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+  #nav-add-btn{flex-shrink:0;margin-left:auto;margin-right:10px;background:var(--teal);color:#fff;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;letter-spacing:0.2px}
   #nav-add-btn:active{opacity:.75}
   #nav::-webkit-scrollbar{display:none}
   .nav-tab{flex:0 0 auto;padding:10px 14px 8px;font-size:12px;font-weight:600;color:#6b8394;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;user-select:none}
@@ -239,7 +244,7 @@
 
 </div>
 
-<button class="section-fab" id="fab" onclick="openQuickLog()">＋</button>
+
 
 <!-- MODAL: Record Task (from Today tap) -->
 <div class="modal-overlay" id="modal-log">
@@ -615,8 +620,7 @@ function updateClock() {
 }
 setInterval(updateClock,1000); updateClock();
 
-
-/* back button handler */
+/* ── BACK BUTTON HANDLER ─────────────────────────────── */
 function pushViewState(view) {
   history.pushState({ view }, '', '#' + view);
 }
@@ -631,9 +635,9 @@ window.addEventListener('popstate', function(e) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + view).classList.add('active');
     currentView = view;
-    if (view==='today') renderToday();
+    if (view==='today')    renderToday();
     if (view==='schedule') renderSchedule();
-    if (view==='log') renderLog();
+    if (view==='log')      renderLog();
     if (view==='settings') renderSettings();
   }
 });
@@ -859,9 +863,10 @@ function renderPresetGrid(gridId, inputId, cat, context) {
     }
     if (p.url) {
       const link = document.createElement('a');
-      link.href = p.url; link.target = '_blank';
+      link.href = p.url;
+      link.onclick = (e) => { e.stopPropagation(); window.open(p.url, '_blank', 'width=800,height=600,toolbar=1,location=1,scrollbars=1'); return false; };
       link.style.cssText = 'font-size:11px;color:#2a7f7f;font-weight:600;padding-left:8px;text-decoration:none';
-      link.textContent = 'ℹ️ Medication info ↗';
+      link.textContent = 'Medication info ↗';
       link.onclick = e => e.stopPropagation();
       btn.appendChild(link);
     }
@@ -1147,7 +1152,7 @@ function renderSettings() {
               <div style="flex:1;min-width:0">
                 <div style="font-size:14px;font-weight:600">${p.name}${p.timing?` <span style="font-size:10px;font-weight:700;border-radius:4px;padding:2px 6px;background:${p.timing==='Scheduled'?'#e8f4fc':'#fef3e2'};color:${p.timing==='Scheduled'?'#1a5a8a':'#a05000'}">${p.timing}</span>`:''}</div>
                 ${p.instructions?`<div style="font-size:11px;color:var(--muted);margin-top:2px;padding-left:8px">${p.instructions}</div>`:''}
-                ${p.url?`<div style="margin-top:3px;padding-left:8px"><a href="${p.url}" target="_blank" style="font-size:11px;color:var(--teal);text-decoration:none;font-weight:600">ℹ️ Medication info ↗</a></div>`:''}
+                ${p.url?`<div style="margin-top:3px;padding-left:8px"><a href="${p.url}" onclick="window.open('${p.url}','_blank','width=800,height=600,toolbar=1,location=1,scrollbars=1');return false;" style="font-size:11px;color:var(--teal);text-decoration:none;font-weight:600">Medication info ↗</a></div>`:''}
               </div>
               <div style="display:flex;gap:2px;flex-shrink:0;align-self:flex-start">
                 <button class="preset-edit-btn" data-edit-preset="${p.id}" data-edit-name="${p.name.replace(/"/g,'&quot;')}" title="Edit">✏️</button>
@@ -1208,12 +1213,17 @@ document.getElementById('settings-content').addEventListener('click', async func
     const name = input ? input.value.trim() : '';
     if (!name) { showToast('Name cannot be empty'); return; }
     try {
+      const existing = Object.values(presets).flat().find(x=>x.id===id);
       await setDoc(doc(db,'presets',id), {
-        cat: existing?.cat || "", order: existing?.order || 0, timing: existing?.timing || "", instructions: existing?.instructions || "", url: existing?.url || "",
+        cat:          existing?.cat || '',
+        order:        existing?.order || 0,
+        timing:       existing?.timing || '',
+        instructions: existing?.instructions || '',
+        url:          existing?.url || '',
         name
       });
       showToast('✓ Preset updated');
-    } catch(err) { showToast('Error — check connection'); }
+    } catch(err) { console.error(err); showToast('Error — check connection'); }
     return;
   }
   // Cancel edit
@@ -1285,6 +1295,11 @@ function dateLabel(dateStr){
 }
 
 setInterval(()=>{if(currentView==='today')renderToday();},60000);
+
+// Register service worker for PWA offline support
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(err => console.log('SW reg failed:', err));
+}
 
 </script>
 </body>
