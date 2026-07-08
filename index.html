@@ -624,24 +624,32 @@ setInterval(updateClock,1000); updateClock();
 function pushViewState(view) {
   history.pushState({ view }, '', '#' + view);
 }
-window.addEventListener('popstate', function(e) {
-  const view = (e.state && e.state.view) ? e.state.view : 'today';
+function activateView(view) {
   const viewMap = { today:0, schedule:1, log:2, settings:3 };
   const tabs = document.querySelectorAll('.nav-tab');
   const idx = viewMap[view];
-  if (idx !== undefined && tabs[idx]) {
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    tabs[idx].classList.add('active');
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('view-' + view).classList.add('active');
-    currentView = view;
-    if (view==='today')    renderToday();
-    if (view==='schedule') renderSchedule();
-    if (view==='log')      renderLog();
-    if (view==='settings') renderSettings();
+  if (idx === undefined || !tabs[idx]) return;
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  tabs[idx].classList.add('active');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  currentView = view;
+  if (view==='today') renderToday();
+  if (view==='schedule') renderSchedule();
+  if (view==='log') renderLog();
+  if (view==='settings') renderSettings();
+}
+window.addEventListener('popstate', function(e) {
+  const view = (e.state && e.state.view) ? e.state.view : 'today';
+  if (view === 'today') {
+    history.pushState({ view: 'today' }, '', '#today');
+    showToast('Tap back again to exit');
+    return;
   }
+  activateView(view);
 });
 history.replaceState({ view: 'today' }, '', '#today');
+history.pushState({ view: 'today' }, '', '#today');
 
 /* ── NAV ─────────────────────────────────────────────── */
 window.switchView = function(view, el) {
