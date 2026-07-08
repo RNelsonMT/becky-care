@@ -185,10 +185,10 @@
 
 <div id="nav">
   <div class="nav-tab active" onclick="switchView('today',this)">Today <span class="tab-badge" id="badge-late" style="display:none">0</span></div>
+  <div class="nav-tab" onclick="switchView('therapy',this)">🏃 Therapy</div>
   <div class="nav-tab" onclick="switchView('schedule',this)">Schedule</div>
   <div class="nav-tab" onclick="switchView('log',this)">Log</div>
   <div class="nav-tab" onclick="switchView('settings',this)">⚙ Care Items</div>
-  <div class="nav-tab" onclick="switchView('therapy',this)">🏃 Therapy</div>
   <button id="nav-add-btn" onclick="openQuickLog()">+ Add Record</button>
 </div>
 
@@ -645,7 +645,7 @@ function pushViewState(view) {
   history.pushState({ view }, '', '#' + view);
 }
 function activateView(view) {
-  const viewMap = { today:0, schedule:1, log:2, settings:3, therapy:4 };
+  const viewMap = { today:0, therapy:1, schedule:2, log:3, settings:4 };
   const tabs = document.querySelectorAll('.nav-tab');
   const idx = viewMap[view];
   if (idx === undefined || !tabs[idx]) return;
