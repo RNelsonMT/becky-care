@@ -612,16 +612,30 @@ function updateClock() {
 }
 setInterval(updateClock,1000); updateClock();
 
+
 /* back button handler */
-const _origSwitchView = window.switchView;
-function pushViewState(view) { history.pushState({ view }, '', '#' + view); }
-window.switchView = function(view, el) { _origSwitchView(view, el); pushViewState(view); };
+function pushViewState(view) {
+  history.pushState({ view }, '', '#' + view);
+}
 window.addEventListener('popstate', function(e) {
-  const view = e.state?.view || 'today';
-  const tab = document.querySelector('.nav-tab[onclick*=\"' + view + '\"]');
-  if (tab) _origSwitchView(view, tab);
+  const view = (e.state && e.state.view) ? e.state.view : 'today';
+  const viewMap = { today:0, schedule:1, log:2, settings:3 };
+  const tabs = document.querySelectorAll('.nav-tab');
+  const idx = viewMap[view];
+  if (idx !== undefined && tabs[idx]) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    tabs[idx].classList.add('active');
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + view).classList.add('active');
+    document.getElementById('fab').style.display = view === 'today' ? 'flex' : 'none';
+    currentView = view;
+    if (view==='today') renderToday();
+    if (view==='schedule') renderSchedule();
+    if (view==='log') renderLog();
+    if (view==='settings') renderSettings();
+  }
 });
-pushViewState('today');
+history.replaceState({ view: 'today' }, '', '#today');
 
 /* ── NAV ─────────────────────────────────────────────── */
 window.switchView = function(view, el) {
@@ -635,6 +649,7 @@ window.switchView = function(view, el) {
   if (view==='schedule') renderSchedule();
   if (view==='log')      renderLog();
   if (view==='settings') renderSettings();
+  pushViewState(view);
 };
 
 /* ── TODAY VIEW ──────────────────────────────────────── */
