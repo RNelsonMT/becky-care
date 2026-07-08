@@ -639,10 +639,31 @@ function activateView(view) {
   if (view==='log') renderLog();
   if (view==='settings') renderSettings();
 }
+let backPressedOnce = false;
+let backPressTimer = null;
 window.addEventListener('popstate', function(e) {
   const view = (e.state && e.state.view) ? e.state.view : 'today';
-  if (view === 'today') {
+  if (view === 'today' && currentView === 'today') {
+    // On Today tab ? handle double-back to exit
     history.pushState({ view: 'today' }, '', '#today');
+    if (backPressedOnce) {
+      // Second press ? actually exit
+      window.history.go(-(window.history.length));
+      return;
+    }
+    backPressedOnce = true;
+    showToast('Tap back again to exit');
+    backPressTimer = setTimeout(() => { backPressedOnce = false; }, 2500);
+    return;
+  }
+  // On another tab ? go to Today
+  activateView('today');
+  history.replaceState({ view: 'today' }, '', '#today');
+  history.pushState({ view: 'today' }, '', '#today');
+});
+// Seed history stack: [today, today] so first back lands on today handler
+history.replaceState({ view: 'today' }, '', '#today');
+history.pushState({ view: 'today' }, '', '#today');
     showToast('Tap back again to exit');
     return;
   }
