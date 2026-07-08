@@ -214,7 +214,7 @@
 
   <!-- SCHEDULE -->
   <div id="view-schedule" class="view">
-    <button class="add-btn" onclick="openAddSchedule()">＋ Add Care Item</button>
+    <button class="add-btn" onclick="openAddSchedule()">＋ Add Scheduled Item</button>
     <div class="filter-row" id="sched-filter-row">
       <div class="filter-chip active" onclick="filterSched(this,'all')">All</div>
       <div class="filter-chip" onclick="filterSched(this,'med')">💊 Meds</div>
@@ -321,13 +321,15 @@
     </div>
     <div class="form-group">
       <label>Days</label>
-      <select id="add-days">
+      <select id="add-days" onchange="updateDaysUI()">
         <option value="daily">Every day</option>
         <option value="weekday">Weekdays only</option>
         <option value="weekend">Weekends only</option>
         <option value="custom">Select days below</option>
+        <option value="once">One-time (specific date)</option>
       </select>
     </div>
+    <div id="once-date" style="display:none;margin-bottom:14px"><label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6b8394;margin-bottom:5px">Date</label><input type="date" id="add-once-date" style="width:100%;border:1.5px solid #d0dde3;border-radius:8px;padding:10px 12px;font-size:15px;color:#1a2e3b;background:#f0f4f4;outline:none"></div>
     <div id="custom-days" style="display:none;margin-bottom:14px">
       <div style="display:flex;flex-wrap:wrap;gap:8px">
         <label style="display:flex;align-items:center;gap:4px;font-size:13px"><input type="checkbox" value="0"> Sun</label>
@@ -763,6 +765,7 @@ function getDayItems(date) {
     if (s.days==='daily') active=true;
     else if (s.days==='weekday') active=dow>=1&&dow<=5;
     else if (s.days==='weekend') active=dow===0||dow===6;
+    else if (s.days==='once') active=s.onceDate===fmtDate(date);
     else if (Array.isArray(s.customDays)) active=s.customDays.includes(dow);
     if (!active) return;
     (s.times||[]).forEach(t => {
@@ -999,7 +1002,7 @@ function renderSchedule() {
   }
   list.innerHTML=items.map(s=>{
     const cfg=CATS[s.cat];
-    const dayLabel=s.days==='daily'?'Daily':s.days==='weekday'?'Mon–Fri':s.days==='weekend'?'Sat–Sun':'Custom';
+    const dayLabel=s.days==='daily'?'Daily':s.days==='weekday'?'Mon–Fri':s.days==='weekend'?'Sat–Sun':s.days==='once'?(s.onceDate||'One-time'):'Custom';
     return `<div class="sched-item">
       <div class="sched-cat-dot" style="background:${cfg.color}"></div>
       <div class="sched-info">
@@ -1020,6 +1023,8 @@ window.openAddSchedule = function() {
   ['add-dose','add-times'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('add-cat').value='med';
   document.getElementById('add-days').value='daily';
+  if(document.getElementById('add-once-date')) document.getElementById('add-once-date').value='';
+  if(document.getElementById('once-date')) document.getElementById('once-date').style.display='none';
   document.getElementById('add-grace').value='30';
   document.getElementById('custom-days').style.display='none';
   document.querySelectorAll('#custom-days input[type=checkbox]').forEach(cb=>cb.checked=false);
@@ -1066,11 +1071,12 @@ window.saveScheduleItem = async function() {
   const timesRaw=document.getElementById('add-times').value;
   const times=timesRaw.split(',').map(t=>t.trim()).filter(t=>/^\d{1,2}:\d{2}$/.test(t));
   const days=document.getElementById('add-days').value;
+  const onceDate=document.getElementById('add-once-date').value||'';
   let customDays=[];
   if (days==='custom') document.querySelectorAll('#custom-days input[type=checkbox]:checked').forEach(cb=>customDays.push(parseInt(cb.value)));
   const item={cat:document.getElementById('add-cat').value,name,times,days,customDays,
     dose:document.getElementById('add-dose').value.trim(),
-    grace:parseInt(document.getElementById('add-grace').value),updatedAt:serverTimestamp()};
+    grace:parseInt(document.getElementById('add-grace').value),onceDate:onceDate,updatedAt:serverTimestamp()};
   const editId=document.getElementById('edit-id').value;
   try {
     if (editId) await setDoc(doc(db,'schedule',editId),item);
