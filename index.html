@@ -32,7 +32,9 @@
   #date-display{font-size:11px;color:#8aabb8;text-align:right}
 
   /* NAV */
-  #nav{background:var(--navy);display:flex;border-top:1px solid #253c4d;overflow-x:auto;scrollbar-width:none}
+  #nav{background:var(--navy);display:flex;border-top:1px solid #253c4d;overflow-x:auto;scrollbar-width:none;align-items:center}
+  #nav-add-btn{flex-shrink:0;margin-left:auto;margin-right:10px;background:var(--teal);color:#fff;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+  #nav-add-btn:active{opacity:.75}
   #nav::-webkit-scrollbar{display:none}
   .nav-tab{flex:0 0 auto;padding:10px 14px 8px;font-size:12px;font-weight:600;color:#6b8394;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;user-select:none}
   .nav-tab.active{color:var(--teal-lt);border-bottom-color:var(--teal-lt)}
@@ -149,7 +151,7 @@
 
   /* MISC */
   .overdue-strip{background:var(--warn);color:#fff;text-align:center;font-size:12px;font-weight:700;padding:6px}
-  .section-fab{position:fixed;bottom:20px;right:16px;width:52px;height:52px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:26px;box-shadow:0 4px 16px rgba(0,0,0,.25);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:50}
+
   .filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;margin-bottom:4px}
   .filter-row::-webkit-scrollbar{display:none}
   .filter-chip{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:#fff;color:var(--navy);cursor:pointer;white-space:nowrap}
@@ -627,7 +629,6 @@ window.addEventListener('popstate', function(e) {
     tabs[idx].classList.add('active');
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + view).classList.add('active');
-    document.getElementById('fab').style.display = view === 'today' ? 'flex' : 'none';
     currentView = view;
     if (view==='today') renderToday();
     if (view==='schedule') renderSchedule();
@@ -643,7 +644,6 @@ window.switchView = function(view, el) {
   el.classList.add('active');
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-'+view).classList.add('active');
-  document.getElementById('fab').style.display = view==='today' ? 'flex' : 'none';
   currentView = view;
   if (view==='today')    renderToday();
   if (view==='schedule') renderSchedule();
