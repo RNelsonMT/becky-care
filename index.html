@@ -985,9 +985,24 @@ window.openTaskLog = function(schedId,timeStr) {
   const item=schedule.find(s=>s.id===schedId); if (!item) return;
   const dateStr=fmtDate(viewDate);
   const existing=getLogEntry(schedId,timeStr,viewDate);
-  pendingLog={schedId,timeStr,dateStr,name:item.name,cat:item.cat,existingId:existing?.id};
+  pendingLog={schedId,timeStr,dateStr,name:item.name,cat:item.cat,existingId:existing?.id,medList:item.medList||[]};
   document.getElementById('log-modal-title').textContent=item.name;
   document.getElementById('log-modal-sub').textContent=CATS[item.cat].icon+' '+CATS[item.cat].label+' · '+fmt12(timeStr);
+  // Show med group checklist
+  const medGroup=document.getElementById('log-med-group');
+  const medListEl=document.getElementById('log-med-list');
+  if(item.medList&&item.medList.length>0){
+    medGroup.style.display='block';
+    const existingMedLogs=logEntries.filter(e=>e.schedId===schedId&&e.dateStr===fmtDate(viewDate)&&e.medGroup===true);
+    medListEl.innerHTML=item.medList.map((m,i)=>{
+      const logged=existingMedLogs.some(e=>e.name===m.name);
+      return `<div class="med-check-item" onclick="toggleMedCheck(${i})">`+
+        `<div class="med-check-box ${logged?'checked':''}" id="med-check-${i}">${logged?'✓':''}</div>`+
+        `<div style="flex:1"><div class="med-check-name">${m.name}</div>${m.dose?`<div class="med-check-dose">${m.dose}</div>`:''}</div></div>`;
+    }).join('');
+  } else {
+    medGroup.style.display='none';
+  }
   document.getElementById('log-caregiver').value='Ron';
   document.getElementById('log-time').value=nowTime();
   document.getElementById('log-notes').value=existing?.notes||'';
