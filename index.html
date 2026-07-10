@@ -757,6 +757,65 @@ function updateClock() {
 }
 setInterval(updateClock,1000); updateClock();
 
+
+/* med group checklist */
+window.renderAddMedChecklist = function(selectedMeds) {
+  const el = document.getElementById('add-med-checklist'); if(!el) return;
+  const selected = selectedMeds||[];
+  const allMeds = presets['med']||[];
+  const scheduled = allMeds.filter(m=>m.timing==='Scheduled');
+  const asNeeded  = allMeds.filter(m=>m.timing==='As Needed');
+  let html='';
+  [['Scheduled',scheduled],['As Needed',asNeeded]].forEach(([lbl,meds])=>{
+    if(!meds.length) return;
+    html+=`<div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#6b8394;padding:6px 4px 4px">${lbl}</div>`;
+    meds.forEach(m=>{
+      const chk=selected.some(s=>s.name===m.name);
+      html+=`<label style="display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer"><input type="checkbox" value="${m.name}" data-dose="${m.instructions||''}" ${chk?'checked':''} style="width:16px;height:16px;accent-color:#2a7f7f;cursor:pointer"><div><div style="font-size:13px;font-weight:500">${m.name}</div>${m.instructions?`<div style="font-size:11px;color:#6b8394">${m.instructions}</div>`:''}</div></label>`;
+    });
+  });
+  el.innerHTML=html||'<div style="font-size:12px;color:#6b8394;padding:8px">No medication presets found.</div>';
+};
+
+window.toggleMedCheck = function(idx) {
+  const box=document.getElementById('med-check-'+idx); if(!box) return;
+  const checked=box.classList.toggle('checked'); box.textContent=checked?'✓':'';
+};
+window.markAllMeds = function() {
+  document.querySelectorAll('.med-check-box').forEach(b=>{b.classList.add('checked');b.textContent='✓';});
+};
+
+async function seedMedGroupsIfNeeded() {
+  if(schedule.some(s=>s.cat==='med'&&s.medList&&s.medList.length>0)) return;
+  const groups=[
+    {name:'Morning Meds',times:['08:00'],medList:[
+      {name:'Citalopram (Celexa)',dose:'40 mg by G tube once daily'},
+      {name:'Gabapentin 600mg (Neurontin)',dose:'600 mg by feeding tube'},
+      {name:'GuaiFENesin (Q-Tussin)',dose:'400 mg (20 mL) by G tube'},
+      {name:'Multivitamin & Mineral',dose:'15 mL by mouth'},
+      {name:'Wheat Dextrin (Benefiber)',dose:'8 gram (2 packets) by G tube'},
+    ]},
+    {name:'Afternoon Meds',times:['12:00'],medList:[
+      {name:'Gabapentin 600mg (Neurontin)',dose:'600 mg by feeding tube'},
+      {name:'GuaiFENesin (Q-Tussin)',dose:'400 mg (20 mL) by G tube'},
+    ]},
+    {name:'Evening Meds',times:['18:00'],medList:[
+      {name:'GuaiFENesin (Q-Tussin)',dose:'400 mg (20 mL) by G tube'},
+    ]},
+    {name:'Bedtime Meds',times:['21:00'],medList:[
+      {name:'Baclofen (Lioresal)',dose:'10 mg by G tube'},
+      {name:'ClonazePAM (Klonopin)',dose:'0.25 mg (half tablet) by G tube'},
+      {name:'Gabapentin 900mg (Neurontin)',dose:'900 mg (18 mL) by G tube'},
+      {name:'GuaiFENesin (Q-Tussin)',dose:'400 mg (20 mL) by G tube'},
+      {name:'TraZODone 150mg (Desyrel)',dose:'150 mg by G tube'},
+    ]},
+  ];
+  for(const g of groups){
+    await addDoc(schedCol,{...g,cat:'med',dose:'',days:'daily',customDays:[],onceDate:'',grace:30,updatedAt:serverTimestamp()});
+  }
+  showToast('✓ Medication groups added');
+}
+
 /* ── BACK BUTTON HANDLER ─────────────────────────────── */
 function pushViewState(view) {
   history.pushState({ view }, '', '#' + view);
