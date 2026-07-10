@@ -155,6 +155,30 @@
   .preset-add-btn{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
   .cat-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;border-radius:6px;padding:3px 8px;margin-bottom:8px}
 
+  /* CONTACTS */
+  .contact-card{background:#fff;border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);cursor:pointer;transition:background .1s}
+  .contact-card:active{background:#f0f4f4}
+  .contact-name{font-size:15px;font-weight:700}
+  .contact-role{font-size:12px;color:var(--teal);font-weight:600;margin-top:1px}
+  .contact-detail{font-size:12px;color:var(--muted);margin-top:3px}
+  .contact-cat-header{display:flex;align-items:center;justify-content:space-between;padding:8px 4px;margin-bottom:4px;margin-top:12px;border-bottom:1px solid var(--border)}
+  .contact-cat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+  .contact-children{margin-left:16px;border-left:2px solid var(--border);padding-left:12px;margin-bottom:8px}
+
+  /* TODO */
+  .todo-item{background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  .todo-item.done{opacity:.5}
+  .todo-check{width:24px;height:24px;flex-shrink:0;border-radius:50%;border:2.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;transition:all .15s;margin-top:1px}
+  .todo-item.done .todo-check{background:var(--ok);border-color:var(--ok);color:#fff}
+  .todo-text{flex:1;font-size:14px;line-height:1.4}
+  .todo-item.done .todo-text{text-decoration:line-through;color:var(--muted)}
+  .todo-meta{font-size:11px;color:var(--muted);margin-top:2px}
+  .todo-del{background:none;border:none;color:var(--warn);font-size:16px;cursor:pointer;padding:0 2px;flex-shrink:0}
+  .todo-add-row{display:flex;gap:8px;margin-bottom:14px}
+  .todo-add-row input{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:15px;font-family:var(--font-ui);color:var(--navy);background:var(--cream);outline:none}
+  .todo-add-row input:focus{border-color:var(--teal)}
+  .todo-add-row button{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer}
+
   /* MISC */
   .overdue-strip{background:var(--warn);color:#fff;text-align:center;font-size:12px;font-weight:700;padding:6px}
 
@@ -185,10 +209,12 @@
 
 <div id="nav">
   <div class="nav-tab active" onclick="switchView('today',this)">Today <span class="tab-badge" id="badge-late" style="display:none">0</span></div>
-  <div class="nav-tab" onclick="switchView('therapy',this)">🏃 Therapy</div>
+  <div class="nav-tab" onclick="switchView('therapy',this)">Therapy</div>
   <div class="nav-tab" onclick="switchView('schedule',this)">Schedule</div>
   <div class="nav-tab" onclick="switchView('log',this)">Log</div>
-  <div class="nav-tab" onclick="switchView('settings',this)">⚙ Care Items</div>
+  <div class="nav-tab" onclick="switchView('contacts',this)">Contacts</div>
+  <div class="nav-tab" onclick="switchView('todo',this)">To-Do</div>
+  <div class="nav-tab" onclick="switchView('settings',this)">Care Items</div>
   <button id="nav-add-btn" onclick="openQuickLog()">+ Add Record</button>
 </div>
 
@@ -251,6 +277,16 @@
     <div id="therapy-content"></div>
   </div>
 
+  <!-- CONTACTS -->
+  <div id="view-contacts" class="view">
+    <div id="contacts-content"></div>
+  </div>
+
+  <!-- TODO -->
+  <div id="view-todo" class="view">
+    <div id="todo-content"></div>
+  </div>
+
 </div>
 
 
@@ -303,7 +339,6 @@
         <option value="feed">🥤 Nutrition</option>
         <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
-        <option value="ther">🏃 Therapy</option>
       </select>
     </div>
     <div class="form-group">
@@ -329,7 +364,10 @@
         <option value="once">One-time (specific date)</option>
       </select>
     </div>
-    <div id="once-date" style="display:none;margin-bottom:14px"><label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6b8394;margin-bottom:5px">Date</label><input type="date" id="add-once-date" style="width:100%;border:1.5px solid #d0dde3;border-radius:8px;padding:10px 12px;font-size:15px;color:#1a2e3b;background:#f0f4f4;outline:none"></div>
+    <div id="once-date" style="display:none;margin-bottom:14px">
+      <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px">Date</label>
+      <input type="date" id="add-once-date" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:15px;font-family:var(--font-ui);color:var(--navy);background:var(--cream);outline:none">
+    </div>
     <div id="custom-days" style="display:none;margin-bottom:14px">
       <div style="display:flex;flex-wrap:wrap;gap:8px">
         <label style="display:flex;align-items:center;gap:4px;font-size:13px"><input type="checkbox" value="0"> Sun</label>
@@ -455,6 +493,56 @@
   </div>
 </div>
 
+<!-- MODAL: Add/Edit Contact -->
+<div class="modal-overlay" id="modal-contact">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3 id="contact-modal-title">Add Contact</h3>
+    <input type="hidden" id="contact-id">
+    <input type="hidden" id="contact-parent-id">
+    <div class="form-group">
+      <label>Category</label>
+      <select id="contact-cat">
+        <option value="Provider">Provider</option>
+        <option value="Vendor">Vendor</option>
+        <option value="Family">Family</option>
+        <option value="Friend">Friend</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="contact-name" placeholder="Full name or business name">
+    </div>
+    <div class="form-group">
+      <label>Role / Title</label>
+      <input type="text" id="contact-role" placeholder="e.g. Case Manager, Physical Therapist…">
+    </div>
+    <div class="form-group">
+      <label>Phone</label>
+      <input type="tel" id="contact-phone" placeholder="(406) 555-0000">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="contact-email" placeholder="email@example.com">
+    </div>
+    <div class="form-group">
+      <label>Address</label>
+      <textarea id="contact-address" placeholder="Street, City, State ZIP" style="min-height:60px"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="contact-notes" placeholder="Additional notes…"></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeModal('modal-contact')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveContact()">Save</button>
+    </div>
+    <div id="contact-delete-row" style="display:none;margin-top:12px;text-align:center">
+      <button onclick="deleteContact()" style="background:none;border:none;color:var(--warn);font-size:13px;cursor:pointer;font-weight:600">🗑 Delete contact</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script type="module">
@@ -475,9 +563,11 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
-const schedCol   = collection(db, 'schedule');
-const logCol     = collection(db, 'log');
-const presetsCol = collection(db, 'presets');
+const schedCol    = collection(db, 'schedule');
+const logCol      = collection(db, 'log');
+const presetsCol  = collection(db, 'presets');
+const contactsCol = collection(db, 'contacts');
+const todosCol    = collection(db, 'todos');
 
 /* ── CATEGORY CONFIG ─────────────────────────────────── */
 const CATS = {
@@ -552,13 +642,6 @@ const DEFAULT_PRESETS = {
     { name:'Bowel Program',   timing:'', instructions:'', url:'' },
     { name:'Output Check',    timing:'', instructions:'', url:'' },
   ],
-  ther: [
-    { name:'Physical Therapy',     timing:'', instructions:'', url:'' },
-    { name:'Occupational Therapy', timing:'', instructions:'', url:'' },
-    { name:'Speech Therapy',        timing:'', instructions:'', url:'' },
-    { name:'Recreational Therapy',  timing:'', instructions:'', url:'' },
-    { name:'Respiratory Therapy',   timing:'', instructions:'', url:'' },
-  ],
   test: [
     { name:'SpO2 Check',    timing:'', instructions:'', url:'' },
     { name:'CO2 Check',     timing:'', instructions:'', url:'' },
@@ -566,12 +649,18 @@ const DEFAULT_PRESETS = {
     { name:'Temperature',   timing:'', instructions:'', url:'' },
     { name:'Blood Sugar',   timing:'', instructions:'', url:'' },
   ],
+  ther: [
+    { name:'Physical Therapy',     timing:'', instructions:'', url:'' },
+    { name:'Occupational Therapy', timing:'', instructions:'', url:'' },
+  ],
 };
 
 /* ── STATE ───────────────────────────────────────────── */
 let schedule   = [];
 let logEntries = [];
-let presets    = {};   // { med: [{id,name}], vent: [...], ... }
+let presets    = {};
+let contacts   = [];
+let todos      = [];
 let viewDate   = new Date();
 let currentView = 'today';
 let collapsedCats = {};
@@ -623,6 +712,18 @@ async function seedPresetsIfEmpty() {
 }
 seedPresetsIfEmpty();
 
+// Contacts listener
+onSnapshot(contactsCol, snap => {
+  contacts = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  if (currentView==='contacts') renderContacts();
+}, err => console.error(err));
+
+// Todos listener
+onSnapshot(query(todosCol, orderBy('createdAt','desc')), snap => {
+  todos = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  if (currentView==='todo') renderTodo();
+}, err => console.error(err));
+
 onSnapshot(presetsCol, snap => {
   presets = {};
   Object.keys(CATS).forEach(k => presets[k] = []);
@@ -642,12 +743,12 @@ function updateClock() {
 }
 setInterval(updateClock,1000); updateClock();
 
-/* back button handler */
+/* ── BACK BUTTON HANDLER ─────────────────────────────── */
 function pushViewState(view) {
   history.pushState({ view }, '', '#' + view);
 }
 function activateView(view) {
-  const viewMap = { today:0, therapy:1, schedule:2, log:3, settings:4 };
+  const viewMap = { today:0, schedule:1, log:2, settings:3, therapy:4 };
   const tabs = document.querySelectorAll('.nav-tab');
   const idx = viewMap[view];
   if (idx === undefined || !tabs[idx]) return;
@@ -657,30 +758,25 @@ function activateView(view) {
   document.getElementById('view-' + view).classList.add('active');
   currentView = view;
   if (view==='today')    renderToday();
-  if (view==='therapy')  renderTherapy();
   if (view==='schedule') renderSchedule();
   if (view==='log')      renderLog();
   if (view==='settings') renderSettings();
 }
-let backPressedOnce = false;
-let backPressTimer = null;
 window.addEventListener('popstate', function(e) {
   const view = (e.state && e.state.view) ? e.state.view : 'today';
-  if (view === 'today' && currentView === 'today') {
+  if (view === 'today') {
+    // Already on today — push state again to prevent exit, show toast
     history.pushState({ view: 'today' }, '', '#today');
-    if (backPressedOnce) { window.history.go(-(window.history.length)); return; }
-    backPressedOnce = true;
     showToast('Tap back again to exit');
-    backPressTimer = setTimeout(() => { backPressedOnce = false; }, 2500);
     return;
   }
-  activateView('today');
-  history.replaceState({ view: 'today' }, '', '#today');
-  history.pushState({ view: 'today' }, '', '#today');
+  activateView(view);
 });
+// Seed two history entries so back from any tab goes to Today first
 history.replaceState({ view: 'today' }, '', '#today');
 history.pushState({ view: 'today' }, '', '#today');
 
+/* ── NAV ─────────────────────────────────────────────── */
 window.switchView = function(view, el) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
@@ -692,6 +788,8 @@ window.switchView = function(view, el) {
   if (view==='log')      renderLog();
   if (view==='settings') renderSettings();
   if (view==='therapy')  renderTherapy();
+  if (view==='contacts') renderContacts();
+  if (view==='todo')     renderTodo();
   pushViewState(view);
 };
 
@@ -867,21 +965,35 @@ function renderPresetGrid(gridId, inputId, cat, context) {
   let catPresets = presets[cat] || [];
   grid.innerHTML = '';
 
-  // For medications: show Scheduled/As Needed filter tabs
+  // For medications: show Scheduled/As Needed buttons first, collapse presets until one is picked
   if (cat === 'med') {
     const filterKey = context || 'quick';
-    const activeFilter = medFilterState[filterKey] || 'all';
+    const activeFilter = medFilterState[filterKey] || '';
     const filterBar = document.createElement('div');
-    filterBar.style.cssText = 'display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap';
-    [['all','All'],['Scheduled','Scheduled'],['As Needed','As Needed']].forEach(([val,lbl]) => {
-      const chip = document.createElement('div');
+    filterBar.style.cssText = 'display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap';
+    [['Scheduled','Scheduled'],['As Needed','As Needed']].forEach(([val,lbl]) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
       chip.textContent = lbl;
-      chip.style.cssText = `flex-shrink:0;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid ${activeFilter===val?'#1a2e3b':'#d0dde3'};background:${activeFilter===val?'#1a2e3b':'#fff'};color:${activeFilter===val?'#fff':'#1a2e3b'};cursor:pointer;white-space:nowrap`;
+      chip.style.cssText = `flex:1;padding:10px;border-radius:10px;font-size:14px;font-weight:700;border:2px solid ${activeFilter===val?'#1a2e3b':'#d0dde3'};background:${activeFilter===val?'#1a2e3b':'#fff'};color:${activeFilter===val?'#fff':'#1a2e3b'};cursor:pointer`;
       chip.onclick = () => { medFilterState[filterKey] = val; renderPresetGrid(gridId, inputId, cat, context); };
       filterBar.appendChild(chip);
     });
     grid.appendChild(filterBar);
-    if (activeFilter !== 'all') catPresets = catPresets.filter(p => p.timing === activeFilter);
+    // If no filter selected yet, show Other button only and return
+    if (!activeFilter) {
+      const otherBtn = document.createElement('button');
+      otherBtn.type='button'; otherBtn.className='preset-btn other-btn'; otherBtn.textContent='+ Other / Type name';
+      otherBtn.onclick = () => {
+        grid.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('selected'));
+        otherBtn.classList.add('selected');
+        input.value = ''; input.style.display = 'block'; input.focus();
+      };
+      grid.appendChild(otherBtn);
+      input.style.display = 'none';
+      return;
+    }
+    catPresets = catPresets.filter(p => p.timing === activeFilter);
   }
 
   catPresets.forEach(p => {
@@ -1008,8 +1120,8 @@ window.openAddSchedule = function() {
   ['add-dose','add-times'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('add-cat').value='med';
   document.getElementById('add-days').value='daily';
-  if(document.getElementById('add-once-date')) document.getElementById('add-once-date').value='';
-  if(document.getElementById('once-date')) document.getElementById('once-date').style.display='none';
+  document.getElementById('add-once-date').value='';
+  document.getElementById('once-date').style.display='none';
   document.getElementById('add-grace').value='30';
   document.getElementById('custom-days').style.display='none';
   document.querySelectorAll('#custom-days input[type=checkbox]').forEach(cb=>cb.checked=false);
@@ -1027,6 +1139,8 @@ window.editItem = function(id) {
   document.getElementById('add-days').value=s.days;
   document.getElementById('add-grace').value=s.grace||30;
   document.getElementById('custom-days').style.display=s.days==='custom'?'block':'none';
+  document.getElementById('once-date').style.display=s.days==='once'?'block':'none';
+  document.getElementById('add-once-date').value=s.onceDate||'';
   document.querySelectorAll('#custom-days input[type=checkbox]').forEach(cb=>{
     cb.checked=(s.customDays||[]).includes(parseInt(cb.value));
   });
@@ -1046,9 +1160,13 @@ window.editItem = function(id) {
   openModal('modal-add');
 };
 
-document.getElementById('add-days').addEventListener('change',function(){
-  document.getElementById('custom-days').style.display=this.value==='custom'?'block':'none';
-});
+window.updateDaysUI = function() {
+  const val = document.getElementById('add-days').value;
+  document.getElementById('custom-days').style.display = val==='custom' ? 'block' : 'none';
+  document.getElementById('once-date').style.display   = val==='once'   ? 'block' : 'none';
+  // Hide times field for one-time if needed
+};
+document.getElementById('add-days').addEventListener('change', updateDaysUI);
 
 window.saveScheduleItem = async function() {
   const name=document.getElementById('add-name').value.trim();
@@ -1056,12 +1174,12 @@ window.saveScheduleItem = async function() {
   const timesRaw=document.getElementById('add-times').value;
   const times=timesRaw.split(',').map(t=>t.trim()).filter(t=>/^\d{1,2}:\d{2}$/.test(t));
   const days=document.getElementById('add-days').value;
-  const onceDate=document.getElementById('add-once-date').value||'';
   let customDays=[];
+  const onceDate=document.getElementById('add-once-date').value||'';
   if (days==='custom') document.querySelectorAll('#custom-days input[type=checkbox]:checked').forEach(cb=>customDays.push(parseInt(cb.value)));
-  const item={cat:document.getElementById('add-cat').value,name,times,days,customDays,
+  const item={cat:document.getElementById('add-cat').value,name,times,days,customDays,onceDate,
     dose:document.getElementById('add-dose').value.trim(),
-    grace:parseInt(document.getElementById('add-grace').value),onceDate:onceDate,updatedAt:serverTimestamp()};
+    grace:parseInt(document.getElementById('add-grace').value),updatedAt:serverTimestamp()};
   const editId=document.getElementById('edit-id').value;
   try {
     if (editId) await setDoc(doc(db,'schedule',editId),item);
@@ -1160,6 +1278,214 @@ window.deleteLogEntry = async function() {
   if (!id||!confirm('Permanently delete this record?')) return;
   try { await deleteDoc(doc(db,'log',id)); closeModal('modal-edit-log'); showToast('Record deleted'); }
   catch(err){showToast('Error — check connection');}
+};
+
+/* ── THERAPY VIEW ────────────────────────────────────── */
+function renderTherapy() {
+  const content = document.getElementById('therapy-content');
+  const items = schedule.filter(s => s.cat === 'ther');
+  const dayItems = getDayItems(viewDate).filter(i => i.cat === 'ther');
+  const logItems = logEntries.filter(e => e.cat === 'ther');
+
+  let html = '<div style="margin-bottom:16px"><h2 style="font-size:17px;font-weight:700">Therapy</h2></div>';
+
+  // Today's therapy items
+  html += '<div class="settings-section"><div class="settings-section-title">Today's Sessions</div>';
+  if (dayItems.length === 0) {
+    html += '<div style="font-size:13px;color:var(--muted);font-style:italic;margin-bottom:12px">No therapy scheduled today.</div>';
+  } else {
+    html += dayItems.map(item => {
+      const status = item.status;
+      const borderColor = {due:'var(--teal)',late:'var(--warn)',soon:'var(--caution)',done:'#b0c0c8',future:'#c8d5da'}[status]||'#c8d5da';
+      const bg = {late:'var(--warn-lt)',soon:'var(--caution-lt)'}[status]||'#fff';
+      const doneBy = item.logEntry ? `<div style="font-size:10px;color:var(--ok);font-weight:600">✓ ${item.logEntry.caregiver} at ${fmt12(item.logEntry.givenTime||item.logEntry.timeStr)}</div>` : '';
+      return `<div style="background:${bg};border-left:4px solid ${borderColor};border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer" onclick="openTaskLog('${item.schedId}','${item.time}')">
+        <div style="font-size:14px;font-weight:600">${item.name}</div>
+        <div style="font-size:12px;color:var(--muted)">${fmt12(item.time)}</div>
+        ${doneBy}
+      </div>`;
+    }).join('');
+  }
+  html += '</div>';
+
+  // Recent therapy log
+  html += '<div class="settings-section"><div class="settings-section-title">Recent Sessions</div>';
+  if (logItems.length === 0) {
+    html += '<div style="font-size:13px;color:var(--muted);font-style:italic">No therapy sessions logged yet.</div>';
+  } else {
+    const recent = logItems.slice(0, 10);
+    html += recent.map(e => `
+      <div class="log-entry" onclick="openEditLog('${e.id}')">
+        <div class="log-entry-time">${e.givenTime ? fmt12(e.givenTime) : '--'}</div>
+        <div class="log-entry-body">
+          <div class="log-entry-name">🏃 ${e.name}</div>
+          <div class="log-entry-meta">By ${e.caregiver||'Unknown'} · ${dateLabel(e.dateStr||'')}</div>
+          ${e.notes ? `<div class="log-entry-note">${e.notes}</div>` : ''}
+        </div>
+        <div class="log-edit-btn">✏️</div>
+      </div>`).join('');
+  }
+  html += '</div>';
+  content.innerHTML = html;
+}
+
+/* ── CONTACTS VIEW ──────────────────────────────────── */
+const CONTACT_CATS = ['Provider','Vendor','Family','Friend'];
+
+function renderContacts() {
+  const el = document.getElementById('contacts-content');
+  const grouped = {};
+  CONTACT_CATS.forEach(c => grouped[c] = []);
+  // Top-level contacts (no parentId)
+  contacts.filter(c => !c.parentId).forEach(c => {
+    if (grouped[c.cat]) grouped[c.cat].push(c);
+  });
+
+  let html = `<div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+    <h2 style="font-size:17px;font-weight:700">Contacts</h2>
+    <button onclick="openContactModal()" style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>
+  </div>`;
+
+  CONTACT_CATS.forEach(cat => {
+    const items = grouped[cat];
+    if (!items.length) return;
+    html += `<div class="contact-cat-header"><span class="contact-cat-label">${cat}</span></div>`;
+    items.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
+      const children = contacts.filter(x => x.parentId === c.id);
+      html += `<div class="contact-card" onclick="openContactModal('${c.id}')">
+        <div class="contact-name">${c.name}</div>
+        ${c.role ? `<div class="contact-role">${c.role}</div>` : ''}
+        ${c.phone ? `<div class="contact-detail">📞 <a href="tel:${c.phone}" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">${c.phone}</a></div>` : ''}
+        ${c.email ? `<div class="contact-detail">✉️ <a href="mailto:${c.email}" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">${c.email}</a></div>` : ''}
+        ${c.address ? `<div class="contact-detail">📍 ${c.address}</div>` : ''}
+        ${c.notes ? `<div class="contact-detail" style="font-style:italic">${c.notes}</div>` : ''}
+        ${children.length ? `<button onclick="event.stopPropagation();openContactModal(null,'${c.id}')" style="margin-top:8px;background:none;border:1.5px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--navy)">+ Add individual</button>` : `<button onclick="event.stopPropagation();openContactModal(null,'${c.id}')" style="margin-top:8px;background:none;border:1.5px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--navy)">+ Add individual</button>`}
+      </div>`;
+      if (children.length) {
+        html += `<div class="contact-children">`;
+        children.sort((a,b) => a.name.localeCompare(b.name)).forEach(ch => {
+          html += `<div class="contact-card" onclick="openContactModal('${ch.id}')">
+            <div class="contact-name">${ch.name}</div>
+            ${ch.role ? `<div class="contact-role">${ch.role}</div>` : ''}
+            ${ch.phone ? `<div class="contact-detail">📞 <a href="tel:${ch.phone}" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">${ch.phone}</a></div>` : ''}
+            ${ch.email ? `<div class="contact-detail">✉️ <a href="mailto:${ch.email}" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">${ch.email}</a></div>` : ''}
+            ${ch.notes ? `<div class="contact-detail" style="font-style:italic">${ch.notes}</div>` : ''}
+          </div>`;
+        });
+        html += `</div>`;
+      }
+    });
+  });
+
+  if (!contacts.length) {
+    html += `<div class="empty-state"><div class="empty-icon">👤</div><p>No contacts yet.<br>Tap <b>+ Add</b> to add care providers, vendors, family, and friends.</p></div>`;
+  }
+  el.innerHTML = html;
+}
+
+window.openContactModal = function(id, parentId) {
+  const c = id ? contacts.find(x => x.id === id) : null;
+  document.getElementById('contact-id').value = id || '';
+  document.getElementById('contact-parent-id').value = parentId || (c?.parentId || '');
+  document.getElementById('contact-modal-title').textContent = id ? 'Edit Contact' : 'Add Contact';
+  document.getElementById('contact-cat').value    = c?.cat    || 'Provider';
+  document.getElementById('contact-name').value   = c?.name   || '';
+  document.getElementById('contact-role').value   = c?.role   || '';
+  document.getElementById('contact-phone').value  = c?.phone  || '';
+  document.getElementById('contact-email').value  = c?.email  || '';
+  document.getElementById('contact-address').value= c?.address|| '';
+  document.getElementById('contact-notes').value  = c?.notes  || '';
+  document.getElementById('contact-delete-row').style.display = id ? 'block' : 'none';
+  openModal('modal-contact');
+};
+
+window.saveContact = async function() {
+  const name = document.getElementById('contact-name').value.trim();
+  if (!name) { showToast('Name is required'); return; }
+  const id       = document.getElementById('contact-id').value;
+  const parentId = document.getElementById('contact-parent-id').value;
+  const data = {
+    cat:      document.getElementById('contact-cat').value,
+    name,
+    role:     document.getElementById('contact-role').value.trim(),
+    phone:    document.getElementById('contact-phone').value.trim(),
+    email:    document.getElementById('contact-email').value.trim(),
+    address:  document.getElementById('contact-address').value.trim(),
+    notes:    document.getElementById('contact-notes').value.trim(),
+    parentId: parentId || '',
+    updatedAt: serverTimestamp(),
+  };
+  try {
+    if (id) await setDoc(doc(db,'contacts',id), data);
+    else { data.createdAt = serverTimestamp(); await addDoc(contactsCol, data); }
+    closeModal('modal-contact'); showToast(id ? '✓ Contact updated' : '✓ Contact added');
+  } catch(e) { showToast('Error — check connection'); console.error(e); }
+};
+
+window.deleteContact = async function() {
+  const id = document.getElementById('contact-id').value;
+  if (!id || !confirm('Delete this contact?')) return;
+  try {
+    await deleteDoc(doc(db,'contacts',id));
+    // Also delete children
+    const children = contacts.filter(c => c.parentId === id);
+    for (const ch of children) await deleteDoc(doc(db,'contacts',ch.id));
+    closeModal('modal-contact'); showToast('Contact deleted');
+  } catch(e) { showToast('Error — check connection'); }
+};
+
+/* ── TODO VIEW ───────────────────────────────────────── */
+function renderTodo() {
+  const el = document.getElementById('todo-content');
+  const open   = todos.filter(t => !t.done);
+  const closed = todos.filter(t => t.done);
+  const all    = [...open, ...closed];
+
+  let html = `<div style="margin-bottom:12px">
+    <h2 style="font-size:17px;font-weight:700;margin-bottom:10px">To-Do</h2>
+    <div class="todo-add-row">
+      <input type="text" id="todo-input" placeholder="Add task or note…" onkeydown="if(event.key==='Enter')addTodo()">
+      <button onclick="addTodo()">Add</button>
+    </div>
+  </div>`;
+
+  if (!all.length) {
+    html += `<div class="empty-state"><div class="empty-icon">✅</div><p>No tasks yet.<br>Add something above.</p></div>`;
+  } else {
+    html += all.map(t => `
+      <div class="todo-item ${t.done?'done':''}">
+        <div class="todo-check" onclick="toggleTodo('${t.id}',${!t.done})">${t.done?'✓':''}</div>
+        <div style="flex:1">
+          <div class="todo-text">${t.text}</div>
+          <div class="todo-meta">${t.addedBy||''}${t.addedBy&&t.createdAt?' · ':''}${t.done&&t.doneBy?'Done by '+t.doneBy:''}${t.doneAt?' · '+dateLabel(t.doneAt):''}</div>
+        </div>
+        <button class="todo-del" onclick="deleteTodo('${t.id}')">×</button>
+      </div>`).join('');
+  }
+  el.innerHTML = html;
+}
+
+window.addTodo = async function() {
+  const input = document.getElementById('todo-input');
+  const text = input?.value.trim();
+  if (!text) return;
+  try {
+    await addDoc(todosCol, { text, done:false, addedBy:'', createdAt:serverTimestamp() });
+    input.value = '';
+    showToast('✓ Added');
+  } catch(e) { showToast('Error — check connection'); }
+};
+
+window.toggleTodo = async function(id, done) {
+  try {
+    await setDoc(doc(db,'todos',id), { done, doneBy:'', doneAt: done ? fmtDate(new Date()) : '' }, { merge:true });
+  } catch(e) { showToast('Error — check connection'); }
+};
+
+window.deleteTodo = async function(id) {
+  if (!confirm('Delete this item?')) return;
+  try { await deleteDoc(doc(db,'todos',id)); }
+  catch(e) { showToast('Error — check connection'); }
 };
 
 /* ── SETTINGS VIEW ───────────────────────────────────── */
