@@ -215,7 +215,7 @@
 
 <div id="nav">
   <div class="nav-tab active" onclick="switchView('today',this)">Today <span class="tab-badge" id="badge-late" style="display:none">0</span></div>
-  <div class="nav-tab" onclick="switchView('therapy',this)">Therapy</div>
+  <div class="nav-tab" onclick="switchView('therapy',this)">Therapy & Medical</div>
   <div class="nav-tab" onclick="switchView('schedule',this)">Schedule</div>
   <div class="nav-tab" onclick="switchView('log',this)">Log</div>
   <div class="nav-tab" onclick="switchView('contacts',this)">Contacts</div>
@@ -350,7 +350,7 @@
         <option value="feed">🥤 Nutrition</option>
         <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
-        <option value="ther">🏃 Therapy</option>
+        <option value="ther">🏃 Therapy & Medical</option>
       </select>
     </div>
     <div class="form-group">
@@ -423,7 +423,7 @@
         <option value="feed">🥤 Nutrition</option>
         <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
-        <option value="ther">🏃 Therapy</option>
+        <option value="ther">🏃 Therapy & Medical</option>
       </select>
     </div>
     <div class="form-group">
@@ -469,7 +469,7 @@
         <option value="feed">🥤 Nutrition</option>
         <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
-        <option value="ther">🏃 Therapy</option>
+        <option value="ther">🏃 Therapy & Medical</option>
       </select>
     </div>
     <div class="form-group">
@@ -589,7 +589,7 @@ const CATS = {
   feed: { label:'Nutrition',     icon:'🥤', color:'#e08840', hdrBg:'#3a2a1a', hdrColor:'#f0b060' },
   cath: { label:'Bowel & Urine', icon:'🔵', color:'#9060d0', hdrBg:'#2e1a3a', hdrColor:'#b060f0' },
   test: { label:'Testing',       icon:'🧪', color:'#78b040', hdrBg:'#1a2e1a', hdrColor:'#a0d070' },
-  ther: { label:'Therapy',        icon:'🏃', color:'#9060d0', hdrBg:'#2a1a3a', hdrColor:'#d090f0' },
+  ther: { label:'Therapy & Medical',        icon:'🏃', color:'#9060d0', hdrBg:'#2a1a3a', hdrColor:'#d090f0' },
 };
 
 /* ── DEFAULT PRESETS (seeded to Firestore on first load) ─ */
