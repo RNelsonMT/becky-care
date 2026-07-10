@@ -155,6 +155,12 @@
   .preset-add-btn{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
   .cat-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;border-radius:6px;padding:3px 8px;margin-bottom:8px}
 
+  .med-check-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:var(--cream);margin-bottom:5px;cursor:pointer}
+  .med-check-box{width:22px;height:22px;border-radius:5px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .15s}
+  .med-check-box.checked{background:var(--ok);border-color:var(--ok);color:#fff}
+  .med-check-name{font-size:13px;font-weight:500;flex:1}
+  .med-check-dose{font-size:11px;color:var(--muted)}
+  .mark-all-btn{width:100%;padding:11px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px}
   /* CONTACTS */
   .contact-card{background:#fff;border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);cursor:pointer;transition:background .1s}
   .contact-card:active{background:#f0f4f4}
@@ -297,6 +303,11 @@
     <div class="modal-handle"></div>
     <h3 id="log-modal-title">Record Care</h3>
     <div class="modal-sub" id="log-modal-sub"></div>
+    <!-- Med group -->
+    <div id="log-med-group" style="display:none;margin-bottom:14px">
+      <button class="mark-all-btn" onclick="markAllMeds()">✓ Mark All Given</button>
+      <div id="log-med-list"></div>
+    </div>
     <div class="form-group">
       <label>Caregiver</label>
       <select id="log-caregiver">
@@ -350,6 +361,7 @@
       <label>Dose / Detail</label>
       <input type="text" id="add-dose" placeholder="e.g. 1 tab PO, 300mL over 1hr…">
     </div>
+    <div id="add-med-group-section" style="display:none"><div class="form-group"><label>Medications in this group</label><div id="add-med-checklist" style="max-height:200px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;padding:8px;background:var(--cream)"></div></div></div>
     <div class="form-group">
       <label>Scheduled Times (comma-separated 24hr, e.g. 08:00, 20:00)</label>
       <input type="text" id="add-times" placeholder="08:00, 14:00, 20:00">
@@ -676,11 +688,13 @@ function setSyncStatus(state, msg) {
 }
 
 /* ── FIRESTORE LISTENERS ─────────────────────────────── */
+let medGroupsSeeded = false;
 onSnapshot(schedCol, snap => {
   schedule = snap.docs.map(d => ({ id:d.id, ...d.data() }));
   setSyncStatus('connected','Live · synced');
   if (currentView==='today')    renderToday();
   if (currentView==='schedule') renderSchedule();
+  if (!medGroupsSeeded && presetsSeeded) { medGroupsSeeded=true; setTimeout(seedMedGroupsIfNeeded,1500); }
 }, err => { setSyncStatus('error','Connection error'); console.error(err); });
 
 const cutoffTs = Timestamp.fromMillis(Date.now() - 14*86400000);
@@ -1051,6 +1065,8 @@ window.updateAddPresets = function() {
   const cat = document.getElementById('add-cat').value;
   document.getElementById('add-name').value = '';
   renderPresetGrid('add-preset-grid','add-name',cat,'add');
+  const ms=document.getElementById('add-med-group-section');
+  if(ms){ms.style.display=cat==='med'?'block':'none';if(cat==='med')renderAddMedChecklist([]);}
 };
 
 window.updateQuickPresets = function() {
