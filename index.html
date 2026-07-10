@@ -22,22 +22,22 @@
     --font-mono:'JetBrains Mono','Fira Mono',monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  body{font-family:var(--font-ui);background:var(--cream);color:var(--navy);min-height:100dvh;display:flex;flex-direction:column;overflow-x:hidden}
+  body{font-family:var(--font-ui);background:var(--cream);color:var(--navy);min-height:100dvh;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto}
 
   /* SYNC BAR */
-  #sync-bar{background:#253c4d;color:#8aabb8;font-size:11px;text-align:center;padding:3px 8px;display:flex;align-items:center;justify-content:center;gap:6px}
+  #sync-bar{background:#253c4d;color:#8aabb8;font-size:11px;text-align:center;padding:3px 8px;display:flex;align-items:center;justify-content:center;gap:6px;position:sticky;top:0;z-index:102}
   #sync-dot{width:7px;height:7px;border-radius:50%;background:#6b8394;flex-shrink:0;transition:background .3s}
   #sync-dot.connected{background:#4dc896} #sync-dot.error{background:var(--warn)}
 
   /* TOP BAR */
-  #topbar{background:var(--navy);color:#fff;padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+  #topbar{background:var(--navy);color:#fff;padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:26px;z-index:101;box-shadow:0 2px 12px rgba(0,0,0,.25)}
   #topbar h1{font-size:18px;font-weight:700;letter-spacing:-.3px}
   #topbar h1 span{color:var(--teal-lt)}
   #clock{font-family:var(--font-mono);font-size:15px;color:var(--teal-lt);letter-spacing:1px}
   #date-display{font-size:11px;color:#8aabb8;text-align:right}
 
   /* NAV */
-  #nav{background:var(--navy);display:flex;border-top:1px solid #253c4d;overflow-x:auto;scrollbar-width:none;align-items:center}
+  #nav{background:var(--navy);display:flex;border-top:1px solid #253c4d;overflow-x:auto;scrollbar-width:none;align-items:center;position:sticky;top:84px;z-index:100}
   #nav-add-btn{flex-shrink:0;margin-left:auto;margin-right:10px;background:var(--teal);color:#fff;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;letter-spacing:0.2px}
   #nav-add-btn:active{opacity:.75}
   #nav::-webkit-scrollbar{display:none}
@@ -221,6 +221,7 @@
   <div class="nav-tab" onclick="switchView('contacts',this)">Contacts</div>
   <div class="nav-tab" onclick="switchView('todo',this)">To-Do</div>
   <div class="nav-tab" onclick="switchView('settings',this)">Care Items</div>
+  <div class="nav-tab" onclick="switchView('reports',this)">📊 Reports</div>
   <button id="nav-add-btn" onclick="openQuickLog()">+ Add Record</button>
 </div>
 
@@ -291,6 +292,11 @@
   <!-- TODO -->
   <div id="view-todo" class="view">
     <div id="todo-content"></div>
+  </div>
+
+  <!-- REPORTS -->
+  <div id="view-reports" class="view">
+    <div id="reports-content"></div>
   </div>
 
 </div>
@@ -864,6 +870,7 @@ window.switchView = function(view, el) {
   if (view==='therapy')  renderTherapy();
   if (view==='contacts') renderContacts();
   if (view==='todo')     renderTodo();
+  if (view==='reports')  renderReports();
   pushViewState(view);
 };
 
