@@ -1358,7 +1358,229 @@ window.deleteLogEntry = async function() {
   catch(err){showToast('Error — check connection');}
 };
 
-/* ── THERAPY VIEW ────────────────────────────────────── */
+/* ?? REPORTS VIEW ?????????????????????????????????????? */
+let currentReport = null;
+let reportDate    = new Date();
+let reportWeekStart = (() => { const d=new Date(); d.setDate(d.getDate()-d.getDay()); return d; })();
+
+function renderReports() {
+  const el = document.getElementById('reports-content');
+  if (!el) return;
+  if (currentReport) { renderReport(currentReport, el); return; }
+  el.innerHTML = `
+    <h2 style="font-size:17px;font-weight:700;margin-bottom:14px">Reports</h2>
+    <div class="report-card" onclick="openReport('daily')">
+      <div class="report-icon">\u{1F4CB}</div>
+      <div><div class="report-title">Daily Schedule</div>
+      <div class="report-desc">All scheduled items for any day with completion status</div></div>
+      <div style="margin-left:auto;font-size:18px;color:var(--muted)">&rsaquo;</div>
+    </div>
+    <div class="report-card" onclick="openReport('mar')">
+      <div class="report-icon">\u{1F48A}</div>
+      <div><div class="report-title">Medication Administration Record</div>
+      <div class="report-desc">Weekly MAR showing each med given/missed by day</div></div>
+      <div style="margin-left:auto;font-size:18px;color:var(--muted)">&rsaquo;</div>
+    </div>
+    <div class="report-card" onclick="openReport('weekly')">
+      <div class="report-icon">\u{1F4C5}</div>
+      <div><div class="report-title">Weekly Summary</div>
+      <div class="report-desc">Overview of care activities for the week</div></div>
+      <div style="margin-left:auto;font-size:18px;color:var(--muted)">&rsaquo;</div>
+    </div>
+    <div class="report-card" onclick="openReport('handoff')">
+      <div class="report-icon">\u{1F91D}</div>
+      <div><div class="report-title">Caregiver Handoff</div>
+      <div class="report-desc">Shift summary for incoming caregiver</div></div>
+      <div style="margin-left:auto;font-size:18px;color:var(--muted)">&rsaquo;</div>
+    </div>`;
+}
+window.openReport  = function(type) { currentReport=type; if(type==='daily'||type==='handoff') reportDate=new Date(); renderReports(); };
+window.closeReport = function()      { currentReport=null; renderReports(); };
+function renderReport(type,el) {
+  if(type==='daily')   renderDailySchedule(el);
+  if(type==='mar')     renderMAR(el);
+  if(type==='weekly')  renderWeeklySummary(el);
+  if(type==='handoff') renderHandoff(el);
+}
+
+function renderDailySchedule(el) {
+  const items = getDayItems(reportDate);
+  const dateStr = fmtDate(reportDate);
+  const isToday = dateStr === fmtDate(new Date());
+  items.sort((a,b)=>a.scheduledTs-b.scheduledTs);
+  let rows='';
+  items.forEach(item=>{
+    const cfg=CATS[item.cat]||{icon:'*',label:item.cat,color:'#888'};
+    const done=!!item.logEntry;
+    const statusLabel=done
+      ? `<span style="color:var(--ok);font-weight:600">done ${item.logEntry.caregiver} ${fmt12(item.logEntry.givenTime||item.logEntry.timeStr)}</span>`
+      : isToday&&item.status==='late' ? `<span style="color:var(--warn);font-weight:600">Overdue</span>`
+      : `<span style="color:var(--muted)">Pending</span>`;
+    const meds=item.medList&&item.medList.length?`<div style="font-size:10px;color:var(--muted);padding-left:80px">${item.medList.map(m=>m.name).join(', ')}</div>`:'';
+    rows+=`<div><div class="report-row">
+      <div class="report-time">${fmt12(item.time)}</div>
+      <div style="flex:1"><div style="display:flex;align-items:baseline;gap:6px">
+        <span class="report-item-name">${item.name}</span>
+        <span style="font-size:10px;color:${cfg.color};font-weight:700">${cfg.icon} ${cfg.label}</span>
+      </div>${item.dose?`<div class="report-item-detail">${item.dose}</div>`:''}</div>
+      <div class="report-item-status">${statusLabel}</div>
+    </div>${meds}${item.logEntry&&item.logEntry.notes?`<div class="report-note">Note: ${item.logEntry.notes}</div>`:''}</div>`;
+  });
+  el.innerHTML=`
+    <button class="back-to-reports" onclick="closeReport()">&#8249; Reports</button>
+    <div class="report-view">
+      <div class="report-header">
+        <div><h2>Daily Schedule</h2>
+        <div class="report-header-sub">Becky Nelson &middot; ${reportDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</div></div>
+        <button class="print-btn" onclick="window.print()">Print</button>
+      </div>
+      <div class="report-body">
+        <div class="report-date-nav">
+          <button onclick="reportDate=new Date(reportDate.getTime()-86400000);renderReports()">&#8249;</button>
+          <input type="date" value="${dateStr}" onchange="reportDate=new Date(this.value+'T12:00:00');renderReports()">
+          <button onclick="reportDate=new Date(reportDate.getTime()+86400000);renderReports()">&#8250;</button>
+        </div>
+        ${items.length===0?'<div style="text-align:center;padding:32px;color:var(--muted)">No items scheduled.</div>':rows}
+        <div style="margin-top:16px;font-size:11px;color:var(--muted);text-align:center">${items.filter(i=>i.logEntry).length} of ${items.length} items completed</div>
+      </div>
+    </div>`;
+}
+
+function renderMAR(el) {
+  const weekStart=new Date(reportWeekStart);
+  const days=Array.from({length:7},(_,i)=>{const d=new Date(weekStart);d.setDate(d.getDate()+i);return d;});
+  const dayLabels=days.map(d=>d.toLocaleDateString('en-US',{weekday:'short',month:'numeric',day:'numeric'}));
+  const medItems=schedule.filter(s=>s.cat==='med');
+  let tableRows='';
+  medItems.sort((a,b)=>((a.times||[''])[0]).localeCompare((b.times||[''])[0])).forEach(s=>{
+    let cells='';
+    days.forEach(day=>{
+      const dow=day.getDay();
+      let active=false;
+      if(s.days==='daily') active=true;
+      else if(s.days==='weekday') active=dow>=1&&dow<=5;
+      else if(s.days==='weekend') active=dow===0||dow===6;
+      else if(s.days==='once') active=s.onceDate===fmtDate(day);
+      else if(Array.isArray(s.customDays)) active=s.customDays.includes(dow);
+      if(!active){cells+='<td style="background:#f8f8f8;text-align:center;color:#ccc">-</td>';return;}
+      const logged=(s.times||[]).map(t=>getLogEntry(s.id,t,day)).filter(Boolean);
+      if(logged.length>0){
+        const cg=[...new Set(logged.map(e=>e.caregiver))].join(',');
+        cells+=`<td style="text-align:center"><span style="color:var(--ok);font-weight:700">&#10003;</span><div style="font-size:9px;color:var(--muted)">${cg}</div></td>`;
+      } else {
+        cells+=day>new Date()?'<td style="text-align:center;color:#ccc">&#183;</td>':'<td style="text-align:center;color:var(--warn);font-weight:700">&#10007;</td>';
+      }
+    });
+    const times=(s.times||[]).map(fmt12).join(', ');
+    tableRows+=`<tr><td><div style="font-weight:600">${s.name}</div><div style="font-size:10px;color:var(--muted)">${times}</div></td>${cells}</tr>`;
+  });
+  el.innerHTML=`
+    <button class="back-to-reports" onclick="closeReport()">&#8249; Reports</button>
+    <div class="report-view">
+      <div class="report-header">
+        <div><h2>Medication Administration Record</h2>
+        <div class="report-header-sub">Becky Nelson &middot; Week of ${weekStart.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div></div>
+        <button class="print-btn" onclick="window.print()">Print</button>
+      </div>
+      <div class="report-body">
+        <div class="report-week-nav">
+          <button onclick="reportWeekStart=new Date(reportWeekStart.getTime()-7*86400000);renderReports()">&#8249; Prev</button>
+          <div style="flex:1;text-align:center;font-size:13px;font-weight:600">${weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'})} - ${days[6].toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
+          <button onclick="reportWeekStart=new Date(reportWeekStart.getTime()+7*86400000);renderReports()">Next &#8250;</button>
+        </div>
+        ${medItems.length===0?'<div style="text-align:center;padding:32px;color:var(--muted)">No medications scheduled.</div>'
+          :`<div style="overflow-x:auto"><table class="mar-grid"><thead><tr><th>Medication</th>${dayLabels.map(l=>`<th>${l}</th>`).join('')}</tr></thead><tbody>${tableRows}</tbody></table></div>`}
+        <div style="margin-top:12px;font-size:11px;color:var(--muted)">&#10003; Given &middot; &#10007; Missed &middot; &middot; Future &middot; - Not scheduled</div>
+      </div>
+    </div>`;
+}
+
+function renderWeeklySummary(el) {
+  const weekStart=new Date(reportWeekStart);
+  const days=Array.from({length:7},(_,i)=>{const d=new Date(weekStart);d.setDate(d.getDate()+i);return d;});
+  const weekEnd=days[6];
+  const weekLogs=logEntries.filter(e=>{const d=e.dateStr||'';return d>=fmtDate(weekStart)&&d<=fmtDate(weekEnd);});
+  let catSummary='';
+  Object.entries(CATS).forEach(([cat,cfg])=>{
+    const catLogs=weekLogs.filter(e=>e.cat===cat&&!e.medGroup);
+    if(!catLogs.length) return;
+    catSummary+=`<div class="report-row"><div class="report-time" style="color:${cfg.color}">${cfg.icon}</div><div style="flex:1;font-weight:600">${cfg.label}</div><div style="font-size:13px;font-weight:700">${catLogs.length} records</div></div>`;
+  });
+  let dayRows='';
+  days.forEach(day=>{
+    const dayStr=fmtDate(day);
+    const dayLogs=weekLogs.filter(e=>(e.dateStr||'')===dayStr);
+    const dayItems=getDayItems(day);
+    const completed=dayItems.filter(i=>i.logEntry).length;
+    const isFuture=day>new Date();
+    dayRows+=`<div class="report-row">
+      <div class="report-time">${day.toLocaleDateString('en-US',{weekday:'short',month:'numeric',day:'numeric'})}</div>
+      <div style="flex:1">${isFuture?'<span style="color:var(--muted)">Future</span>':`<span style="font-weight:600">${completed}/${dayItems.length} scheduled</span><span style="font-size:11px;color:var(--muted)"> &middot; ${dayLogs.length} records</span>`}</div>
+      ${!isFuture?`<div style="font-size:11px;color:var(--muted)">${[...new Set(dayLogs.map(e=>e.caregiver).filter(Boolean))].join(', ')}</div>`:''}
+    </div>`;
+  });
+  el.innerHTML=`
+    <button class="back-to-reports" onclick="closeReport()">&#8249; Reports</button>
+    <div class="report-view">
+      <div class="report-header">
+        <div><h2>Weekly Summary</h2>
+        <div class="report-header-sub">Becky Nelson &middot; ${weekStart.toLocaleDateString('en-US',{month:'long',day:'numeric'})} - ${weekEnd.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div></div>
+        <button class="print-btn" onclick="window.print()">Print</button>
+      </div>
+      <div class="report-body">
+        <div class="report-week-nav">
+          <button onclick="reportWeekStart=new Date(reportWeekStart.getTime()-7*86400000);renderReports()">&#8249; Prev</button>
+          <div style="flex:1;text-align:center;font-size:13px;font-weight:600">${weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'})} - ${weekEnd.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
+          <button onclick="reportWeekStart=new Date(reportWeekStart.getTime()+7*86400000);renderReports()">Next &#8250;</button>
+        </div>
+        <div class="report-section-title">By Category</div>
+        ${catSummary||'<div style="color:var(--muted);font-size:13px">No records this week.</div>'}
+        <div class="report-section-title">By Day</div>
+        ${dayRows}
+        <div style="margin-top:14px;font-size:11px;color:var(--muted);text-align:center">Total records this week: ${weekLogs.length}</div>
+      </div>
+    </div>`;
+}
+
+function renderHandoff(el) {
+  const now=new Date();
+  const dateStr=fmtDate(reportDate);
+  const todayItems=getDayItems(reportDate);
+  const done=todayItems.filter(i=>i.logEntry);
+  const pending=todayItems.filter(i=>!i.logEntry&&i.scheduledTs>now.getTime());
+  const overdue=todayItems.filter(i=>!i.logEntry&&i.scheduledTs<=now.getTime());
+  const recentLogs=logEntries.filter(e=>e.dateStr===dateStr).slice(0,8);
+  const openTodos=todos.filter(t=>!t.done).slice(0,10);
+  el.innerHTML=`
+    <button class="back-to-reports" onclick="closeReport()">&#8249; Reports</button>
+    <div class="report-view">
+      <div class="report-header">
+        <div><h2>Caregiver Handoff</h2>
+        <div class="report-header-sub">Becky Nelson &middot; ${now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})} &middot; ${fmt12(nowTime())}</div></div>
+        <button class="print-btn" onclick="window.print()">Print</button>
+      </div>
+      <div class="report-body">
+        ${overdue.length?`<div class="handoff-section" style="background:#fdf0ef;border-left:4px solid var(--warn)">
+          <div class="handoff-section-title" style="color:var(--warn)">Overdue (${overdue.length})</div>
+          ${overdue.map(i=>`<div class="report-row"><div class="report-time">${fmt12(i.time)}</div><div class="report-item-name">${i.name}</div></div>`).join('')}
+        </div>`:''}
+        <div class="handoff-section">
+          <div class="handoff-section-title">Completed Today (${done.length})</div>
+          ${done.length===0?'<div style="font-size:12px;color:var(--muted)">Nothing completed yet.</div>':
+            done.map(i=>`<div class="report-row"><div class="report-time">${fmt12(i.time)}</div><div style="flex:1;font-weight:600">${i.name}</div><div style="font-size:11px;color:var(--ok)">${i.logEntry.caregiver}</div></div>`).join('')}
+        </div>
+        <div class="handoff-section">
+          <div class="handoff-section-title">Still Pending (${pending.length})</div>
+          ${pending.length===0?'<div style="font-size:12px;color:var(--muted)">All done!</div>':
+            pending.map(i=>`<div class="report-row"><div class="report-time">${fmt12(i.time)}</div><div class="report-item-name">${i.name}</div></div>`).join('')}
+        </div>
+        ${openTodos.length?`<div class="handoff-section"><div class="handoff-section-title">Open To-Do (${openTodos.length})</div>${openTodos.map(t=>`<div class="report-row"><div style="flex:1;font-size:13px">${t.text}</div></div>`).join('')}</div>`:''}
+        <div style="margin-top:16px;font-size:11px;color:var(--muted);text-align:center;border-top:1px solid var(--border);padding-top:10px">Becky's Care &middot; rnelsonmt.github.io/becky-care</div>
+      </div>
+    </div>`;
+}
+
+\n/* ── THERAPY VIEW ────────────────────────────────────── */
 function renderTherapy() {
   const content = document.getElementById('therapy-content');
   const items = schedule.filter(s => s.cat === 'ther');
