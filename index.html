@@ -886,29 +886,9 @@ function renderToday() {
     content.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>No items scheduled.<br>Go to <b>Schedule</b> to add care items.</p></div>`;
     updateOverdueStrip(0); updateBadge(0); return;
   }
-  const groups = {};
-  Object.keys(CATS).forEach(k => groups[k]=[]);
-  dayItems.forEach(i => groups[i.cat].push(i));
-  let lateCount=0, html='';
-  Object.keys(CATS).forEach(cat => {
-    const items=groups[cat]; if (!items.length) return;
-    const cfg=CATS[cat];
-    const catLate=items.filter(i=>i.status==='late').length;
-    lateCount+=catLate;
-    const collapsed=collapsedCats[cat]||false;
-    html+=`<div class="cat-section cat-${cat}">
-      <div class="cat-header" onclick="toggleCat('${cat}')">
-        <span class="cat-icon">${cfg.icon}</span>
-        <span class="cat-title">${cfg.label}</span>
-        ${catLate?`<span class="tab-badge">${catLate} late</span>`:''}
-        <span style="margin-left:auto;font-size:12px;opacity:.7">${collapsed?'▶':'▼'}</span>
-      </div>
-      <div class="cat-body ${collapsed?'collapsed':''}">
-        ${items.map((i,idx) => renderTaskCard(i,now,idx===items.length-1)).join('')}
-      </div>
-    </div>`;
-  });
-  content.innerHTML = html;
+  let lateCount = dayItems.filter(i=>i.status==='late').length;
+  const html = dayItems.map((item,idx) => renderTaskCard(item, now, idx===dayItems.length-1)).join('');
+  content.innerHTML = `<div style="display:flex;flex-direction:column;gap:1px;border-radius:12px;overflow:hidden">${html}</div>`;
   updateOverdueStrip(lateCount); updateBadge(lateCount);
 }
 
