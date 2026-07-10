@@ -642,7 +642,7 @@ function updateClock() {
 }
 setInterval(updateClock,1000); updateClock();
 
-/* ── BACK BUTTON HANDLER ─────────────────────────────── */
+/* back button handler */
 function pushViewState(view) {
   history.pushState({ view }, '', '#' + view);
 }
@@ -656,46 +656,31 @@ function activateView(view) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + view).classList.add('active');
   currentView = view;
-  if (view==='today') renderToday();
-  if (view==='schedule') renderSchedule();
-  if (view==='log') renderLog();
-  if (view==='settings') renderSettings();
+  if (view==='today')    renderToday();
   if (view==='therapy')  renderTherapy();
+  if (view==='schedule') renderSchedule();
+  if (view==='log')      renderLog();
+  if (view==='settings') renderSettings();
 }
 let backPressedOnce = false;
 let backPressTimer = null;
 window.addEventListener('popstate', function(e) {
   const view = (e.state && e.state.view) ? e.state.view : 'today';
   if (view === 'today' && currentView === 'today') {
-    // On Today tab ? handle double-back to exit
     history.pushState({ view: 'today' }, '', '#today');
-    if (backPressedOnce) {
-      // Second press ? actually exit
-      window.history.go(-(window.history.length));
-      return;
-    }
+    if (backPressedOnce) { window.history.go(-(window.history.length)); return; }
     backPressedOnce = true;
     showToast('Tap back again to exit');
     backPressTimer = setTimeout(() => { backPressedOnce = false; }, 2500);
     return;
   }
-  // On another tab ? go to Today
   activateView('today');
   history.replaceState({ view: 'today' }, '', '#today');
   history.pushState({ view: 'today' }, '', '#today');
 });
-// Seed history stack: [today, today] so first back lands on today handler
-history.replaceState({ view: 'today' }, '', '#today');
-history.pushState({ view: 'today' }, '', '#today');
-    showToast('Tap back again to exit');
-    return;
-  }
-  activateView(view);
-});
 history.replaceState({ view: 'today' }, '', '#today');
 history.pushState({ view: 'today' }, '', '#today');
 
-/* ── NAV ─────────────────────────────────────────────── */
 window.switchView = function(view, el) {
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
