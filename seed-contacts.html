@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Seed Contacts</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f0f4f4; color: #1a2e3b; }
+  h1 { font-size: 22px; margin-bottom: 8px; }
+  .status { background: #fff; border-radius: 12px; padding: 20px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.1); max-height:400px; overflow-y:auto; }
+  .item { font-size: 13px; padding: 3px 0; border-bottom: 1px solid #f0f4f4; }
+  .item.ok { color: #1e7e4c; } .item.err { color: #c0392b; }
+  #summary { font-size: 16px; font-weight: 700; margin-top: 16px; }
+  button { background: #2a7f7f; color: #fff; border: none; border-radius: 8px; padding: 14px 28px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 16px; }
+  button:disabled { opacity: 0.5; }
+</style>
+</head>
+<body>
+<h1>🌱 Becky's Care — Contact Seeder</h1>
+<p>Click below to add all contacts to Firestore. <b>This will add new contacts — it does not delete existing ones.</b></p>
+<button id="btn" onclick="runSeed()">Add Contacts Now</button>
+<div class="status" id="status" style="display:none">
+  <div id="log"></div>
+  <div id="summary"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCxPjDCBYFLc2XDqXvHcbGuqMV7265w3HE",
+  authDomain: "care-tracker-383e0.firebaseapp.com",
+  projectId: "care-tracker-383e0",
+  storageBucket: "care-tracker-383e0.firebasestorage.app",
+  messagingSenderId: "696799569086",
+  appId: "1:696799569086:web:08b7e6356a018338a3aaef"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+const col = collection(db, 'contacts');
+
+const TOP_LEVEL = [
+  // ── PROVIDERS ──────────────────────────────────────────
+  { cat:'Provider', name:'Neilsen Rehabilitation Hospital',
+    role:'Inpatient Rehabilitation Facility',
+    phone:'801-646-8900', email:'', address:'85 North Medical Dr, Salt Lake City, UT 84132',
+    notes:'Fax: 801-646-8919. Emergency PMR on-call: 801-581-2267' },
+  { cat:'Provider', name:'Benefis Home Health / Community Care',
+    role:'Home Health Agency',
+    phone:'406-771-6400', email:'', address:'Great Falls, MT',
+    notes:'Fax: 406-771-6445. Direct: 406-771-6429' },
+  { cat:'Provider', name:'Benefis Medical Office Bldg 4',
+    role:'Specialist Clinic Hub',
+    phone:'', email:'', address:'1401 25th Street South, Great Falls, MT',
+    notes:'Multiple specialists located here' },
+  { cat:'Provider', name:'Pacific Source Insurance',
+    role:'Health Insurance',
+    phone:'', email:'', address:'', notes:'' },
+  { cat:'Vendor', name:'Rotech',
+    role:'Oxygen & DME Supplier',
+    phone:'406-452-0202', email:'', address:'Great Falls, MT',
+    notes:'Fax: 406-452-0462. SLC Office: 801-563-0202. Delivering cough assist. Return loaner machine via FedEx to Jeff Shelton RT at Neilsen Rehab.' },
+  { cat:'Vendor', name:'National Seating and Mobility',
+    role:'Home DME Supplier',
+    phone:'801-281-6601', email:'', address:'Murray, UT', notes:'Delivered shower chair, Hoyer lift, drop arm commode' },
+  { cat:'Vendor', name:'Coram / CVS Specialty Nutrition Services',
+    role:'Feeding Pump Supplies',
+    phone:'385-214-3924', email:'', address:'', notes:'Contact: Emily Preib, MD, RD' },
+  { cat:'Vendor', name:'Edgepark Medical Supply',
+    role:'Catheter Supplies',
+    phone:'800-321-0591 x92088', email:'', address:'', notes:'Hollister brand catheters — ships directly to home' },
+  { cat:'Vendor', name:'CVS Caremark Mail Order',
+    role:'Medication Delivery',
+    phone:'', email:'', address:'', notes:'Mail order pharmacy. PCP Blair will manage refills.' },
+  { cat:'Vendor', name:"Sam's Club Pharmacy",
+    role:'Local Pharmacy',
+    phone:'406-453-3466', email:'', address:'Great Falls, MT',
+    notes:'Free home delivery for Plus members or $12/delivery. 1-2 day with same-day through app.' },
+];
+
+const CHILDREN = {
+  'Neilsen Rehabilitation Hospital': [
+    { cat:'Provider', name:'Dr. Chihyung Kevin Park, MD',
+      role:'Attending Physician — Physical Medicine & Rehab',
+      phone:'801-581-2267', email:'', address:'',
+      notes:'NPI: 1497247118. Virtual appts: 7/13 @ 1600, 8/10 @ 1000. In-person: 9/17 @ 1100' },
+    { cat:'Provider', name:'Robin Williamson BSN RN',
+      role:'Case Manager',
+      phone:'801-585-2308', email:'Robin.Williamson@utah.edu', address:'', notes:'' },
+    { cat:'Provider', name:'Jeff Shelton, RT',
+      role:'Respiratory Therapist',
+      phone:'801-581-2267', email:'', address:'85 North Medical Dr, SLC UT 84132',
+      notes:'Return loaner cough assist machine via FedEx to his attention' },
+    { cat:'Provider', name:'McKenna Stapleton, FNP',
+      role:'Nurse Practitioner — PMR Clinic',
+      phone:'801-581-2267', email:'', address:'', notes:'Also covers Primary Care interim 7/9–7/14' },
+  ],
+  'Benefis Home Health / Community Care': [
+    { cat:'Provider', name:'Julie Garza',
+      role:'Home Health Liaison',
+      phone:'406-836-1215', email:'', address:'', notes:'Direct line. Intake appt Monday 7/13' },
+    { cat:'Provider', name:'Amber / Bernie',
+      role:'Home Health RN', phone:'406-771-6400', email:'', address:'', notes:'' },
+    { cat:'Provider', name:'Lori',
+      role:'Speech-Language Therapist (SLT)', phone:'406-771-6400', email:'', address:'', notes:'' },
+    { cat:'Provider', name:'Vickie',
+      role:'Respiratory Therapist', phone:'406-231-3152', email:'', address:'', notes:'' },
+  ],
+  'Benefis Medical Office Bldg 4': [
+    { cat:'Provider', name:'Merhala Balasubramaniam, MD',
+      role:'Pulmonology', phone:'406-455-5346', email:'',
+      address:'1401 25th Street South, Great Falls, MT',
+      notes:'Referred — scheduling directly with Allie (2 weeks)' },
+    { cat:'Provider', name:'Katia Michelotti, PA',
+      role:'ENT', phone:'406-731-8375', email:'',
+      address:'1401 25th Street South OR 1101 26th Street South, Great Falls, MT',
+      notes:'Referred — reviewing referral, will schedule' },
+    { cat:'Provider', name:'Jill Aitken',
+      role:'Audiology', phone:'406-731-8375', email:'',
+      address:'1401 25th Street South, Great Falls, MT',
+      notes:'Referred — will call Allie to schedule' },
+    { cat:'Provider', name:'Lahara',
+      role:'Neurology', phone:'406-455-5000', email:'',
+      address:'1401 25th Street South, Great Falls, MT',
+      notes:'Referred — call to schedule' },
+    { cat:'Provider', name:'Kathleen Blair, DO',
+      role:'Primary Care Physician', phone:'406-731-8888', email:'',
+      address:'Suite 2, Medical Office Bldg 4, 1401 25th Street South, Great Falls, MT',
+      notes:'First appt 7/14 @ 1400. Will manage medication refills.' },
+  ],
+  'Pacific Source Insurance': [
+    { cat:'Vendor', name:'Dave Ellis RN CCM',
+      role:'Case Manager', phone:'406-441-2141', email:'Dave.Ellis@pacificsource.com',
+      address:'', notes:'' },
+  ],
+  'Rotech': [
+    { cat:'Vendor', name:'Gracie Bach',
+      role:'Great Falls Office', phone:'406-452-0202', email:'Gracie.bach@rotech.com',
+      address:'Great Falls, MT',
+      notes:'Call if no contact by Monday 7/13. Taking over care in MT, setting up mask fitting.' },
+  ],
+  'Coram / CVS Specialty Nutrition Services': [
+    { cat:'Vendor', name:'Emily Preib, MD, RD',
+      role:'Registered Dietitian', phone:'385-214-3924', email:'', address:'',
+      notes:'Work with Corem to adjust tube feed amounts and rates to Becky\'s tolerances' },
+  ],
+};
+
+window.runSeed = async function() {
+  const btn = document.getElementById('btn');
+  const statusDiv = document.getElementById('status');
+  const logDiv = document.getElementById('log');
+  const summaryDiv = document.getElementById('summary');
+  btn.disabled = true; btn.textContent = 'Adding…';
+  statusDiv.style.display = 'block';
+
+  let ok = 0, fail = 0;
+  const parentIds = {};
+
+  for (const c of TOP_LEVEL) {
+    try {
+      const ref = await addDoc(col, { ...c, parentId:'', createdAt:serverTimestamp(), updatedAt:serverTimestamp() });
+      parentIds[c.name] = ref.id;
+      logDiv.innerHTML += `<div class="item ok">✓ ${c.name}</div>`;
+      ok++;
+    } catch(e) {
+      logDiv.innerHTML += `<div class="item err">✗ ${c.name} — ${e.message}</div>`;
+      fail++;
+    }
+  }
+
+  for (const [parentName, children] of Object.entries(CHILDREN)) {
+    const parentId = parentIds[parentName];
+    if (!parentId) {
+      logDiv.innerHTML += `<div class="item err">✗ No parent ID for: ${parentName}</div>`;
+      continue;
+    }
+    for (const c of children) {
+      try {
+        await addDoc(col, { ...c, parentId, createdAt:serverTimestamp(), updatedAt:serverTimestamp() });
+        logDiv.innerHTML += `<div class="item ok">✓ ${c.name} → ${parentName}</div>`;
+        ok++;
+      } catch(e) {
+        logDiv.innerHTML += `<div class="item err">✗ ${c.name} — ${e.message}</div>`;
+        fail++;
+      }
+    }
+  }
+
+  summaryDiv.innerHTML = fail === 0
+    ? `✅ Done! ${ok} contacts added successfully.`
+    : `⚠ ${ok} succeeded, ${fail} failed.`;
+  btn.textContent = 'Done';
+};
+</script>
+</body>
+</html>
