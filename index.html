@@ -1417,7 +1417,7 @@ function renderDailySchedule(el) {
     const cfg=CATS[item.cat]||{icon:'*',label:item.cat,color:'#888'};
     const done=!!item.logEntry;
     const statusLabel=done
-      ? `✓ ${item.logEntry.caregiver} at ${fmt12(item.logEntry.givenTime||item.logEntry.timeStr)}`
+      ? 'Done by ' + item.logEntry.caregiver + ' at ' + fmt12(item.logEntry.givenTime||item.logEntry.timeStr)
       : isToday&&item.status==='late' ? 'Overdue' : 'Pending';
     const statusColor=done?'var(--ok)':isToday&&item.status==='late'?'var(--warn)':'var(--muted)';
     const meds=item.medList&&item.medList.length?`<div style="font-size:11px;color:var(--muted);margin-top:2px">${item.medList.map(m=>m.name).join(' · ')}</div>`:'';
