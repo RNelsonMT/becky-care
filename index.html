@@ -1416,23 +1416,20 @@ function renderDailySchedule(el) {
   items.forEach(item=>{
     const cfg=CATS[item.cat]||{icon:'*',label:item.cat,color:'#888'};
     const done=!!item.logEntry;
-    const statusLabel=done
-      ? 'Done by ' + item.logEntry.caregiver + ' at ' + fmt12(item.logEntry.givenTime||item.logEntry.timeStr)
-      : isToday&&item.status==='late' ? 'Overdue' : 'Pending';
-    const statusColor=done?'var(--ok)':isToday&&item.status==='late'?'var(--warn)':'var(--muted)';
-    const meds=item.medList&&item.medList.length?`<div style="font-size:11px;color:var(--muted);margin-top:2px">${item.medList.map(m=>m.name).join(' · ')}</div>`:'';
-    rows+=`<div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
-      <div style="display:flex;align-items:baseline;gap:10px">
-        <div style="font-family:monospace;font-size:13px;font-weight:700;color:var(--teal);flex-shrink:0;min-width:72px">${fmt12(item.time)}</div>
-        <div style="flex:1"><span style="font-size:14px;font-weight:700">${item.name}</span><span style="font-size:10px;color:${cfg.color};font-weight:700;margin-left:6px">${cfg.icon} ${cfg.label}</span></div>
-      </div>
-      <div style="padding-left:82px;margin-top:4px">
-        <div style="font-size:12px;color:${statusColor};font-weight:600">${statusLabel}</div>
-        ${item.dose?`<div style="font-size:11px;color:var(--muted);margin-top:1px">${item.dose}</div>`:''}
-        ${meds}
-        ${item.logEntry&&item.logEntry.notes?`<div style="font-size:11px;color:#4a6070;font-style:italic;margin-top:2px">Note: ${item.logEntry.notes}</div>`:''}
-      </div>
-    </div>`;
+    const doneLabel = done ? ('Done by ' + item.logEntry.caregiver + ' at ' + fmt12(item.logEntry.givenTime||item.logEntry.timeStr)) : (isToday&&item.status==='late' ? 'Overdue' : 'Pending');
+    const doneColor = done ? 'var(--ok)' : (isToday&&item.status==='late' ? 'var(--warn)' : 'var(--muted)');
+    const medNames = (item.medList&&item.medList.length) ? item.medList.map(function(m){return m.name;}).join(' | ') : '';
+    rows += '<div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.06)">';
+    rows += '<div style="display:flex;align-items:baseline;gap:10px">';
+    rows += '<div style="font-family:monospace;font-size:13px;font-weight:700;color:var(--teal);flex-shrink:0;min-width:72px">' + fmt12(item.time) + '</div>';
+    rows += '<div style="flex:1"><span style="font-size:14px;font-weight:700">' + item.name + '</span>';
+    rows += '<span style="font-size:10px;color:' + cfg.color + ';font-weight:700;margin-left:6px">' + cfg.icon + ' ' + cfg.label + '</span></div></div>';
+    rows += '<div style="padding-left:82px;margin-top:4px">';
+    rows += '<div style="font-size:12px;color:' + doneColor + ';font-weight:600">' + doneLabel + '</div>';
+    if (item.dose) rows += '<div style="font-size:11px;color:var(--muted);margin-top:1px">' + item.dose + '</div>';
+    if (medNames) rows += '<div style="font-size:11px;color:var(--muted);margin-top:2px">' + medNames + '</div>';
+    if (item.logEntry&&item.logEntry.notes) rows += '<div style="font-size:11px;color:#4a6070;font-style:italic;margin-top:2px">Note: ' + item.logEntry.notes + '</div>';
+    rows += '</div></div>';
   });
   el.innerHTML=`
     <button class="back-to-reports" onclick="closeReport()">&#8249; Reports</button>
