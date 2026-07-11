@@ -1213,6 +1213,7 @@ window.filterSched = function(el,cat) {
 };
 
 function renderSchedule() {
+  console.log('renderSchedule called, schedule length:', schedule.length, 'filter:', schedFilter);
   const list=document.getElementById('sched-list');
   const items=schedule.filter(s=>schedFilter==='all'||s.cat===schedFilter)
     .sort((a,b)=>((a.times||[''])[0]).localeCompare((b.times||[''])[0])||a.name.localeCompare(b.name));
