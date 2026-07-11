@@ -1413,18 +1413,22 @@ function renderDailySchedule(el) {
     const cfg=CATS[item.cat]||{icon:'*',label:item.cat,color:'#888'};
     const done=!!item.logEntry;
     const statusLabel=done
-      ? `<span style="color:var(--ok);font-weight:600">done ${item.logEntry.caregiver} ${fmt12(item.logEntry.givenTime||item.logEntry.timeStr)}</span>`
-      : isToday&&item.status==='late' ? `<span style="color:var(--warn);font-weight:600">Overdue</span>`
-      : `<span style="color:var(--muted)">Pending</span>`;
-    const meds=item.medList&&item.medList.length?`<div style="font-size:10px;color:var(--muted);padding-left:80px">${item.medList.map(m=>m.name).join(', ')}</div>`:'';
-    rows+=`<div><div class="report-row">
-      <div class="report-time">${fmt12(item.time)}</div>
-      <div style="flex:1"><div style="display:flex;align-items:baseline;gap:6px">
-        <span class="report-item-name">${item.name}</span>
-        <span style="font-size:10px;color:${cfg.color};font-weight:700">${cfg.icon} ${cfg.label}</span>
-      </div>${item.dose?`<div class="report-item-detail">${item.dose}</div>`:''}</div>
-      <div class="report-item-status">${statusLabel}</div>
-    </div>${meds}${item.logEntry&&item.logEntry.notes?`<div class="report-note">Note: ${item.logEntry.notes}</div>`:''}</div>`;
+      ? `✓ ${item.logEntry.caregiver} at ${fmt12(item.logEntry.givenTime||item.logEntry.timeStr)}`
+      : isToday&&item.status==='late' ? 'Overdue' : 'Pending';
+    const statusColor=done?'var(--ok)':isToday&&item.status==='late'?'var(--warn)':'var(--muted)';
+    const meds=item.medList&&item.medList.length?`<div style="font-size:11px;color:var(--muted);margin-top:2px">${item.medList.map(m=>m.name).join(' · ')}</div>`:'';
+    rows+=`<div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <div style="font-family:monospace;font-size:13px;font-weight:700;color:var(--teal);flex-shrink:0;min-width:72px">${fmt12(item.time)}</div>
+        <div style="flex:1"><span style="font-size:14px;font-weight:700">${item.name}</span><span style="font-size:10px;color:${cfg.color};font-weight:700;margin-left:6px">${cfg.icon} ${cfg.label}</span></div>
+      </div>
+      <div style="padding-left:82px;margin-top:4px">
+        <div style="font-size:12px;color:${statusColor};font-weight:600">${statusLabel}</div>
+        ${item.dose?`<div style="font-size:11px;color:var(--muted);margin-top:1px">${item.dose}</div>`:''}
+        ${meds}
+        ${item.logEntry&&item.logEntry.notes?`<div style="font-size:11px;color:#4a6070;font-style:italic;margin-top:2px">Note: ${item.logEntry.notes}</div>`:''}
+      </div>
+    </div>`;
   });
   el.innerHTML=`
     <button class="back-to-reports" onclick="closeReport()">&#8249; Reports</button>
