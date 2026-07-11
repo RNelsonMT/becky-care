@@ -161,6 +161,42 @@
   .med-check-name{font-size:13px;font-weight:500;flex:1}
   .med-check-dose{font-size:11px;color:var(--muted)}
   .mark-all-btn{width:100%;padding:11px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px}
+  /* REPORT LAYOUT */
+  .report-view{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+  .report-header{background:var(--navy);color:#fff;padding:14px 20px;text-align:center}
+  .report-header h2{font-size:16px;font-weight:700;margin-bottom:2px}
+  .report-header-sub{font-size:11px;color:#8aabb8;margin-top:2px}
+  .report-body{padding:0;background:#fff}
+  .report-date-nav{display:flex;align-items:center;gap:8px;justify-content:center;padding:10px 16px;border-bottom:1px solid var(--border)}
+  .report-date-nav button{background:var(--navy);color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:14px;cursor:pointer}
+  .report-date-nav input[type=date]{border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:14px;color:var(--navy);background:var(--cream);outline:none;text-align:center}
+  .report-week-nav{display:flex;align-items:center;gap:8px;justify-content:center;padding:10px 16px;border-bottom:1px solid var(--border)}
+  .report-week-nav button{background:var(--navy);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:13px;cursor:pointer}
+  .report-row{display:flex;align-items:baseline;gap:8px;padding:8px 16px;border-bottom:1px solid #f4f7f7}
+  .report-row:last-child{border-bottom:none}
+  .report-time{font-family:monospace;font-size:13px;font-weight:700;color:var(--teal);flex-shrink:0;min-width:72px}
+  .report-item-name{font-size:14px;font-weight:600;flex:1}
+  .report-item-detail{font-size:11px;color:var(--muted)}
+  .report-item-status{font-size:11px;font-weight:600;flex-shrink:0}
+  .report-note{font-size:11px;color:#4a6070;font-style:italic;padding:2px 16px 6px 96px}
+  .report-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);padding:10px 16px 6px;border-bottom:1px solid var(--border)}
+  .print-btn{background:none;border:1px solid #8aabb8;color:#8aabb8;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;margin-top:6px;display:inline-block}
+  .back-to-reports{background:none;border:none;color:var(--teal);font-size:13px;font-weight:700;cursor:pointer;padding:0 0 12px;display:flex;align-items:center;gap:4px}
+  .status-done-label{color:var(--ok);font-weight:600}
+  .status-miss-label{color:var(--warn);font-weight:600}
+  .handoff-section{background:var(--cream);border-radius:8px;padding:12px 14px;margin:8px 16px}
+  .handoff-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px}
+  .mar-grid{width:100%;border-collapse:collapse;font-size:12px}
+  .mar-grid th{background:var(--navy);color:#fff;padding:6px 8px;text-align:left;font-size:11px}
+  .mar-grid td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+  .mar-grid tr:nth-child(even) td{background:#f8fafb}
+@media print{
+  #sync-bar,#topbar,#nav,#overdue-strip,.back-to-reports,.print-btn,.report-date-nav,.report-week-nav{display:none !important}
+  body{background:white}
+  #main{padding:0}
+  .report-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
   /* CONTACTS */
   .contact-card{background:#fff;border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);cursor:pointer;transition:background .1s}
   .contact-card:active{background:#f0f4f4}
