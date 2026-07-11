@@ -1370,29 +1370,33 @@ function renderReports() {
   el.innerHTML = `
     <h2 style="font-size:17px;font-weight:700;margin-bottom:14px">Reports</h2>
     <div class="report-card" onclick="openReport('daily')">
-      <div class="report-icon">\u{1F4CB}</div>
-      <div><div class="report-title">Daily Schedule</div>
-      <div class="report-desc">All scheduled items for any day with completion status</div></div>
-      <div style="margin-left:auto;font-size:18px;color:var(--muted)">&rsaquo;</div>
+      <div style="flex:1">
+        <div class="report-title">📋 Daily Schedule</div>
+        <div class="report-desc">All scheduled items for any day with completion status</div>
+      </div>
+      <div style="font-size:18px;color:var(--muted)">&#8250;</div>
     </div>
     <div class="report-card" onclick="openReport('mar')">
-      <div class="report-icon">\u{1F48A}</div>
-      <div><div class="report-title">Medication Administration Record</div>
-      <div class="report-desc">Weekly MAR showing each med given/missed by day</div></div>
-      <div style="margin-left:auto;font-size:18px;color:var(--muted)">&rsaquo;</div>
+      <div style="flex:1">
+        <div class="report-title">💊 Medication Administration Record</div>
+        <div class="report-desc">Weekly MAR showing each med given/missed by day</div>
+      </div>
+      <div style="font-size:18px;color:var(--muted)">&#8250;</div>
     </div>
     <div class="report-card" onclick="openReport('weekly')">
-      <div class="report-icon">\u{1F4C5}</div>
-      <div><div class="report-title">Weekly Summary</div>
-      <div class="report-desc">Overview of care activities for the week</div></div>
-      <div style="margin-left:auto;font-size:18px;color:var(--muted)">&rsaquo;</div>
+      <div style="flex:1">
+        <div class="report-title">📅 Weekly Summary</div>
+        <div class="report-desc">Overview of care activities for the week</div>
+      </div>
+      <div style="font-size:18px;color:var(--muted)">&#8250;</div>
     </div>
     <div class="report-card" onclick="openReport('handoff')">
-      <div class="report-icon">\u{1F91D}</div>
-      <div><div class="report-title">Caregiver Handoff</div>
-      <div class="report-desc">Shift summary for incoming caregiver</div></div>
-      <div style="margin-left:auto;font-size:18px;color:var(--muted)">&rsaquo;</div>
-    </div>`;
+      <div style="flex:1">
+        <div class="report-title">🤝 Caregiver Handoff</div>
+        <div class="report-desc">Shift summary for incoming caregiver</div>
+      </div>
+      <div style="font-size:18px;color:var(--muted)">&#8250;</div>
+    </div>\`;
 }
 window.openReport  = function(type) { currentReport=type; if(type==='daily'||type==='handoff') reportDate=new Date(); renderReports(); };
 window.closeReport = function()      { currentReport=null; renderReports(); };
