@@ -1230,8 +1230,8 @@ function renderSchedule() {
       +'<div class="sched-detail">'+(s.dose?s.dose+' · ':'')+(s.times||[]).map(fmt12).join(', ')+(s.times&&s.times.length?'':' No time')+' · '+dayLabel+'</div>'
       +'</div>'
       +'<div class="sched-actions">'
-      +'<button class="sched-btn" onclick="editItem(''+s.id+'')">Edit</button>'
-      +'<button class="sched-btn del" onclick="deleteItem(''+s.id+'')">✕</button>'
+      +'<button class="sched-btn" onclick="editItem(&quot;'+s.id+'&quot;)">Edit</button>'
+      +'<button class="sched-btn del" onclick="deleteItem(&quot;'+s.id+'&quot;)">✕</button>'
       +'</div></div>';
   }).join('');
 }
