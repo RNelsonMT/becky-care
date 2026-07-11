@@ -1447,8 +1447,6 @@ function renderDailySchedule(el) {
   html2 += '<div style="margin-top:16px;font-size:11px;color:var(--muted);text-align:center">' + items.filter(function(x){return x.logEntry;}).length + ' of ' + items.length + ' items completed</div>';
   html2 += '</div></div>';
   el.innerHTML = html2;
-}
-
 function renderMAR(el) {
   const weekStart=new Date(reportWeekStart);
   const days=Array.from({length:7},(_,i)=>{const d=new Date(weekStart);d.setDate(d.getDate()+i);return d;});
