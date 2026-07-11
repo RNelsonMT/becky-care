@@ -1220,19 +1220,19 @@ function renderSchedule() {
     list.innerHTML=`<div class="empty-state"><div class="empty-icon">🗓</div><p>No items yet. Tap <b>Add Care Item</b> to get started.</p></div>`;return;
   }
   list.innerHTML=items.map(s=>{
-    const cfg=CATS[s.cat];
+    const cfg=CATS[s.cat]||{color:'#888',icon:'*',label:s.cat||''};
     const dayLabel=s.days==='daily'?'Daily':s.days==='weekday'?'Mon–Fri':s.days==='weekend'?'Sat–Sun':s.days==='once'?(s.onceDate||'One-time'):'Custom';
-    return `<div class="sched-item">
-      <div class="sched-cat-dot" style="background:${cfg.color}"></div>
-      <div class="sched-info">
-        <div class="sched-name">${cfg.icon} ${s.name}</div>
-        <div class="sched-detail">${s.dose?s.dose+' · ':''}${(s.times||[]).map(fmt12).join(', ')||'No time'} · ${dayLabel}</div>
-      </div>
-      <div class="sched-actions">
-        <button class="sched-btn" onclick="editItem('${s.id}')">Edit</button>
-        <button class="sched-btn del" onclick="deleteItem('${s.id}')">✕</button>
-      </div>
-    </div>`;
+    const medCount=s.medList&&s.medList.length?' · '+s.medList.length+' meds':'';
+    return '<div class="sched-item">'
+      +'<div class="sched-cat-dot" style="background:'+cfg.color+'"></div>'
+      +'<div class="sched-info">'
+      +'<div class="sched-name">'+cfg.icon+' '+s.name+medCount+'</div>'
+      +'<div class="sched-detail">'+(s.dose?s.dose+' · ':'')+(s.times||[]).map(fmt12).join(', ')+(s.times&&s.times.length?'':' No time')+' · '+dayLabel+'</div>'
+      +'</div>'
+      +'<div class="sched-actions">'
+      +'<button class="sched-btn" onclick="editItem(''+s.id+'')">Edit</button>'
+      +'<button class="sched-btn del" onclick="deleteItem(''+s.id+'')">✕</button>'
+      +'</div></div>';
   }).join('');
 }
 
