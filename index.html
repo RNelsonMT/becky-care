@@ -1396,10 +1396,10 @@ function renderReport(type, el) {
   if (type === 'handoff') renderHandoff(el);
 }
 function rHeader(title, sub) {
-  return '<div class="report-header"><div><h2>' + title + '</h2>'
-    + '<div class="report-header-sub">Becky Nelson &middot; ' + sub + '</div></div>'
+  return '<div class="report-header">'
+    + '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:#8aabb8;margin-bottom:2px">' + title + '</div>'
+    + '<div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:2px">' + sub + '</div>'
     + '<button class="print-btn" onclick="window.print()">Print</button></div>';
-}
 function rBack() { return '<button class="back-to-reports" onclick="closeReport()">&#8249; Reports</button>'; }
 
 function renderDailySchedule(el) {
