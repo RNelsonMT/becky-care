@@ -1376,9 +1376,8 @@ function renderReports() {
 }
 function rCard(type, title, desc) {
   return '<div class="report-card" onclick="openReport(\'' + type + '\')">'
-    + '<div style="flex:1"><div class="report-title">' + title + '</div>'
-    + '<div class="report-desc">' + desc + '</div></div>'
-    + '<div style="font-size:18px;color:var(--muted)">&#8250;</div></div>';
+    + '<div class="report-title">' + title + '</div>'
+    + '<div class="report-desc">' + desc + '</div></div>';
 }
 window.openReport  = function(type) { currentReport = type; reportDate = new Date(); renderReports(); };
 window.closeReport = function()     { currentReport = null; renderReports(); };
