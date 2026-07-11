@@ -1367,11 +1367,11 @@ function renderReports() {
   var el = document.getElementById('reports-content');
   if (!el) return;
   if (currentReport) { renderReport(currentReport, el); return; }
-  var html = '<h2 style="font-size:17px;font-weight:700;margin-bottom:14px">Reports</h2>';
+  var html = '<h2 style="font-size:17px;font-weight:700;margin-bottom:14px">Reports</h2><div class="report-cards-wrap">';
   html += rCard('daily',   'Daily Schedule',                    'All scheduled items for any day with completion status');
   html += rCard('mar',     'Medication Administration Record',  'Weekly MAR showing each med given or missed by day');
   html += rCard('weekly',  'Weekly Summary',                    'Overview of care activities for the week');
-  html += rCard('handoff', 'Caregiver Handoff',                 'Shift summary for incoming caregiver');
+  html += rCard('handoff', 'Caregiver Handoff', 'Shift summary for incoming caregiver') + '</div>';
   el.innerHTML = html;
 }
 function rCard(type, title, desc) {
