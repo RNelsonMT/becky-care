@@ -7,13 +7,24 @@ if not match:
 js = match.group(1)
 opens = js.count("{")
 closes = js.count("}")
-backticks = js.count("`")
+bt = js.count("`")
 print(f"Braces: {opens} open, {closes} close, diff={opens-closes}")
-print(f"Backticks: {backticks}, even={backticks%2==0}")
+print(f"Backticks: {bt}, even={bt%2==0}")
 if opens != closes:
     print("ERROR: Unbalanced braces!")
     sys.exit(1)
-if backticks % 2 != 0:
+if bt % 2 != 0:
     print("ERROR: Unbalanced backticks!")
+    sys.exit(1)
+# Check for broken onclick patterns
+lines = js.split('\n')
+bad = []
+for i,l in enumerate(lines):
+    if "onclick=" in l and "''" in l and "tabBar" in l:
+        bad.append(f"Line {i+1}: broken onclick: {l[:80]}")
+    if "measView=''" in l or "measFilter=''" in l:
+        bad.append(f"Line {i+1}: broken meas onclick: {l[:80]}")
+if bad:
+    for b in bad: print("ERROR:", b)
     sys.exit(1)
 print("OK: JS syntax looks clean")

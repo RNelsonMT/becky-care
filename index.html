@@ -1573,7 +1573,7 @@ function renderMeasurements() {
   if (!el) return;
   var tabBar = '<div style="display:flex;gap:8px;margin-bottom:14px">';
   [['quick','Quick Entry'],['vitals','Full Vitals'],['trends','Trends']].forEach(function(t) {
-    tabBar += '<button onclick="measView='' + t[0] + '';renderMeasurements()" style="flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:' + (measView===t[0]?'var(--navy)':'var(--cream)') + ';color:' + (measView===t[0]?'#fff':'var(--navy)') + '">' + t[1] + '</button>';
+    tabBar += '<button data-measview="' + t[0] + '" style="flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:' + (measView===t[0]?'var(--navy)':'var(--cream)') + ';color:' + (measView===t[0]?'#fff':'var(--navy)') + '">' + t[1] + '</button>';
   });
   tabBar += '</div>';
   if (measView==='quick') renderQuickMeasurement(el,tabBar);
@@ -1584,7 +1584,7 @@ function renderMeasurements() {
 function measTypeBar() {
   var bar = '<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;scrollbar-width:none">';
   MEAS_TYPES.forEach(function(t) {
-    bar += '<button class="meas-type-btn ' + (measFilter===t.key?'selected':'') + '" onclick="measFilter='' + t.key + '';renderMeasurements()">' + t.label + '</button>';
+    bar += '<button class="meas-type-btn ' + (measFilter===t.key?'selected':'') + '" data-measfilter="' + t.key + '">' + t.label + '</button>';
   });
   return bar + '</div>';
 }
@@ -1664,6 +1664,14 @@ function renderTrends(el, tabBar) {
     + '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px"><span>'+(data[0]&&data[0].dateStr||'')+'</span><span>'+(data[data.length-1]&&data[data.length-1].dateStr||'')+'</span></div></div>'
     + '<div class="meas-section-title">History</div>' + listHtml;
 }
+
+// Event delegation for measurements buttons
+document.addEventListener('click', function(e) {
+  var mv = e.target.closest('[data-measview]');
+  if (mv) { measView = mv.dataset.measview; renderMeasurements(); return; }
+  var mf = e.target.closest('[data-measfilter]');
+  if (mf) { measFilter = mf.dataset.measfilter; renderMeasurements(); return; }
+});
 
 window.saveMeasurement = async function() {
   var mtype=MEAS_TYPES.find(function(t){return t.key===measFilter;});
