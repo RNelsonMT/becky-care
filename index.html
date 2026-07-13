@@ -413,6 +413,10 @@
       <label>Notes (optional)</label>
       <textarea id="log-notes" placeholder="Observations, reactions, issues…"></textarea>
     </div>
+    <div id="log-fluid-output" style="display:none" class="form-group">
+      <label>Fluid Output (mL)</label>
+      <input type="number" id="log-fluid-output-val" placeholder="e.g. 350">
+    </div>
     <div id="log-existing-info" style="display:none;background:var(--ok-lt);border-radius:8px;padding:10px;font-size:12px;color:var(--ok);margin-bottom:8px"></div>
     <div class="btn-row">
       <button class="btn btn-secondary" onclick="closeModal('modal-log')">Cancel</button>
@@ -1029,14 +1033,14 @@ function renderTaskCard(item,now,isLast) {
   let delta='';
   if (item.status==='late') delta=`${hrs?hrs+'h ':''}${mins}m overdue`;
   else if (item.status==='soon'||item.status==='future') delta=`in ${hrs?hrs+'h ':''}${mins}m`;
-  const fluidOut = item.cat==='cath' ? (() => { var r=measurements.filter(function(m){return m.type==='fluout'&&m.dateStr===fmtDate(viewDate);}); return r.length?'<div style="font-size:10px;color:#9060d0;font-weight:600">Output: '+r[0].value+' mL</div>':''; })() : '';
-  const doneBy=item.logEntry?`<div class="done-by">✓ ${item.logEntry.caregiver} at ${fmt12(item.logEntry.givenTime||item.logEntry.timeStr)}</div>`:'';
+  const cathOutput = (item.cat==='cath' && item.logEntry && item.logEntry.fluidOutput) ? `<div style="font-size:10px;color:#9060d0;font-weight:600">Output: ${item.logEntry.fluidOutput} mL</div>` : '';
+  const doneBy=item.logEntry?`<div class="done-by">✓ ${item.logEntry.caregiver} at ${fmt12(item.logEntry.givenTime||item.logEntry.timeStr)}${item.logEntry.fluidOutput?' · '+item.logEntry.fluidOutput+' mL':''}</div>`:'';
   return `<div class="task-card status-${item.status}" style="${isLast?'border-radius:0 0 12px 12px':''}" onclick="openTaskLog('${item.schedId}','${item.time}')">
     <div class="task-check">${item.status==='done'?'✓':''}</div>
     <div class="task-info">
       <div class="task-name">${item.name}</div>
       <div class="task-sub">${item.dose?`<b>${item.dose}</b>`:''}</div>
-      ${doneBy}${fluidOut}
+      ${doneBy}${cathOutput}
     </div>
     <div class="task-time-col">
       <div class="task-time">${fmt12(item.time)}</div>
@@ -1100,6 +1104,14 @@ window.openTaskLog = function(schedId,timeStr) {
     undoBtn.style.display='block'; saveBtn.textContent='Update Record';
   } else {
     infoBox.style.display='none'; undoBtn.style.display='none'; saveBtn.textContent='Save Record';
+  }
+  // Show fluid output field for Straight Cath
+  var fluidOutputGroup = document.getElementById('log-fluid-output');
+  if (fluidOutputGroup) {
+    var showFluid = item.name === 'Straight Cath' || item.cat === 'cath';
+    fluidOutputGroup.style.display = showFluid ? 'block' : 'none';
+    var foVal = document.getElementById('log-fluid-output-val');
+    if (foVal) foVal.value = existing ? (existing.fluidOutput || '') : '';
   }
   // Show skipped options for Suction and Cough Assist
   var skippedGroup = document.getElementById('log-skipped-group');
@@ -1564,7 +1576,6 @@ const MEAS_TYPES = [
   { key:'etco2', label:'EtCO2',          unit:'mmHg',  format:'num' },
   { key:'wt',    label:'Weight',         unit:'lbs',   format:'num' },
   { key:'tfin',  label:'Tube Feed In',   unit:'mL',    format:'num' },
-  { key:'fluout',label:'Fluid Output',   unit:'mL',    format:'num' },
 ];
 let measView = 'quick';
 let measFilter = 'bp';
@@ -1625,7 +1636,6 @@ function renderVitalsForm(el, tabBar) {
     + '<div class="vitals-field"><label>EtCO2 (mmHg)</label><input type="number" id="v-etco2" placeholder="35"></div>'
     + '<div class="vitals-field"><label>Weight (lbs)</label><input type="number" id="v-wt" placeholder="120" step="0.1"></div>'
     + '<div class="vitals-field"><label>Tube Feed In (mL)</label><input type="number" id="v-tfin" placeholder="300"></div>'
-    + '<div class="vitals-field" style="grid-column:1/-1"><label>Fluid Output (mL)</label><input type="number" id="v-fluout" placeholder="250"></div>'
     + '</div>'
     + '<div style="display:flex;gap:8px;margin-bottom:10px"><select id="v-cg" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;background:var(--cream);outline:none"><option>Ron</option><option>Marcus</option><option>Connor</option><option>Allie</option><option>Lisa</option><option>Erin</option><option>Nurse/Staff</option></select>'
     + '<input type="time" id="v-time" value="' + nowTime() + '" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;background:var(--cream);outline:none"></div>'
@@ -1699,7 +1709,7 @@ window.saveVitals = async function() {
   var time=document.getElementById('v-time')&&document.getElementById('v-time').value;
   var notes=document.getElementById('v-notes')&&document.getElementById('v-notes').value.trim();
   var dateStr=fmtDate(new Date());
-  var fields=[{id:'v-sys',id2:'v-dia',type:'bp'},{id:'v-hr',type:'hr'},{id:'v-spo2',type:'spo2'},{id:'v-temp',type:'temp'},{id:'v-rr',type:'rr'},{id:'v-etco2',type:'etco2'},{id:'v-wt',type:'wt'},{id:'v-tfin',type:'tfin'},{id:'v-fluout',type:'fluout'}];
+  var fields=[{id:'v-sys',id2:'v-dia',type:'bp'},{id:'v-hr',type:'hr'},{id:'v-spo2',type:'spo2'},{id:'v-temp',type:'temp'},{id:'v-rr',type:'rr'},{id:'v-etco2',type:'etco2'},{id:'v-wt',type:'wt'},{id:'v-tfin',type:'tfin'}];
   try{
     var saved=0;
     for(var i=0;i<fields.length;i++){
