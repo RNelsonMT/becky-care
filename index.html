@@ -22,22 +22,22 @@
     --font-mono:'JetBrains Mono','Fira Mono',monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  body{font-family:var(--font-ui);background:var(--cream);color:var(--navy);min-height:100dvh;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto}
+  body{font-family:var(--font-ui);background:var(--cream);color:var(--navy);min-height:100dvh;display:flex;flex-direction:column;overflow-x:hidden}
 
   /* SYNC BAR */
-  #sync-bar{background:#253c4d;color:#8aabb8;font-size:11px;text-align:center;padding:3px 8px;display:flex;align-items:center;justify-content:center;gap:6px;position:sticky;top:0;z-index:102}
+  #sync-bar{background:#253c4d;color:#8aabb8;font-size:11px;text-align:center;padding:3px 8px;display:flex;align-items:center;justify-content:center;gap:6px}
   #sync-dot{width:7px;height:7px;border-radius:50%;background:#6b8394;flex-shrink:0;transition:background .3s}
   #sync-dot.connected{background:#4dc896} #sync-dot.error{background:var(--warn)}
 
   /* TOP BAR */
-  #topbar{background:var(--navy);color:#fff;padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:26px;z-index:101;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+  #topbar{background:var(--navy);color:#fff;padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25)}
   #topbar h1{font-size:18px;font-weight:700;letter-spacing:-.3px}
   #topbar h1 span{color:var(--teal-lt)}
   #clock{font-family:var(--font-mono);font-size:15px;color:var(--teal-lt);letter-spacing:1px}
   #date-display{font-size:11px;color:#8aabb8;text-align:right}
 
   /* NAV */
-  #nav{background:var(--navy);display:flex;border-top:1px solid #253c4d;overflow-x:auto;scrollbar-width:none;align-items:center;position:sticky;top:84px;z-index:100}
+  #nav{background:var(--navy);display:flex;border-top:1px solid #253c4d;overflow-x:auto;scrollbar-width:none;align-items:center}
   #nav-add-btn{flex-shrink:0;margin-left:auto;margin-right:10px;background:var(--teal);color:#fff;border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;letter-spacing:0.2px}
   #nav-add-btn:active{opacity:.75}
   #nav::-webkit-scrollbar{display:none}
@@ -155,47 +155,15 @@
   .preset-add-btn{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
   .cat-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;border-radius:6px;padding:3px 8px;margin-bottom:8px}
 
+  /* MED GROUP */
   .med-check-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:var(--cream);margin-bottom:5px;cursor:pointer}
+  .med-check-item:active{background:#e0e8ec}
   .med-check-box{width:22px;height:22px;border-radius:5px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:all .15s}
   .med-check-box.checked{background:var(--ok);border-color:var(--ok);color:#fff}
   .med-check-name{font-size:13px;font-weight:500;flex:1}
   .med-check-dose{font-size:11px;color:var(--muted)}
   .mark-all-btn{width:100%;padding:11px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px}
-  /* REPORT LAYOUT */
-  .report-view{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
-  .report-header{background:var(--navy);color:#fff;padding:14px 20px;text-align:center}
-  .report-header h2{font-size:16px;font-weight:700;margin-bottom:2px}
-  .report-header-sub{font-size:11px;color:#8aabb8;margin-top:2px}
-  .report-body{padding:0;background:#fff}
-  .report-date-nav{display:flex;align-items:center;gap:8px;justify-content:center;padding:10px 16px;border-bottom:1px solid var(--border)}
-  .report-date-nav button{background:var(--navy);color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:14px;cursor:pointer}
-  .report-date-nav input[type=date]{border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:14px;color:var(--navy);background:var(--cream);outline:none;text-align:center}
-  .report-week-nav{display:flex;align-items:center;gap:8px;justify-content:center;padding:10px 16px;border-bottom:1px solid var(--border)}
-  .report-week-nav button{background:var(--navy);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:13px;cursor:pointer}
-  .report-row{display:flex;align-items:baseline;gap:8px;padding:8px 16px;border-bottom:1px solid #f4f7f7}
-  .report-row:last-child{border-bottom:none}
-  .report-time{font-family:monospace;font-size:13px;font-weight:700;color:var(--teal);flex-shrink:0;min-width:72px}
-  .report-item-name{font-size:14px;font-weight:600;flex:1}
-  .report-item-detail{font-size:11px;color:var(--muted)}
-  .report-item-status{font-size:11px;font-weight:600;flex-shrink:0}
-  .report-note{font-size:11px;color:#4a6070;font-style:italic;padding:2px 16px 6px 96px}
-  .report-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);padding:10px 16px 6px;border-bottom:1px solid var(--border)}
-  .print-btn{background:none;border:1px solid #8aabb8;color:#8aabb8;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;margin-top:6px;display:inline-block}
-  .back-to-reports{background:none;border:none;color:var(--teal);font-size:13px;font-weight:700;cursor:pointer;padding:0 0 12px;display:flex;align-items:center;gap:4px}
-  .status-done-label{color:var(--ok);font-weight:600}
-  .status-miss-label{color:var(--warn);font-weight:600}
-  .handoff-section{background:var(--cream);border-radius:8px;padding:12px 14px;margin:8px 16px}
-  .handoff-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px}
-  .mar-grid{width:100%;border-collapse:collapse;font-size:12px}
-  .mar-grid th{background:var(--navy);color:#fff;padding:6px 8px;text-align:left;font-size:11px}
-  .mar-grid td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}
-  .mar-grid tr:nth-child(even) td{background:#f8fafb}
-  @media print{
-    #sync-bar,#topbar,#nav,#overdue-strip,.back-to-reports,.print-btn,.report-date-nav,.report-week-nav{display:none !important}
-    body{background:white}
-    #main{padding:0}
-    .report-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  }
+  .mark-all-btn:active{opacity:.75}
 
   /* CONTACTS */
   .contact-card{background:#fff;border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;box-shadow:var(--shadow);cursor:pointer;transition:background .1s}
@@ -222,12 +190,69 @@
   .todo-add-row button{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer}
 
   /* REPORTS */
-  .report-cards-wrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
-  .report-card{padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
-  .report-card:last-child{border-bottom:none}
+  .report-card{background:#fff;border-radius:var(--radius);padding:14px 16px;margin-bottom:1px;box-shadow:none;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+  .report-card:first-child{border-radius:var(--radius) var(--radius) 0 0}
+  .report-card:last-child{border-radius:0 0 var(--radius) var(--radius);border-bottom:none;margin-bottom:0}
   .report-card:active{background:#f0f4f4}
+  .report-icon{font-size:20px;flex-shrink:0}
   .report-title{font-size:15px;font-weight:600;color:var(--teal);text-decoration:underline;text-underline-offset:3px}
   .report-desc{font-size:12px;color:var(--muted);margin-top:4px;padding-left:16px}
+  .report-view{background:#fff;border-radius:var(--radius);padding:0}
+  .report-header{background:var(--navy);color:#fff;padding:16px 20px;border-radius:var(--radius) var(--radius) 0 0;display:flex;align-items:center;justify-content:space-between}
+  .report-header h2{font-size:16px;font-weight:700}
+  .report-header-sub{font-size:11px;color:#8aabb8;margin-top:2px}
+  .report-body{padding:16px}
+  .report-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);padding:8px 0 6px;border-bottom:1px solid var(--border);margin-bottom:8px;margin-top:14px}
+  .report-section-title:first-child{margin-top:0}
+  .report-row{display:flex;align-items:baseline;gap:8px;padding:6px 0;border-bottom:1px solid #f4f7f7}
+  .report-row:last-child{border-bottom:none}
+  .report-time{font-family:monospace;font-size:13px;font-weight:700;color:var(--teal);flex-shrink:0;min-width:72px}
+  .report-item-name{font-size:13px;font-weight:600;flex:1}
+  .report-item-detail{font-size:11px;color:var(--muted)}
+  .report-item-status{font-size:11px;font-weight:600;flex-shrink:0}
+  .status-done-label{color:var(--ok)}
+  .status-miss-label{color:var(--warn)}
+  .report-note{font-size:11px;color:#4a6070;font-style:italic;padding-left:80px;margin-top:2px;padding-bottom:4px}
+  .report-date-nav{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .report-date-nav button{background:var(--navy);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:14px;cursor:pointer}
+  .report-date-nav input[type=date]{border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:14px;font-family:var(--font-ui);color:var(--navy);background:var(--cream);outline:none;flex:1}
+  .report-week-nav{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .report-week-nav button{background:var(--navy);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:14px;cursor:pointer}
+  .print-btn{background:var(--teal);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer}
+  .back-to-reports{background:none;border:none;color:var(--teal);font-size:13px;font-weight:700;cursor:pointer;padding:0 0 12px;display:flex;align-items:center;gap:4px}
+  .mar-grid{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+  .mar-grid th{background:var(--navy);color:#fff;padding:6px 8px;text-align:left;font-size:11px}
+  .mar-grid td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+  .mar-grid tr:nth-child(even) td{background:#f8fafb}
+  .mar-check{color:var(--ok);font-weight:700}
+  .mar-miss{color:var(--warn);font-weight:700}
+  .handoff-section{background:var(--cream);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+  .handoff-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px}
+
+  @media print {
+    #sync-bar,#topbar,#nav,#overdue-strip,#main > .view:not(.active),
+    .back-to-reports,.print-btn,.report-date-nav,.report-week-nav { display:none !important; }
+    body { background: white; }
+    #main { padding: 0; }
+    .report-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  /* MEASUREMENTS */
+  .meas-type-btn{padding:10px 14px;border-radius:20px;border:2px solid var(--border);background:#fff;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;white-space:nowrap;transition:all .15s}
+  .meas-type-btn.selected{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .meas-entry{background:#fff;border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  .meas-value{font-size:18px;font-weight:700;color:var(--navy);flex-shrink:0;min-width:80px}
+  .meas-unit{font-size:12px;color:var(--muted);font-weight:600}
+  .meas-meta{font-size:11px;color:var(--muted);margin-top:2px}
+  .meas-trend-wrap{background:#fff;border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+  .meas-section-title{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--navy)}
+  .vitals-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .vitals-field label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px}
+  .vitals-field input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 10px;font-size:16px;font-family:var(--font-ui);color:var(--navy);background:var(--cream);outline:none}
+  .vitals-field input:focus{border-color:var(--teal)}
+  .bp-row{display:flex;gap:6px;align-items:center}
+  .bp-row input{flex:1}
+  .bp-sep{font-size:18px;font-weight:700;color:var(--muted)}
 
   /* MISC */
   .overdue-strip{background:var(--warn);color:#fff;text-align:center;font-size:12px;font-weight:700;padding:6px}
@@ -259,12 +284,13 @@
 
 <div id="nav">
   <div class="nav-tab active" onclick="switchView('today',this)">Today <span class="tab-badge" id="badge-late" style="display:none">0</span></div>
-  <div class="nav-tab" onclick="switchView('therapy',this)">Therapy & Medical</div>
   <div class="nav-tab" onclick="switchView('schedule',this)">Schedule</div>
+  <div class="nav-tab" onclick="switchView('settings',this)">Care Items</div>
+  <div class="nav-tab" onclick="switchView('therapy',this)">Therapy &amp; Medical</div>
+  <div class="nav-tab" onclick="switchView('measurements',this)">Measurements</div>
   <div class="nav-tab" onclick="switchView('log',this)">Log</div>
   <div class="nav-tab" onclick="switchView('contacts',this)">Contacts</div>
   <div class="nav-tab" onclick="switchView('todo',this)">To-Do</div>
-  <div class="nav-tab" onclick="switchView('settings',this)">Care Items</div>
   <div class="nav-tab" onclick="switchView('reports',this)">📊 Reports</div>
   <button id="nav-add-btn" onclick="openQuickLog()">+ Add Record</button>
 </div>
@@ -343,6 +369,11 @@
     <div id="reports-content"></div>
   </div>
 
+  <!-- MEASUREMENTS -->
+  <div id="view-measurements" class="view">
+    <div id="measurements-content"></div>
+  </div>
+
 </div>
 
 
@@ -353,10 +384,18 @@
     <div class="modal-handle"></div>
     <h3 id="log-modal-title">Record Care</h3>
     <div class="modal-sub" id="log-modal-sub"></div>
-    <!-- Med group -->
+    <!-- Med group checklist (shown only for medication groups) -->
     <div id="log-med-group" style="display:none;margin-bottom:14px">
       <button class="mark-all-btn" onclick="markAllMeds()">✓ Mark All Given</button>
       <div id="log-med-list"></div>
+    </div>
+    <!-- Skipped options for Suction/Cough Assist -->
+    <div id="log-skipped-group" style="display:none;margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px">Mark as Skipped</div>
+      <div style="display:flex;gap:8px">
+        <button type="button" id="skip-declined-btn" onclick="markSkipped('Declined')" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:#fff;font-size:13px;font-weight:600;cursor:pointer">Declined</button>
+        <button type="button" id="skip-notneeded-btn" onclick="markSkipped('Not Needed')" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:#fff;font-size:13px;font-weight:600;cursor:pointer">Not Needed</button>
+      </div>
     </div>
     <div class="form-group">
       <label>Caregiver</label>
@@ -400,7 +439,6 @@
         <option value="feed">🥤 Nutrition</option>
         <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
-        <option value="ther">🏃 Therapy & Medical</option>
       </select>
     </div>
     <div class="form-group">
@@ -412,7 +450,13 @@
       <label>Dose / Detail</label>
       <input type="text" id="add-dose" placeholder="e.g. 1 tab PO, 300mL over 1hr…">
     </div>
-    <div id="add-med-group-section" style="display:none"><div class="form-group"><label>Medications in this group</label><div id="add-med-checklist" style="max-height:200px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;padding:8px;background:var(--cream)"></div></div></div>
+    <!-- Med group selector - shown only for Medication category -->
+    <div id="add-med-group-section" style="display:none">
+      <div class="form-group">
+        <label>Medications in this group</label>
+        <div id="add-med-checklist" style="max-height:200px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;padding:8px;background:var(--cream)"></div>
+      </div>
+    </div>
     <div class="form-group">
       <label>Scheduled Times (comma-separated 24hr, e.g. 08:00, 20:00)</label>
       <input type="text" id="add-times" placeholder="08:00, 14:00, 20:00">
@@ -473,7 +517,7 @@
         <option value="feed">🥤 Nutrition</option>
         <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
-        <option value="ther">🏃 Therapy & Medical</option>
+        <option value="ther">🏃 Therapy</option>
       </select>
     </div>
     <div class="form-group">
@@ -519,7 +563,7 @@
         <option value="feed">🥤 Nutrition</option>
         <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
-        <option value="ther">🏃 Therapy & Medical</option>
+        <option value="ther">🏃 Therapy</option>
       </select>
     </div>
     <div class="form-group">
@@ -630,7 +674,8 @@ const schedCol    = collection(db, 'schedule');
 const logCol      = collection(db, 'log');
 const presetsCol  = collection(db, 'presets');
 const contactsCol = collection(db, 'contacts');
-const todosCol    = collection(db, 'todos');
+const todosCol        = collection(db, 'todos');
+const measurementsCol = collection(db, 'measurements');
 
 /* ── CATEGORY CONFIG ─────────────────────────────────── */
 const CATS = {
@@ -639,7 +684,7 @@ const CATS = {
   feed: { label:'Nutrition',     icon:'🥤', color:'#e08840', hdrBg:'#3a2a1a', hdrColor:'#f0b060' },
   cath: { label:'Bowel & Urine', icon:'🔵', color:'#9060d0', hdrBg:'#2e1a3a', hdrColor:'#b060f0' },
   test: { label:'Testing',       icon:'🧪', color:'#78b040', hdrBg:'#1a2e1a', hdrColor:'#a0d070' },
-  ther: { label:'Therapy & Medical',        icon:'🏃', color:'#9060d0', hdrBg:'#2a1a3a', hdrColor:'#d090f0' },
+  ther: { label:'Therapy',        icon:'🏃', color:'#9060d0', hdrBg:'#2a1a3a', hdrColor:'#d090f0' },
 };
 
 /* ── DEFAULT PRESETS (seeded to Firestore on first load) ─ */
@@ -723,7 +768,8 @@ let schedule   = [];
 let logEntries = [];
 let presets    = {};
 let contacts   = [];
-let todos      = [];
+let todos        = [];
+let measurements = [];
 let viewDate   = new Date();
 let currentView = 'today';
 let collapsedCats = {};
@@ -745,7 +791,11 @@ onSnapshot(schedCol, snap => {
   setSyncStatus('connected','Live · synced');
   if (currentView==='today')    renderToday();
   if (currentView==='schedule') renderSchedule();
-  if (!medGroupsSeeded && presetsSeeded) { medGroupsSeeded=true; setTimeout(seedMedGroupsIfNeeded,1500); }
+  // Seed med groups once after presets are loaded
+  if (!medGroupsSeeded && presetsSeeded) {
+    medGroupsSeeded = true;
+    setTimeout(seedMedGroupsIfNeeded, 1000);
+  }
 }, err => { setSyncStatus('error','Connection error'); console.error(err); });
 
 const cutoffTs = Timestamp.fromMillis(Date.now() - 14*86400000);
@@ -783,6 +833,12 @@ onSnapshot(contactsCol, snap => {
   if (currentView==='contacts') renderContacts();
 }, err => console.error(err));
 
+// Measurements listener
+onSnapshot(query(measurementsCol, orderBy('ts','desc')), snap => {
+  measurements = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  if (currentView==='measurements') renderMeasurements();
+}, err => console.error(err));
+
 // Todos listener
 onSnapshot(query(todosCol, orderBy('createdAt','desc')), snap => {
   todos = snap.docs.map(d => ({ id:d.id, ...d.data() }));
@@ -808,63 +864,49 @@ function updateClock() {
 }
 setInterval(updateClock,1000); updateClock();
 
-
-/* med group checklist */
-window.renderAddMedChecklist = function(selectedMeds) {
-  const el = document.getElementById('add-med-checklist'); if(!el) return;
-  const selected = selectedMeds||[];
-  const allMeds = presets['med']||[];
-  const scheduled = allMeds.filter(m=>m.timing==='Scheduled');
-  const asNeeded  = allMeds.filter(m=>m.timing==='As Needed');
-  let html='';
-  [['Scheduled',scheduled],['As Needed',asNeeded]].forEach(([lbl,meds])=>{
-    if(!meds.length) return;
-    html+=`<div style="font-size:10px;font-weight:700;text-transform:uppercase;color:#6b8394;padding:6px 4px 4px">${lbl}</div>`;
-    meds.forEach(m=>{
-      const chk=selected.some(s=>s.name===m.name);
-      html+=`<label style="display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer"><input type="checkbox" value="${m.name}" data-dose="${m.instructions||''}" ${chk?'checked':''} style="width:16px;height:16px;accent-color:#2a7f7f;cursor:pointer"><div><div style="font-size:13px;font-weight:500">${m.name}</div>${m.instructions?`<div style="font-size:11px;color:#6b8394">${m.instructions}</div>`:''}</div></label>`;
-    });
-  });
-  el.innerHTML=html||'<div style="font-size:12px;color:#6b8394;padding:8px">No medication presets found.</div>';
-};
-
-window.toggleMedCheck = function(idx) {
-  const box=document.getElementById('med-check-'+idx); if(!box) return;
-  const checked=box.classList.toggle('checked'); box.textContent=checked?'✓':'';
-};
-window.markAllMeds = function() {
-  document.querySelectorAll('.med-check-box').forEach(b=>{b.classList.add('checked');b.textContent='✓';});
-};
-
+/* ── SEED MED GROUPS ────────────────────────────────── */
 async function seedMedGroupsIfNeeded() {
-  if(schedule.some(s=>s.cat==='med'&&s.medList&&s.medList.length>0)) return;
-  const groups=[
-    {name:'Morning Meds',times:['08:00'],medList:[
-      {name:'Citalopram (Celexa)',dose:'40 mg by G tube once daily'},
-      {name:'Gabapentin 600mg (Neurontin)',dose:'600 mg by feeding tube'},
-      {name:'GuaiFENesin (Q-Tussin)',dose:'400 mg (20 mL) by G tube'},
-      {name:'Multivitamin & Mineral',dose:'15 mL by mouth'},
-      {name:'Wheat Dextrin (Benefiber)',dose:'8 gram (2 packets) by G tube'},
-    ]},
-    {name:'Afternoon Meds',times:['12:00'],medList:[
-      {name:'Gabapentin 600mg (Neurontin)',dose:'600 mg by feeding tube'},
-      {name:'GuaiFENesin (Q-Tussin)',dose:'400 mg (20 mL) by G tube'},
-    ]},
-    {name:'Evening Meds',times:['18:00'],medList:[
-      {name:'GuaiFENesin (Q-Tussin)',dose:'400 mg (20 mL) by G tube'},
-    ]},
-    {name:'Bedtime Meds',times:['21:00'],medList:[
-      {name:'Baclofen (Lioresal)',dose:'10 mg by G tube'},
-      {name:'ClonazePAM (Klonopin)',dose:'0.25 mg (half tablet) by G tube'},
-      {name:'Gabapentin 900mg (Neurontin)',dose:'900 mg (18 mL) by G tube'},
-      {name:'GuaiFENesin (Q-Tussin)',dose:'400 mg (20 mL) by G tube'},
-      {name:'TraZODone 150mg (Desyrel)',dose:'150 mg by G tube'},
-    ]},
+  const existing = schedule.filter(s => s.cat === 'med' && s.medList && s.medList.length > 0);
+  if (existing.length > 0) return; // Already seeded
+  const groups = [
+    {
+      name: 'Morning Meds', times: ['08:00'], days: 'daily', cat: 'med', dose: '', days_label: '',
+      medList: [
+        { name: 'Citalopram (Celexa)', dose: '40 mg by G tube once daily' },
+        { name: 'Gabapentin 600mg (Neurontin)', dose: '600 mg by feeding tube' },
+        { name: 'GuaiFENesin (Q-Tussin)', dose: '400 mg (20 mL) by G tube' },
+        { name: 'Multivitamin & Mineral', dose: '15 mL by mouth' },
+        { name: 'Wheat Dextrin (Benefiber)', dose: '8 gram (2 packets) by G tube' },
+      ]
+    },
+    {
+      name: 'Afternoon Meds', times: ['12:00'], days: 'daily', cat: 'med', dose: '',
+      medList: [
+        { name: 'Gabapentin 600mg (Neurontin)', dose: '600 mg by feeding tube' },
+        { name: 'GuaiFENesin (Q-Tussin)', dose: '400 mg (20 mL) by G tube' },
+      ]
+    },
+    {
+      name: 'Evening Meds', times: ['18:00'], days: 'daily', cat: 'med', dose: '',
+      medList: [
+        { name: 'GuaiFENesin (Q-Tussin)', dose: '400 mg (20 mL) by G tube' },
+      ]
+    },
+    {
+      name: 'Bedtime Meds', times: ['21:00'], days: 'daily', cat: 'med', dose: '',
+      medList: [
+        { name: 'Baclofen (Lioresal)', dose: '10 mg by G tube' },
+        { name: 'ClonazePAM (Klonopin)', dose: '0.25 mg (½ tablet) by G tube' },
+        { name: 'Gabapentin 900mg (Neurontin)', dose: '900 mg (18 mL) by G tube' },
+        { name: 'GuaiFENesin (Q-Tussin)', dose: '400 mg (20 mL) by G tube' },
+        { name: 'TraZODone 150mg (Desyrel)', dose: '150 mg by G tube' },
+      ]
+    },
   ];
-  for(const g of groups){
-    await addDoc(schedCol,{...g,cat:'med',dose:'',days:'daily',customDays:[],onceDate:'',grace:30,updatedAt:serverTimestamp()});
+  for (const g of groups) {
+    await addDoc(schedCol, { ...g, customDays: [], onceDate: '', grace: 30, updatedAt: serverTimestamp() });
   }
-  showToast('✓ Medication groups added');
+  showToast('✓ Medication groups added to schedule');
 }
 
 /* ── BACK BUTTON HANDLER ─────────────────────────────── */
@@ -872,7 +914,7 @@ function pushViewState(view) {
   history.pushState({ view }, '', '#' + view);
 }
 function activateView(view) {
-  const viewMap = { today:0, schedule:1, log:2, settings:3, therapy:4 };
+  const viewMap = { today:0, schedule:1, settings:2, therapy:3, measurements:4, log:5, contacts:6, todo:7, reports:8 };
   const tabs = document.querySelectorAll('.nav-tab');
   const idx = viewMap[view];
   if (idx === undefined || !tabs[idx]) return;
@@ -914,7 +956,8 @@ window.switchView = function(view, el) {
   if (view==='therapy')  renderTherapy();
   if (view==='contacts') renderContacts();
   if (view==='todo')     renderTodo();
-  if (view==='reports')  renderReports();
+  if (view==='reports')      renderReports();
+  if (view==='measurements') renderMeasurements();
   pushViewState(view);
 };
 
@@ -1020,24 +1063,33 @@ window.openTaskLog = function(schedId,timeStr) {
   pendingLog={schedId,timeStr,dateStr,name:item.name,cat:item.cat,existingId:existing?.id,medList:item.medList||[]};
   document.getElementById('log-modal-title').textContent=item.name;
   document.getElementById('log-modal-sub').textContent=CATS[item.cat].icon+' '+CATS[item.cat].label+' · '+fmt12(timeStr);
-  // Show med group checklist
-  const medGroup=document.getElementById('log-med-group');
-  const medListEl=document.getElementById('log-med-list');
-  if(item.medList&&item.medList.length>0){
-    medGroup.style.display='block';
-    const existingMedLogs=logEntries.filter(e=>e.schedId===schedId&&e.dateStr===fmtDate(viewDate)&&e.medGroup===true);
-    medListEl.innerHTML=item.medList.map((m,i)=>{
-      const logged=existingMedLogs.some(e=>e.name===m.name);
-      return `<div class="med-check-item" onclick="toggleMedCheck(${i})">`+
-        `<div class="med-check-box ${logged?'checked':''}" id="med-check-${i}">${logged?'✓':''}</div>`+
-        `<div style="flex:1"><div class="med-check-name">${m.name}</div>${m.dose?`<div class="med-check-dose">${m.dose}</div>`:''}</div></div>`;
-    }).join('');
-  } else {
-    medGroup.style.display='none';
-  }
   document.getElementById('log-caregiver').value='Ron';
   document.getElementById('log-time').value=nowTime();
   document.getElementById('log-notes').value=existing?.notes||'';
+
+  // Med group checklist
+  const medGroup = document.getElementById('log-med-group');
+  const medListEl = document.getElementById('log-med-list');
+  if (item.medList && item.medList.length > 0) {
+    medGroup.style.display = 'block';
+    // Get individual logs for each med
+    const existingMedLogs = logEntries.filter(e =>
+      e.schedId === schedId && e.dateStr === dateStr && e.medGroup === true
+    );
+    medListEl.innerHTML = item.medList.map((m,i) => {
+      const logged = existingMedLogs.some(e => e.name === m.name);
+      return `<div class="med-check-item" onclick="toggleMedCheck(${i})">
+        <div class="med-check-box ${logged?'checked':''}" id="med-check-${i}">${logged?'✓':''}</div>
+        <div style="flex:1">
+          <div class="med-check-name">${m.name}</div>
+          ${m.dose?`<div class="med-check-dose">${m.dose}</div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    medGroup.style.display = 'none';
+  }
+
   const infoBox=document.getElementById('log-existing-info');
   const undoBtn=document.getElementById('log-undo-btn');
   const saveBtn=document.getElementById('log-save-btn');
@@ -1048,7 +1100,30 @@ window.openTaskLog = function(schedId,timeStr) {
   } else {
     infoBox.style.display='none'; undoBtn.style.display='none'; saveBtn.textContent='Save Record';
   }
+  // Show skipped options for Suction and Cough Assist
+  var skippedGroup = document.getElementById('log-skipped-group');
+  if (skippedGroup) {
+    var showSkip = ['Suction','Cough Assist'].indexOf(item.name) >= 0;
+    skippedGroup.style.display = showSkip ? 'block' : 'none';
+    if (skippedGroup.querySelector('#skip-declined-btn')) {
+      document.getElementById('skip-declined-btn').style.background = '#fff';
+      document.getElementById('skip-notneeded-btn').style.background = '#fff';
+    }
+  }
   openModal('modal-log');
+};
+
+window.toggleMedCheck = function(idx) {
+  const box = document.getElementById('med-check-'+idx);
+  if (!box) return;
+  const checked = box.classList.toggle('checked');
+  box.textContent = checked ? '✓' : '';
+};
+
+window.markAllMeds = function() {
+  document.querySelectorAll('.med-check-box').forEach(box => {
+    box.classList.add('checked'); box.textContent = '✓';
+  });
 };
 
 window.saveLog = async function() {
@@ -1056,14 +1131,44 @@ window.saveLog = async function() {
   const btn=document.getElementById('log-save-btn');
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Saving…';
   try {
-    const entry={schedId:pendingLog.schedId,timeStr:pendingLog.timeStr,dateStr:pendingLog.dateStr,
-      cat:pendingLog.cat,name:pendingLog.name,
-      caregiver:document.getElementById('log-caregiver').value,
-      givenTime:document.getElementById('log-time').value,
-      notes:document.getElementById('log-notes').value.trim(),
-      unscheduled:false,ts:serverTimestamp()};
-    if (pendingLog.existingId) await setDoc(doc(db,'log',pendingLog.existingId),entry);
-    else await addDoc(logCol,entry);
+    const caregiver = document.getElementById('log-caregiver').value;
+    const givenTime = document.getElementById('log-time').value;
+    const notes     = document.getElementById('log-notes').value.trim();
+
+    // Check if this is a med group with individual selections
+    const checkedBoxes = document.querySelectorAll('.med-check-box.checked');
+    const hasMedGroup  = pendingLog.medList && pendingLog.medList.length > 0;
+
+    if (hasMedGroup && checkedBoxes.length > 0) {
+      // Check if all are checked — save as one group entry
+      const allChecked = checkedBoxes.length === pendingLog.medList.length;
+      if (allChecked) {
+        // Save one entry for the whole group
+        const entry={schedId:pendingLog.schedId,timeStr:pendingLog.timeStr,dateStr:pendingLog.dateStr,
+          cat:pendingLog.cat,name:pendingLog.name,caregiver,givenTime,notes,
+          unscheduled:false,medGroup:false,ts:serverTimestamp()};
+        if (pendingLog.existingId) await setDoc(doc(db,'log',pendingLog.existingId),entry);
+        else await addDoc(logCol,entry);
+      } else {
+        // Save individual entries for each checked med
+        for (let i=0; i<pendingLog.medList.length; i++) {
+          const box = document.getElementById('med-check-'+i);
+          if (box && box.classList.contains('checked')) {
+            await addDoc(logCol,{schedId:pendingLog.schedId,timeStr:pendingLog.timeStr,
+              dateStr:pendingLog.dateStr,cat:pendingLog.cat,
+              name:pendingLog.medList[i].name,caregiver,givenTime,notes,
+              unscheduled:false,medGroup:true,ts:serverTimestamp()});
+          }
+        }
+      }
+    } else {
+      // Standard single entry
+      const entry={schedId:pendingLog.schedId,timeStr:pendingLog.timeStr,dateStr:pendingLog.dateStr,
+        cat:pendingLog.cat,name:pendingLog.name,caregiver,givenTime,notes,
+        unscheduled:false,ts:serverTimestamp()};
+      if (pendingLog.existingId) await setDoc(doc(db,'log',pendingLog.existingId),entry);
+      else await addDoc(logCol,entry);
+    }
     closeModal('modal-log'); showToast('✓ Recorded');
   } catch(e){showToast('Error saving — check connection');console.error(e);}
   finally{btn.disabled=false;btn.textContent='Save Record';}
@@ -1171,8 +1276,11 @@ window.updateAddPresets = function() {
   const cat = document.getElementById('add-cat').value;
   document.getElementById('add-name').value = '';
   renderPresetGrid('add-preset-grid','add-name',cat,'add');
-  const ms=document.getElementById('add-med-group-section');
-  if(ms){ms.style.display=cat==='med'?'block':'none';if(cat==='med')renderAddMedChecklist([]);}
+  const medSection = document.getElementById('add-med-group-section');
+  if (medSection) {
+    medSection.style.display = cat === 'med' ? 'block' : 'none';
+    if (cat === 'med') renderAddMedChecklist();
+  }
 };
 
 window.updateQuickPresets = function() {
@@ -1213,29 +1321,59 @@ window.filterSched = function(el,cat) {
 };
 
 function renderSchedule() {
-  console.log('renderSchedule called, schedule length:', schedule.length, 'filter:', schedFilter);
   const list=document.getElementById('sched-list');
   const items=schedule.filter(s=>schedFilter==='all'||s.cat===schedFilter)
-    .sort((a,b)=>((a.times&&a.times[0])||'').localeCompare((b.times&&b.times[0])||'')||(a.name||'').localeCompare(b.name||''));
+    .sort((a,b)=>((a.times||[''])[0]).localeCompare((b.times||[''])[0])||a.name.localeCompare(b.name));
   if (!items.length){
     list.innerHTML=`<div class="empty-state"><div class="empty-icon">🗓</div><p>No items yet. Tap <b>Add Care Item</b> to get started.</p></div>`;return;
   }
   list.innerHTML=items.map(s=>{
-    const cfg=CATS[s.cat]||{color:'#888',icon:'*',label:s.cat||''};
+    const cfg=CATS[s.cat];
     const dayLabel=s.days==='daily'?'Daily':s.days==='weekday'?'Mon–Fri':s.days==='weekend'?'Sat–Sun':s.days==='once'?(s.onceDate||'One-time'):'Custom';
-    const medCount=s.medList&&s.medList.length?' · '+s.medList.length+' meds':'';
-    return '<div class="sched-item">'
-      +'<div class="sched-cat-dot" style="background:'+cfg.color+'"></div>'
-      +'<div class="sched-info">'
-      +'<div class="sched-name">'+cfg.icon+' '+s.name+medCount+'</div>'
-      +'<div class="sched-detail">'+(s.dose?s.dose+' · ':'')+(s.times||[]).map(fmt12).join(', ')+(s.times&&s.times.length?'':' No time')+' · '+dayLabel+'</div>'
-      +'</div>'
-      +'<div class="sched-actions">'
-      +'<button class="sched-btn" onclick="editItem(&quot;'+s.id+'&quot;)">Edit</button>'
-      +'<button class="sched-btn del" onclick="deleteItem(&quot;'+s.id+'&quot;)">✕</button>'
-      +'</div></div>';
+    return `<div class="sched-item">
+      <div class="sched-cat-dot" style="background:${cfg.color}"></div>
+      <div class="sched-info">
+        <div class="sched-name">${cfg.icon} ${s.name}</div>
+        <div class="sched-detail">${s.dose?s.dose+' · ':''}${(s.times||[]).map(fmt12).join(', ')||'No time'} · ${dayLabel}</div>
+      </div>
+      <div class="sched-actions">
+        <button class="sched-btn" onclick="editItem('${s.id}')">Edit</button>
+        <button class="sched-btn del" onclick="deleteItem('${s.id}')">✕</button>
+      </div>
+    </div>`;
   }).join('');
 }
+
+/* ── MED GROUP CHECKLIST (in schedule modal) ─────────── */
+window.renderAddMedChecklist = function(selectedMeds) {
+  const el = document.getElementById('add-med-checklist');
+  if (!el) return;
+  const selected = selectedMeds || [];
+  const allMeds = presets['med'] || [];
+  if (!allMeds.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px">No medication presets found. Add them in Care Items first.</div>';
+    return;
+  }
+  const scheduled = allMeds.filter(m => m.timing === 'Scheduled');
+  const asNeeded  = allMeds.filter(m => m.timing === 'As Needed');
+  const groups = [['Scheduled', scheduled], ['As Needed', asNeeded]];
+  let html = '';
+  groups.forEach(([label, meds]) => {
+    if (!meds.length) return;
+    html += `<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:6px 4px 4px">${label}</div>`;
+    meds.forEach(m => {
+      const isChecked = selected.some(s => s.name === m.name);
+      html += `<label style="display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;border-radius:6px">
+        <input type="checkbox" value="${m.name}" data-dose="${m.instructions||''}" ${isChecked?'checked':''} style="width:16px;height:16px;accent-color:var(--teal);cursor:pointer">
+        <div>
+          <div style="font-size:13px;font-weight:500">${m.name}</div>
+          ${m.instructions?`<div style="font-size:11px;color:var(--muted)">${m.instructions}</div>`:''}
+        </div>
+      </label>`;
+    });
+  });
+  el.innerHTML = html;
+};
 
 window.openAddSchedule = function() {
   document.getElementById('edit-id').value='';
@@ -1268,6 +1406,11 @@ window.editItem = function(id) {
     cb.checked=(s.customDays||[]).includes(parseInt(cb.value));
   });
   updateAddPresets();
+  // Show med group section if med category
+  if (s.cat === 'med') {
+    const medSection = document.getElementById('add-med-group-section');
+    if (medSection) { medSection.style.display = 'block'; renderAddMedChecklist(s.medList||[]); }
+  }
   // Pre-select matching preset or show text field with value
   const grid=document.getElementById('add-preset-grid');
   const input=document.getElementById('add-name');
@@ -1300,7 +1443,14 @@ window.saveScheduleItem = async function() {
   let customDays=[];
   const onceDate=document.getElementById('add-once-date').value||'';
   if (days==='custom') document.querySelectorAll('#custom-days input[type=checkbox]:checked').forEach(cb=>customDays.push(parseInt(cb.value)));
-  const item={cat:document.getElementById('add-cat').value,name,times,days,customDays,onceDate,
+  // Collect selected meds if medication group
+  let medList = [];
+  if (document.getElementById('add-cat').value === 'med') {
+    document.querySelectorAll('#add-med-checklist input[type=checkbox]:checked').forEach(cb => {
+      medList.push({ name: cb.value, dose: cb.dataset.dose || '' });
+    });
+  }
+  const item={cat:document.getElementById('add-cat').value,name,times,days,customDays,onceDate,medList,
     dose:document.getElementById('add-dose').value.trim(),
     grace:parseInt(document.getElementById('add-grace').value),updatedAt:serverTimestamp()};
   const editId=document.getElementById('edit-id').value;
@@ -1403,178 +1553,169 @@ window.deleteLogEntry = async function() {
   catch(err){showToast('Error — check connection');}
 };
 
-/* reports view */
-let currentReport = null;
-let reportDate = new Date();
-let reportWeekStart = (function(){ var d=new Date(); d.setDate(d.getDate()-d.getDay()); return d; })();
+/* ── MEASUREMENTS VIEW ──────────────────────────────── */
+const MEAS_TYPES = [
+  { key:'bp',    label:'Blood Pressure', unit:'mmHg',  format:'bp' },
+  { key:'hr',    label:'Heart Rate',     unit:'bpm',   format:'num' },
+  { key:'spo2',  label:'SpO2',           unit:'%',     format:'num' },
+  { key:'temp',  label:'Temperature',    unit:'F',     format:'num' },
+  { key:'rr',    label:'Resp Rate',      unit:'/min',  format:'num' },
+  { key:'etco2', label:'EtCO2',          unit:'mmHg',  format:'num' },
+  { key:'wt',    label:'Weight',         unit:'lbs',   format:'num' },
+  { key:'tfin',  label:'Tube Feed In',   unit:'mL',    format:'num' },
+  { key:'fluout',label:'Fluid Output',   unit:'mL',    format:'num' },
+];
+let measView = 'quick';
+let measFilter = 'bp';
 
-function renderReports() {
-  var el = document.getElementById('reports-content');
+function renderMeasurements() {
+  var el = document.getElementById('measurements-content');
   if (!el) return;
-  if (currentReport) { renderReport(currentReport, el); return; }
-  var html = '<h2 style="font-size:17px;font-weight:700;margin-bottom:14px">Reports</h2><div class="report-cards-wrap">';
-  html += rCard('daily',   'Daily Schedule',                    'All scheduled items for any day with completion status');
-  html += rCard('mar',     'Medication Administration Record',  'Weekly MAR showing each med given or missed by day');
-  html += rCard('weekly',  'Weekly Summary',                    'Overview of care activities for the week');
-  html += rCard('handoff', 'Caregiver Handoff', 'Shift summary for incoming caregiver') + '</div>';
-  el.innerHTML = html;
-}
-function rCard(type, title, desc) {
-  return '<div class="report-card" onclick="openReport(\'' + type + '\')">'
-    + '<div class="report-title">' + title + '</div>'
-    + '<div class="report-desc">' + desc + '</div></div>';
-}
-window.openReport  = function(type) { currentReport = type; reportDate = new Date(); renderReports(); };
-window.closeReport = function()     { currentReport = null; renderReports(); };
-function renderReport(type, el) {
-  if (type === 'daily')   renderDailySchedule(el);
-  if (type === 'mar')     renderMAR(el);
-  if (type === 'weekly')  renderWeeklySummary(el);
-  if (type === 'handoff') renderHandoff(el);
-}
-function rHeader(title, sub) {
-  return '<div class="report-header">'
-    + '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:#8aabb8;margin-bottom:2px">' + title + '</div>'
-    + '<div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:2px">' + sub + '</div>'
-    + '<button class="print-btn" onclick="window.print()">Print</button></div>';
-}
-function rBack() { return '<button class="back-to-reports" onclick="closeReport()">&#8249; Reports</button>'; }
-
-function renderDailySchedule(el) {
-  var items = getDayItems(reportDate);
-  var dateStr = fmtDate(reportDate);
-  var isToday = dateStr === fmtDate(new Date());
-  items.sort(function(a,b){ return a.scheduledTs - b.scheduledTs; });
-  var rows = '';
-  items.forEach(function(item) {
-    var cfg = CATS[item.cat] || {icon:'*', label:item.cat, color:'#888'};
-    var done = !!item.logEntry;
-    var doneLabel = done
-      ? ('Done by ' + item.logEntry.caregiver + ' at ' + fmt12(item.logEntry.givenTime||item.logEntry.timeStr))
-      : (isToday && item.status === 'late' ? 'Overdue' : 'Pending');
-    var doneColor = done ? 'var(--ok)' : (isToday && item.status === 'late' ? 'var(--warn)' : 'var(--muted)');
-    var medNames = (item.medList && item.medList.length) ? item.medList.map(function(m){ return m.name; }).join(' | ') : '';
-    rows += '<div style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.06)">';
-    rows += '<div style="display:flex;align-items:baseline;gap:10px">';
-    rows += '<div style="font-family:monospace;font-size:13px;font-weight:700;color:var(--teal);flex-shrink:0;min-width:72px">' + fmt12(item.time) + '</div>';
-    rows += '<div style="flex:1"><span style="font-size:14px;font-weight:700">' + item.name + '</span>';
-    rows += '<span style="font-size:10px;color:' + cfg.color + ';font-weight:700;margin-left:6px">' + cfg.icon + ' ' + cfg.label + '</span></div></div>';
-    rows += '<div style="padding-left:82px;margin-top:4px">';
-    rows += '<div style="font-size:12px;color:' + doneColor + ';font-weight:600">' + doneLabel + '</div>';
-    if (item.dose) rows += '<div style="font-size:11px;color:var(--muted);margin-top:1px">' + item.dose + '</div>';
-    if (medNames) rows += '<div style="font-size:11px;color:var(--muted);margin-top:2px">' + medNames + '</div>';
-    if (item.logEntry && item.logEntry.notes) rows += '<div style="font-size:11px;color:#4a6070;font-style:italic;margin-top:2px">Note: ' + item.logEntry.notes + '</div>';
-    rows += '</div></div>';
+  var tabBar = '<div style="display:flex;gap:8px;margin-bottom:14px">';
+  [['quick','Quick Entry'],['vitals','Full Vitals'],['trends','Trends']].forEach(function(t) {
+    tabBar += '<button onclick="measView='' + t[0] + '';renderMeasurements()" style="flex:1;padding:8px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:' + (measView===t[0]?'var(--navy)':'var(--cream)') + ';color:' + (measView===t[0]?'#fff':'var(--navy)') + '">' + t[1] + '</button>';
   });
-  var noItems = '<div style="text-align:center;padding:32px;color:var(--muted)">No items scheduled.</div>';
-  var dateNav = '<div class="report-date-nav">'
-    + '<button onclick="reportDate=new Date(reportDate.getTime()-86400000);renderReports()">&#8249;</button>'
-    + '<input type="date" value="' + dateStr + '" onchange="reportDate=new Date(this.value+\'T12:00:00\');renderReports()">'
-    + '<button onclick="reportDate=new Date(reportDate.getTime()+86400000);renderReports()">&#8250;</button></div>';
-  var dLabel = reportDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  var comp = items.filter(function(i){ return i.logEntry; }).length;
-  el.innerHTML = rBack() + '<div class="report-view">' + rHeader('Daily Schedule', dLabel)
-    + '<div class="report-body">' + dateNav + (items.length === 0 ? noItems : rows)
-    + '<div style="margin-top:16px;font-size:11px;color:var(--muted);text-align:center">' + comp + ' of ' + items.length + ' items completed</div>'
-    + '</div></div>';
+  tabBar += '</div>';
+  if (measView==='quick') renderQuickMeasurement(el,tabBar);
+  else if (measView==='vitals') renderVitalsForm(el,tabBar);
+  else renderTrends(el,tabBar);
 }
 
-function renderMAR(el) {
-  var weekStart = new Date(reportWeekStart);
-  var days = []; for (var i=0;i<7;i++){var d=new Date(weekStart);d.setDate(d.getDate()+i);days.push(d);}
-  var dayLabels = days.map(function(d){return d.toLocaleDateString('en-US',{weekday:'short',month:'numeric',day:'numeric'});});
-  var medItems = schedule.filter(function(s){return s.cat==='med';});
-  medItems.sort(function(a,b){return ((a.times||[''])[0]).localeCompare((b.times||[''])[0]);});
-  var tableRows = '';
-  medItems.forEach(function(s) {
-    var cells = '';
-    days.forEach(function(day) {
-      var dow=day.getDay(), active=false;
-      if(s.days==='daily') active=true;
-      else if(s.days==='weekday') active=dow>=1&&dow<=5;
-      else if(s.days==='weekend') active=dow===0||dow===6;
-      else if(s.days==='once') active=s.onceDate===fmtDate(day);
-      else if(Array.isArray(s.customDays)) active=s.customDays.includes(dow);
-      if(!active){cells+='<td style="background:#f8f8f8;text-align:center;color:#ccc">-</td>';return;}
-      var logged=(s.times||[]).map(function(t){return getLogEntry(s.id,t,day);}).filter(Boolean);
-      if(logged.length>0){
-        var cg=[...new Set(logged.map(function(e){return e.caregiver;}))].join(',');
-        cells+='<td style="text-align:center"><span style="color:var(--ok);font-weight:700">&#10003;</span><div style="font-size:9px;color:var(--muted)">'+cg+'</div></td>';
-      } else {
-        cells+=day>new Date()?'<td style="text-align:center;color:#ccc">&#183;</td>':'<td style="text-align:center;color:var(--warn);font-weight:700">&#10007;</td>';
-      }
-    });
-    tableRows+='<tr><td><div style="font-weight:600">'+s.name+'</div><div style="font-size:10px;color:var(--muted)">'+(s.times||[]).map(fmt12).join(', ')+'</div></td>'+cells+'</tr>';
+function measTypeBar() {
+  var bar = '<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;scrollbar-width:none">';
+  MEAS_TYPES.forEach(function(t) {
+    bar += '<button class="meas-type-btn ' + (measFilter===t.key?'selected':'') + '" onclick="measFilter='' + t.key + '';renderMeasurements()">' + t.label + '</button>';
   });
-  var weekEnd=days[6];
-  var wNav='<div class="report-week-nav"><button onclick="reportWeekStart=new Date(reportWeekStart.getTime()-7*86400000);renderReports()">&#8249; Prev</button>'
-    +'<div style="flex:1;text-align:center;font-size:13px;font-weight:600">'+weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' - '+weekEnd.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'</div>'
-    +'<button onclick="reportWeekStart=new Date(reportWeekStart.getTime()+7*86400000);renderReports()">Next &#8250;</button></div>';
-  var tHtml=medItems.length===0?'<div style="text-align:center;padding:32px;color:var(--muted)">No medications scheduled.</div>'
-    :'<div style="overflow-x:auto"><table class="mar-grid"><thead><tr><th>Medication</th>'+dayLabels.map(function(l){return '<th>'+l+'</th>';}).join('')+'</tr></thead><tbody>'+tableRows+'</tbody></table></div>'
-    +'<div style="margin-top:12px;font-size:11px;color:var(--muted)">&#10003; Given &middot; &#10007; Missed &middot; &middot; Future &middot; - Not scheduled</div>';
-  var sub='Week of '+weekStart.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-  el.innerHTML=rBack()+'<div class="report-view">'+rHeader('Medication Administration Record',sub)+'<div class="report-body">'+wNav+tHtml+'</div></div>';
+  return bar + '</div>';
 }
 
-function renderWeeklySummary(el) {
-  var weekStart=new Date(reportWeekStart);
-  var days=[]; for(var i=0;i<7;i++){var d=new Date(weekStart);d.setDate(d.getDate()+i);days.push(d);}
-  var weekEnd=days[6];
-  var weekLogs=logEntries.filter(function(e){var d=e.dateStr||'';return d>=fmtDate(weekStart)&&d<=fmtDate(weekEnd);});
-  var catSummary='';
-  Object.entries(CATS).forEach(function(entry){
-    var cat=entry[0],cfg=entry[1];
-    var catLogs=weekLogs.filter(function(e){return e.cat===cat&&!e.medGroup;});
-    if(!catLogs.length) return;
-    catSummary+='<div class="report-row"><div class="report-time" style="color:'+cfg.color+'">'+cfg.icon+'</div><div style="flex:1;font-weight:600">'+cfg.label+'</div><div style="font-size:13px;font-weight:700">'+catLogs.length+' records</div></div>';
+function renderQuickMeasurement(el, tabBar) {
+  var mtype = MEAS_TYPES.find(function(t){return t.key===measFilter;}) || MEAS_TYPES[0];
+  var recent = measurements.filter(function(m){return m.type===measFilter;}).slice(0,5);
+  var valField = mtype.format==='bp'
+    ? '<div style="display:flex;gap:6px;align-items:center;margin-bottom:10px"><input type="number" id="meas-sys" placeholder="Systolic" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:10px;font-size:20px;text-align:center;outline:none;background:var(--cream)"><span style="font-size:18px;font-weight:700;color:var(--muted)">/</span><input type="number" id="meas-dia" placeholder="Diastolic" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:10px;font-size:20px;text-align:center;outline:none;background:var(--cream)"></div>'
+    : '<input type="number" id="meas-val" placeholder="Enter value" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:12px;font-size:24px;text-align:center;margin-bottom:10px;outline:none;background:var(--cream);box-sizing:border-box">';
+  var recentHtml = recent.length ? '<div class="meas-section-title">Recent ' + mtype.label + '</div>' + recent.map(function(m){
+    var val=m.type==='bp'?m.systolic+'/'+m.diastolic:m.value;
+    return '<div class="meas-entry"><div class="meas-value">'+val+'</div><div style="flex:1"><div class="meas-unit">'+mtype.unit+'</div><div class="meas-meta">'+(m.givenTime||'')+' &middot; '+(m.caregiver||'')+(m.notes?' &middot; '+m.notes:'')+'</div><div class="meas-meta">'+(m.dateStr||'')+'</div></div></div>';
+  }).join('') : '';
+  el.innerHTML = tabBar + measTypeBar()
+    + '<div style="background:#fff;border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow)">'
+    + '<div style="font-size:15px;font-weight:700;margin-bottom:12px">Record ' + mtype.label + '</div>'
+    + valField
+    + '<div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:12px">' + mtype.unit + '</div>'
+    + '<div style="display:flex;gap:8px;margin-bottom:10px"><select id="meas-cg" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;background:var(--cream);outline:none"><option>Ron</option><option>Marcus</option><option>Connor</option><option>Allie</option><option>Lisa</option><option>Erin</option><option>Nurse/Staff</option></select>'
+    + '<input type="time" id="meas-time" value="' + nowTime() + '" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;background:var(--cream);outline:none"></div>'
+    + '<input type="text" id="meas-notes" placeholder="Notes (optional)" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;margin-bottom:12px;background:var(--cream);outline:none;box-sizing:border-box">'
+    + '<button onclick="saveMeasurement()" style="width:100%;padding:13px;background:var(--teal);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer">Save</button>'
+    + '</div>' + recentHtml;
+}
+
+function renderVitalsForm(el, tabBar) {
+  el.innerHTML = tabBar
+    + '<div style="background:#fff;border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)">'
+    + '<div style="font-size:15px;font-weight:700;margin-bottom:14px">Full Vitals Assessment</div>'
+    + '<div class="vitals-form-grid">'
+    + '<div class="vitals-field" style="grid-column:1/-1"><label>Blood Pressure</label><div class="bp-row"><input type="number" id="v-sys" placeholder="Systolic"><span class="bp-sep">/</span><input type="number" id="v-dia" placeholder="Diastolic"></div></div>'
+    + '<div class="vitals-field"><label>Heart Rate (bpm)</label><input type="number" id="v-hr" placeholder="72"></div>'
+    + '<div class="vitals-field"><label>SpO2 (%)</label><input type="number" id="v-spo2" placeholder="98"></div>'
+    + '<div class="vitals-field"><label>Temperature (F)</label><input type="number" id="v-temp" placeholder="98.6" step="0.1"></div>'
+    + '<div class="vitals-field"><label>Resp Rate (/min)</label><input type="number" id="v-rr" placeholder="16"></div>'
+    + '<div class="vitals-field"><label>EtCO2 (mmHg)</label><input type="number" id="v-etco2" placeholder="35"></div>'
+    + '<div class="vitals-field"><label>Weight (lbs)</label><input type="number" id="v-wt" placeholder="120" step="0.1"></div>'
+    + '<div class="vitals-field"><label>Tube Feed In (mL)</label><input type="number" id="v-tfin" placeholder="300"></div>'
+    + '<div class="vitals-field" style="grid-column:1/-1"><label>Fluid Output (mL)</label><input type="number" id="v-fluout" placeholder="250"></div>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;margin-bottom:10px"><select id="v-cg" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;background:var(--cream);outline:none"><option>Ron</option><option>Marcus</option><option>Connor</option><option>Allie</option><option>Lisa</option><option>Erin</option><option>Nurse/Staff</option></select>'
+    + '<input type="time" id="v-time" value="' + nowTime() + '" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;background:var(--cream);outline:none"></div>'
+    + '<input type="text" id="v-notes" placeholder="General notes (optional)" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;margin-bottom:12px;background:var(--cream);outline:none;box-sizing:border-box">'
+    + '<button onclick="saveVitals()" style="width:100%;padding:13px;background:var(--teal);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer">Save All Vitals</button>'
+    + '</div>';
+}
+
+function renderTrends(el, tabBar) {
+  var mtype = MEAS_TYPES.find(function(t){return t.key===measFilter;}) || MEAS_TYPES[0];
+  var data = measurements.filter(function(m){return m.type===measFilter;}).slice(0,14).reverse();
+  if (!data.length) {
+    el.innerHTML = tabBar + measTypeBar() + '<div class="empty-state"><div class="empty-icon">&#x1F4C8;</div><p>No ' + mtype.label + ' recorded yet.</p></div>';
+    return;
+  }
+  var vals = data.map(function(m){return m.type==='bp'?m.systolic:parseFloat(m.value||0);});
+  var minV=Math.min.apply(null,vals), maxV=Math.max.apply(null,vals), range=maxV-minV||1;
+  var w=300,h=120,pad=20;
+  var pts = vals.map(function(v,i){
+    var x=pad+(i/(vals.length-1||1))*(w-pad*2);
+    var y=pad+(1-(v-minV)/range)*(h-pad*2);
+    return x+','+y;
+  }).join(' ');
+  var svg='<svg viewBox="0 0 '+w+' '+h+'" style="width:100%;height:auto"><polyline points="'+pts+'" fill="none" stroke="var(--teal)" stroke-width="2.5" stroke-linejoin="round"/>';
+  vals.forEach(function(v,i){
+    var x=pad+(i/(vals.length-1||1))*(w-pad*2);
+    var y=pad+(1-(v-minV)/range)*(h-pad*2);
+    svg+='<circle cx="'+x+'" cy="'+y+'" r="4" fill="var(--teal)"/><text x="'+x+'" y="'+(y-8)+'" font-size="9" text-anchor="middle" fill="#6b8394">'+v+'</text>';
   });
-  var dayRows='';
-  days.forEach(function(day){
-    var dayStr=fmtDate(day);
-    var dayLogs=weekLogs.filter(function(e){return (e.dateStr||'')===dayStr;});
-    var dayItems=getDayItems(day);
-    var comp=dayItems.filter(function(i){return i.logEntry;}).length;
-    var isFuture=day>new Date();
-    var cgs=[...new Set(dayLogs.map(function(e){return e.caregiver;}).filter(Boolean))].join(', ');
-    dayRows+='<div class="report-row"><div class="report-time">'+day.toLocaleDateString('en-US',{weekday:'short',month:'numeric',day:'numeric'})+'</div>'
-      +'<div style="flex:1">'+(isFuture?'<span style="color:var(--muted)">Future</span>':'<span style="font-weight:600">'+comp+'/'+dayItems.length+' scheduled</span><span style="font-size:11px;color:var(--muted)"> &middot; '+dayLogs.length+' records</span>')+'</div>'
-      +(!isFuture?'<div style="font-size:11px;color:var(--muted)">'+cgs+'</div>':'')+'</div>';
-  });
-  var wNav='<div class="report-week-nav"><button onclick="reportWeekStart=new Date(reportWeekStart.getTime()-7*86400000);renderReports()">&#8249; Prev</button>'
-    +'<div style="flex:1;text-align:center;font-size:13px;font-weight:600">'+weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' - '+weekEnd.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'</div>'
-    +'<button onclick="reportWeekStart=new Date(reportWeekStart.getTime()+7*86400000);renderReports()">Next &#8250;</button></div>';
-  var sub=weekStart.toLocaleDateString('en-US',{month:'long',day:'numeric'})+' - '+weekEnd.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-  el.innerHTML=rBack()+'<div class="report-view">'+rHeader('Weekly Summary',sub)
-    +'<div class="report-body">'+wNav
-    +'<div class="report-section-title">By Category</div>'+(catSummary||'<div style="color:var(--muted);font-size:13px">No records this week.</div>')
-    +'<div class="report-section-title">By Day</div>'+dayRows
-    +'<div style="margin-top:14px;font-size:11px;color:var(--muted);text-align:center">Total records this week: '+weekLogs.length+'</div>'
-    +'</div></div>';
+  svg+='</svg>';
+  var listHtml = measurements.filter(function(m){return m.type===measFilter;}).slice(0,10).map(function(m){
+    var val=m.type==='bp'?m.systolic+'/'+m.diastolic:m.value;
+    return '<div class="meas-entry"><div class="meas-value">'+val+'</div><div style="flex:1"><div class="meas-unit">'+mtype.unit+'</div><div class="meas-meta">'+(m.givenTime||'')+' &middot; '+(m.caregiver||'')+(m.notes?' &middot; '+m.notes:'')+'</div><div class="meas-meta">'+(m.dateStr||'')+'</div></div></div>';
+  }).join('');
+  el.innerHTML = tabBar + measTypeBar()
+    + '<div class="meas-trend-wrap"><div class="meas-section-title">'+mtype.label+' - Last '+data.length+' readings</div>'+svg
+    + '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:4px"><span>'+(data[0]&&data[0].dateStr||'')+'</span><span>'+(data[data.length-1]&&data[data.length-1].dateStr||'')+'</span></div></div>'
+    + '<div class="meas-section-title">History</div>' + listHtml;
 }
 
-function renderHandoff(el) {
-  var now=new Date(), dateStr=fmtDate(reportDate);
-  var todayItems=getDayItems(reportDate);
-  var done=todayItems.filter(function(i){return i.logEntry;});
-  var pending=todayItems.filter(function(i){return !i.logEntry&&i.scheduledTs>now.getTime();});
-  var overdue=todayItems.filter(function(i){return !i.logEntry&&i.scheduledTs<=now.getTime();});
-  var recentLogs=logEntries.filter(function(e){return e.dateStr===dateStr;}).slice(0,8);
-  var openTodos=todos.filter(function(t){return !t.done;}).slice(0,10);
-  function iRow(i){return '<div class="report-row"><div class="report-time">'+fmt12(i.time)+'</div><div style="flex:1;font-weight:600">'+i.name+'</div></div>';}
-  var html=rBack()+'<div class="report-view">'+rHeader('Caregiver Handoff',now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})+' &middot; '+fmt12(nowTime()))+'<div class="report-body">';
-  if(overdue.length) html+='<div class="handoff-section" style="background:#fdf0ef;border-left:4px solid var(--warn)"><div class="handoff-section-title" style="color:var(--warn)">Overdue ('+overdue.length+')</div>'+overdue.map(iRow).join('')+'</div>';
-  html+='<div class="handoff-section"><div class="handoff-section-title">Completed Today ('+done.length+')</div>'
-    +(done.length===0?'<div style="font-size:12px;color:var(--muted)">Nothing completed yet.</div>'
-      :done.map(function(i){return '<div class="report-row"><div class="report-time">'+fmt12(i.time)+'</div><div style="flex:1;font-weight:600">'+i.name+'</div><div style="font-size:11px;color:var(--ok)">'+i.logEntry.caregiver+'</div></div>';}).join(''))+'</div>';
-  html+='<div class="handoff-section"><div class="handoff-section-title">Still Pending ('+pending.length+')</div>'
-    +(pending.length===0?'<div style="font-size:12px;color:var(--muted)">All done!</div>':pending.map(iRow).join(''))+'</div>';
-  if(openTodos.length) html+='<div class="handoff-section"><div class="handoff-section-title">Open To-Do ('+openTodos.length+')</div>'+openTodos.map(function(t){return '<div class="report-row"><div style="flex:1;font-size:13px">'+t.text+'</div></div>';}).join('')+'</div>';
-  if(recentLogs.length) html+='<div class="handoff-section"><div class="handoff-section-title">Recent Records</div>'+recentLogs.map(function(e){var cfg=CATS[e.cat]||{icon:'*',color:'#888'};return '<div class="report-row"><div class="report-time">'+(e.givenTime?fmt12(e.givenTime):'--')+'</div><div style="flex:1"><span style="font-size:10px;color:'+cfg.color+';font-weight:700">'+cfg.icon+'</span> '+e.name+'</div><div style="font-size:11px;color:var(--muted)">'+(e.caregiver||'')+'</div></div>'+(e.notes?'<div class="report-note">'+e.notes+'</div>':'');}).join('')+'</div>';
-  html+='<div style="margin-top:16px;font-size:11px;color:var(--muted);text-align:center;border-top:1px solid var(--border);padding-top:10px">Becky\'s Care &middot; rnelsonmt.github.io/becky-care</div></div></div>';
-  el.innerHTML=html;
-}
+window.saveMeasurement = async function() {
+  var mtype=MEAS_TYPES.find(function(t){return t.key===measFilter;});
+  var cg=document.getElementById('meas-cg')&&document.getElementById('meas-cg').value;
+  var time=document.getElementById('meas-time')&&document.getElementById('meas-time').value;
+  var notes=document.getElementById('meas-notes')&&document.getElementById('meas-notes').value.trim();
+  var data={type:measFilter,label:mtype?mtype.label:measFilter,caregiver:cg,givenTime:time,notes:notes,dateStr:fmtDate(new Date()),ts:serverTimestamp()};
+  if (measFilter==='bp'){
+    var sys=document.getElementById('meas-sys')&&document.getElementById('meas-sys').value;
+    var dia=document.getElementById('meas-dia')&&document.getElementById('meas-dia').value;
+    if(!sys||!dia){showToast('Enter both values');return;}
+    data.systolic=parseFloat(sys);data.diastolic=parseFloat(dia);data.value=sys+'/'+dia;
+  } else {
+    var val=document.getElementById('meas-val')&&document.getElementById('meas-val').value;
+    if(!val){showToast('Enter a value');return;}
+    data.value=parseFloat(val);
+  }
+  try{await addDoc(measurementsCol,data);showToast('Saved');renderMeasurements();}
+  catch(e){showToast('Error - check connection');console.error(e);}
+};
 
+window.saveVitals = async function() {
+  var cg=document.getElementById('v-cg')&&document.getElementById('v-cg').value;
+  var time=document.getElementById('v-time')&&document.getElementById('v-time').value;
+  var notes=document.getElementById('v-notes')&&document.getElementById('v-notes').value.trim();
+  var dateStr=fmtDate(new Date());
+  var fields=[{id:'v-sys',id2:'v-dia',type:'bp'},{id:'v-hr',type:'hr'},{id:'v-spo2',type:'spo2'},{id:'v-temp',type:'temp'},{id:'v-rr',type:'rr'},{id:'v-etco2',type:'etco2'},{id:'v-wt',type:'wt'},{id:'v-tfin',type:'tfin'},{id:'v-fluout',type:'fluout'}];
+  try{
+    var saved=0;
+    for(var i=0;i<fields.length;i++){
+      var f=fields[i],el=document.getElementById(f.id);
+      if(!el||!el.value) continue;
+      var mt=MEAS_TYPES.find(function(t){return t.key===f.type;});
+      var entry={type:f.type,label:mt?mt.label:f.type,caregiver:cg,givenTime:time,notes:notes,dateStr:dateStr,ts:serverTimestamp()};
+      if(f.type==='bp'){var el2=document.getElementById(f.id2);entry.systolic=parseFloat(el.value);entry.diastolic=el2?parseFloat(el2.value):0;entry.value=el.value+'/'+(el2?el2.value:'');}
+      else{entry.value=parseFloat(el.value);}
+      await addDoc(measurementsCol,entry);saved++;
+    }
+    showToast(saved+' vitals saved');renderMeasurements();
+  }catch(e){showToast('Error - check connection');console.error(e);}
+};
+
+window.markSkipped = async function(reason) {
+  if(!pendingLog) return;
+  try{
+    await addDoc(logCol,{schedId:pendingLog.schedId,timeStr:pendingLog.timeStr,dateStr:pendingLog.dateStr,
+      cat:pendingLog.cat,name:pendingLog.name,caregiver:document.getElementById('log-caregiver').value,
+      givenTime:document.getElementById('log-time').value,notes:'Skipped: '+reason,
+      skipped:true,skipReason:reason,unscheduled:false,ts:serverTimestamp()});
+    closeModal('modal-log');showToast('Recorded as skipped: '+reason);
+  }catch(e){showToast('Error - check connection');}
+};
 
 /* ── THERAPY VIEW ────────────────────────────────────── */
 function renderTherapy() {
@@ -1586,7 +1727,7 @@ function renderTherapy() {
   let html = '<div style="margin-bottom:16px"><h2 style="font-size:17px;font-weight:700">Therapy</h2></div>';
 
   // Today's therapy items
-  html += '<div class="settings-section"><div class="settings-section-title">Today\'s Sessions</div>';
+  html += '<div class="settings-section"><div class="settings-section-title">Today's Sessions</div>';
   if (dayItems.length === 0) {
     html += '<div style="font-size:13px;color:var(--muted);font-style:italic;margin-bottom:12px">No therapy scheduled today.</div>';
   } else {
@@ -1783,6 +1924,333 @@ window.deleteTodo = async function(id) {
   try { await deleteDoc(doc(db,'todos',id)); }
   catch(e) { showToast('Error — check connection'); }
 };
+
+/* ── REPORTS VIEW ────────────────────────────────────── */
+let currentReport = null;
+let reportDate    = new Date();
+let reportWeekStart = (() => { const d=new Date(); d.setDate(d.getDate()-d.getDay()); return d; })();
+
+function renderReports() {
+  const el = document.getElementById('reports-content');
+  if (currentReport) { renderReport(currentReport, el); return; }
+  el.innerHTML = `
+    <h2 style="font-size:17px;font-weight:700;margin-bottom:14px">Reports</h2>
+    <div class="report-card" onclick="openReport('daily')">
+      <div class="report-icon">📋</div>
+      <div><div class="report-title">Daily Schedule</div>
+      <div class="report-desc">All scheduled items for any day with completion status</div></div>
+      <div style="margin-left:auto;font-size:18px;color:var(--muted)">›</div>
+    </div>
+    <div class="report-card" onclick="openReport('mar')">
+      <div class="report-icon">💊</div>
+      <div><div class="report-title">Medication Administration Record</div>
+      <div class="report-desc">Weekly MAR showing each med given/missed by day</div></div>
+      <div style="margin-left:auto;font-size:18px;color:var(--muted)">›</div>
+    </div>
+    <div class="report-card" onclick="openReport('weekly')">
+      <div class="report-icon">📅</div>
+      <div><div class="report-title">Weekly Summary</div>
+      <div class="report-desc">Overview of care activities for the week</div></div>
+      <div style="margin-left:auto;font-size:18px;color:var(--muted)">›</div>
+    </div>
+    <div class="report-card" onclick="openReport('handoff')">
+      <div class="report-icon">🤝</div>
+      <div><div class="report-title">Caregiver Handoff Report</div>
+      <div class="report-desc">Shift summary for incoming caregiver</div></div>
+      <div style="margin-left:auto;font-size:18px;color:var(--muted)">›</div>
+    </div>`;
+}
+
+window.openReport = function(type) {
+  currentReport = type;
+  if (type === 'daily')   reportDate = new Date();
+  if (type === 'handoff') reportDate = new Date();
+  renderReports();
+};
+window.closeReport = function() { currentReport = null; renderReports(); };
+
+function renderReport(type, el) {
+  if (type === 'daily')   renderDailySchedule(el);
+  if (type === 'mar')     renderMAR(el);
+  if (type === 'weekly')  renderWeeklySummary(el);
+  if (type === 'handoff') renderHandoff(el);
+}
+
+/* ── DAILY SCHEDULE ──────────────────────────────────── */
+function renderDailySchedule(el) {
+  const items = getDayItems(reportDate);
+  const dateStr = fmtDate(reportDate);
+  const isToday = dateStr === fmtDate(new Date());
+
+  // Group by hour for readability
+  const catOrder = Object.keys(CATS);
+  items.sort((a,b) => a.scheduledTs - b.scheduledTs);
+
+  let rows = '';
+  items.forEach(item => {
+    const cfg = CATS[item.cat] || { icon:'•', label:item.cat, color:'#888' };
+    const done = !!item.logEntry;
+    const statusLabel = done
+      ? `<span class="status-done-label">✓ ${item.logEntry.caregiver} ${fmt12(item.logEntry.givenTime||item.logEntry.timeStr)}</span>`
+      : isToday && item.status==='late'
+        ? `<span class="status-miss-label">⚠ Overdue</span>`
+        : `<span style="color:var(--muted)">—</span>`;
+    const medCount = item.medList && item.medList.length
+      ? `<div style="font-size:11px;color:var(--muted);padding-left:80px;margin-top:1px">${item.medList.map(m=>m.name).join(', ')}</div>` : '';
+    rows += `<div>
+      <div class="report-row">
+        <div class="report-time">${fmt12(item.time)}</div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:baseline;gap:6px">
+            <span class="report-item-name">${item.name}</span>
+            <span style="font-size:10px;color:${cfg.color};font-weight:700">${cfg.icon} ${cfg.label}</span>
+          </div>
+          ${item.dose ? `<div class="report-item-detail">${item.dose}</div>` : ''}
+        </div>
+        <div class="report-item-status">${statusLabel}</div>
+      </div>
+      ${medCount}
+      ${item.logEntry?.notes ? `<div class="report-note">Note: ${item.logEntry.notes}</div>` : ''}
+    </div>`;
+  });
+
+  el.innerHTML = `
+    <button class="back-to-reports" onclick="closeReport()">‹ Reports</button>
+    <div class="report-view">
+      <div class="report-header">
+        <div>
+          <h2>Daily Schedule</h2>
+          <div class="report-header-sub">Becky Nelson · ${reportDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</div>
+        </div>
+        <button class="print-btn" onclick="window.print()">🖨 Print</button>
+      </div>
+      <div class="report-body">
+        <div class="report-date-nav">
+          <button onclick="reportDate=new Date(reportDate.getTime()-86400000);renderReports()">‹</button>
+          <input type="date" value="${dateStr}" onchange="reportDate=new Date(this.value+'T12:00:00');renderReports()">
+          <button onclick="reportDate=new Date(reportDate.getTime()+86400000);renderReports()">›</button>
+        </div>
+        ${items.length === 0
+          ? '<div style="text-align:center;padding:32px;color:var(--muted)">No items scheduled for this day.</div>'
+          : rows}
+        <div style="margin-top:16px;font-size:11px;color:var(--muted);text-align:center">
+          ${items.filter(i=>i.logEntry).length} of ${items.length} items completed
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ── MAR (Medication Administration Record) ──────────── */
+function renderMAR(el) {
+  // Get the week containing reportDate
+  const weekStart = new Date(reportWeekStart);
+  const days = Array.from({length:7}, (_,i) => {
+    const d = new Date(weekStart); d.setDate(d.getDate()+i); return d;
+  });
+  const dayLabels = days.map(d => d.toLocaleDateString('en-US',{weekday:'short',month:'numeric',day:'numeric'}));
+
+  // Get all med schedule items
+  const medItems = schedule.filter(s => s.cat==='med');
+
+  let tableRows = '';
+  medItems.sort((a,b) => ((a.times||[''])[0]).localeCompare((b.times||[''])[0])).forEach(s => {
+    let cells = '';
+    days.forEach(day => {
+      const dow = day.getDay();
+      let active = false;
+      if (s.days==='daily') active=true;
+      else if (s.days==='weekday') active=dow>=1&&dow<=5;
+      else if (s.days==='weekend') active=dow===0||dow===6;
+      else if (s.days==='once') active=s.onceDate===fmtDate(day);
+      else if (Array.isArray(s.customDays)) active=s.customDays.includes(dow);
+      if (!active) { cells += '<td style="background:#f8f8f8;text-align:center;color:#ccc">—</td>'; return; }
+      const logged = (s.times||[]).map(t => getLogEntry(s.id,t,day)).filter(Boolean);
+      if (logged.length > 0) {
+        const cg = [...new Set(logged.map(e=>e.caregiver))].join(', ');
+        cells += `<td style="text-align:center"><span class="mar-check">✓</span><div style="font-size:9px;color:var(--muted)">${cg}</div></td>`;
+      } else {
+        const isFuture = day > new Date();
+        cells += isFuture
+          ? '<td style="text-align:center;color:#ccc">·</td>'
+          : '<td style="text-align:center"><span class="mar-miss">✗</span></td>';
+      }
+    });
+    const times = (s.times||[]).map(fmt12).join(', ');
+    tableRows += `<tr><td><div style="font-weight:600">${s.name}</div><div style="font-size:10px;color:var(--muted)">${times}</div></td>${cells}</tr>`;
+  });
+
+  el.innerHTML = `
+    <button class="back-to-reports" onclick="closeReport()">‹ Reports</button>
+    <div class="report-view">
+      <div class="report-header">
+        <div>
+          <h2>Medication Administration Record</h2>
+          <div class="report-header-sub">Becky Nelson · Week of ${weekStart.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
+        </div>
+        <button class="print-btn" onclick="window.print()">🖨 Print</button>
+      </div>
+      <div class="report-body">
+        <div class="report-week-nav">
+          <button onclick="reportWeekStart=new Date(reportWeekStart.getTime()-7*86400000);renderReports()">‹ Prev</button>
+          <div style="flex:1;text-align:center;font-size:13px;font-weight:600">${weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${days[6].toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
+          <button onclick="reportWeekStart=new Date(reportWeekStart.getTime()+7*86400000);renderReports()">Next ›</button>
+        </div>
+        ${medItems.length===0
+          ? '<div style="text-align:center;padding:32px;color:var(--muted)">No medications scheduled.</div>'
+          : `<div style="overflow-x:auto"><table class="mar-grid">
+              <thead><tr><th>Medication</th>${dayLabels.map(l=>`<th>${l}</th>`).join('')}</tr></thead>
+              <tbody>${tableRows}</tbody>
+            </table></div>`}
+        <div style="margin-top:12px;font-size:11px;color:var(--muted)">✓ = Given &nbsp;·&nbsp; ✗ = Missed/Not recorded &nbsp;·&nbsp; · = Future &nbsp;·&nbsp; — = Not scheduled</div>
+      </div>
+    </div>`;
+}
+
+/* ── WEEKLY SUMMARY ──────────────────────────────────── */
+function renderWeeklySummary(el) {
+  const weekStart = new Date(reportWeekStart);
+  const days = Array.from({length:7}, (_,i) => {
+    const d = new Date(weekStart); d.setDate(d.getDate()+i); return d;
+  });
+  const weekEnd = days[6];
+
+  // Filter log entries for this week
+  const weekLogs = logEntries.filter(e => {
+    const d = e.dateStr || '';
+    return d >= fmtDate(weekStart) && d <= fmtDate(weekEnd);
+  });
+
+  // Summary by category
+  let catSummary = '';
+  Object.entries(CATS).forEach(([cat, cfg]) => {
+    const catLogs = weekLogs.filter(e => e.cat===cat && !e.medGroup);
+    if (!catLogs.length) return;
+    catSummary += `<div class="report-row">
+      <div class="report-time" style="color:${cfg.color}">${cfg.icon}</div>
+      <div style="flex:1"><span style="font-weight:600">${cfg.label}</span></div>
+      <div style="font-size:13px;font-weight:700">${catLogs.length} records</div>
+    </div>`;
+  });
+
+  // Day by day breakdown
+  let dayRows = '';
+  days.forEach(day => {
+    const dayStr = fmtDate(day);
+    const dayLogs = weekLogs.filter(e => (e.dateStr||'')===dayStr);
+    const dayItems = getDayItems(day);
+    const completed = dayItems.filter(i => i.logEntry).length;
+    const isFuture = day > new Date();
+    dayRows += `<div class="report-row">
+      <div class="report-time">${day.toLocaleDateString('en-US',{weekday:'short',month:'numeric',day:'numeric'})}</div>
+      <div style="flex:1">
+        ${isFuture ? '<span style="color:var(--muted)">Future</span>'
+          : `<span style="font-weight:600">${completed}/${dayItems.length} scheduled</span>
+             <span style="font-size:11px;color:var(--muted)"> · ${dayLogs.length} total records</span>`}
+      </div>
+      ${!isFuture ? `<div style="font-size:11px;color:var(--muted)">${[...new Set(dayLogs.map(e=>e.caregiver).filter(Boolean))].join(', ')}</div>` : ''}
+    </div>`;
+  });
+
+  el.innerHTML = `
+    <button class="back-to-reports" onclick="closeReport()">‹ Reports</button>
+    <div class="report-view">
+      <div class="report-header">
+        <div>
+          <h2>Weekly Summary</h2>
+          <div class="report-header-sub">Becky Nelson · ${weekStart.toLocaleDateString('en-US',{month:'long',day:'numeric'})} – ${weekEnd.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
+        </div>
+        <button class="print-btn" onclick="window.print()">🖨 Print</button>
+      </div>
+      <div class="report-body">
+        <div class="report-week-nav">
+          <button onclick="reportWeekStart=new Date(reportWeekStart.getTime()-7*86400000);renderReports()">‹ Prev</button>
+          <div style="flex:1;text-align:center;font-size:13px;font-weight:600">${weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${weekEnd.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
+          <button onclick="reportWeekStart=new Date(reportWeekStart.getTime()+7*86400000);renderReports()">Next ›</button>
+        </div>
+        <div class="report-section-title">By Category</div>
+        ${catSummary || '<div style="color:var(--muted);font-size:13px">No records this week.</div>'}
+        <div class="report-section-title">By Day</div>
+        ${dayRows}
+        <div style="margin-top:14px;font-size:11px;color:var(--muted);text-align:center">
+          Total records this week: ${weekLogs.length}
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ── CAREGIVER HANDOFF ───────────────────────────────── */
+function renderHandoff(el) {
+  const now = new Date();
+  const dateStr = fmtDate(reportDate);
+  const todayItems = getDayItems(reportDate);
+  const done   = todayItems.filter(i => i.logEntry);
+  const pending = todayItems.filter(i => !i.logEntry && i.scheduledTs > now.getTime());
+  const overdue = todayItems.filter(i => !i.logEntry && i.scheduledTs <= now.getTime());
+  const recentLogs = logEntries.filter(e => e.dateStr===dateStr).slice(0,8);
+  const openTodos = todos.filter(t => !t.done).slice(0,10);
+
+  el.innerHTML = `
+    <button class="back-to-reports" onclick="closeReport()">‹ Reports</button>
+    <div class="report-view">
+      <div class="report-header">
+        <div>
+          <h2>Caregiver Handoff</h2>
+          <div class="report-header-sub">Becky Nelson · ${now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})} · Generated ${fmt12(nowTime())}</div>
+        </div>
+        <button class="print-btn" onclick="window.print()">🖨 Print</button>
+      </div>
+      <div class="report-body">
+        ${overdue.length ? `
+          <div class="handoff-section" style="background:#fdf0ef;border-left:4px solid var(--warn)">
+            <div class="handoff-section-title" style="color:var(--warn)">⚠ Overdue (${overdue.length})</div>
+            ${overdue.map(i=>`<div class="report-row"><div class="report-time">${fmt12(i.time)}</div><div class="report-item-name">${i.name}</div></div>`).join('')}
+          </div>` : ''}
+
+        <div class="handoff-section">
+          <div class="handoff-section-title">✓ Completed Today (${done.length})</div>
+          ${done.length===0 ? '<div style="font-size:12px;color:var(--muted)">Nothing completed yet.</div>' :
+            done.map(i=>`<div class="report-row">
+              <div class="report-time">${fmt12(i.time)}</div>
+              <div style="flex:1"><div class="report-item-name">${i.name}</div></div>
+              <div class="status-done-label" style="font-size:11px">✓ ${i.logEntry.caregiver}</div>
+            </div>`).join('')}
+        </div>
+
+        <div class="handoff-section">
+          <div class="handoff-section-title">⏳ Still Pending (${pending.length})</div>
+          ${pending.length===0 ? '<div style="font-size:12px;color:var(--muted)">All items complete!</div>' :
+            pending.map(i=>`<div class="report-row">
+              <div class="report-time">${fmt12(i.time)}</div>
+              <div class="report-item-name">${i.name}</div>
+            </div>`).join('')}
+        </div>
+
+        ${openTodos.length ? `
+          <div class="handoff-section">
+            <div class="handoff-section-title">📝 Open To-Do Items (${openTodos.length})</div>
+            ${openTodos.map(t=>`<div class="report-row"><div style="flex:1;font-size:13px">${t.text}</div></div>`).join('')}
+          </div>` : ''}
+
+        ${recentLogs.length ? `
+          <div class="handoff-section">
+            <div class="handoff-section-title">📋 Recent Records</div>
+            ${recentLogs.map(e=>{
+              const cfg=CATS[e.cat]||{icon:'•',color:'#888'};
+              return `<div class="report-row">
+                <div class="report-time">${e.givenTime?fmt12(e.givenTime):'--'}</div>
+                <div style="flex:1"><span style="font-size:10px;color:${cfg.color};font-weight:700">${cfg.icon}</span> ${e.name}</div>
+                <div style="font-size:11px;color:var(--muted)">${e.caregiver||''}</div>
+              </div>
+              ${e.notes?`<div class="report-note">${e.notes}</div>`:''}`;
+            }).join('')}
+          </div>` : ''}
+
+        <div style="margin-top:16px;font-size:11px;color:var(--muted);text-align:center;border-top:1px solid var(--border);padding-top:10px">
+          Becky's Care App · rnelsonmt.github.io/becky-care
+        </div>
+      </div>
+    </div>`;
+}
 
 /* ── SETTINGS VIEW ───────────────────────────────────── */
 let collapsedSettings = { med:true, vent:true, feed:true, cath:true, test:true, ther:true };
