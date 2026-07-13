@@ -15,20 +15,16 @@ const app = initializeApp({
   appId: "1:696799569086:web:08b7e6356a018338a3aaef"
 });
 const db = getFirestore(app);
-const schedCol = collection(db, 'schedule');
-const snap = await getDocs(query(schedCol, where('name', '==', 'Straight Cath')));
+const snap = await getDocs(query(collection(db,'schedule'), where('name','==','Straight Cath')));
 if (snap.empty) {
-  document.getElementById('status').textContent = 'No Straight Cath item found!';
+  document.getElementById('status').textContent = 'No Straight Cath item found - check Schedule tab.';
 } else {
   for (const d of snap.docs) {
-    await updateDoc(doc(db, 'schedule', d.id), {
-      times: ['08:30', '14:00', '19:30'],
-      days: 'daily',
-      onceDate: '',
-      grace: 30,
+    await updateDoc(doc(db,'schedule',d.id), {
+      times: ['08:00','12:00','16:00','20:00'],
+      days: 'daily', onceDate: '', grace: 30,
     });
-    document.getElementById('status').textContent = 'Done! Straight Cath scheduled at 8:30 AM, 2:00 PM, 7:30 PM daily. You can close this page.';
   }
+  document.getElementById('status').textContent = 'Done! Straight Cath scheduled at 8:00 AM, 12:00 PM, 4:00 PM, 8:00 PM daily. You can close this page.';
 }
-</script>
-</body></html>
+</script></body></html>
