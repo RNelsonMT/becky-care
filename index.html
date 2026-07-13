@@ -1029,13 +1029,14 @@ function renderTaskCard(item,now,isLast) {
   let delta='';
   if (item.status==='late') delta=`${hrs?hrs+'h ':''}${mins}m overdue`;
   else if (item.status==='soon'||item.status==='future') delta=`in ${hrs?hrs+'h ':''}${mins}m`;
+  const fluidOut = item.cat==='cath' ? (() => { var r=measurements.filter(function(m){return m.type==='fluout'&&m.dateStr===fmtDate(viewDate);}); return r.length?'<div style="font-size:10px;color:#9060d0;font-weight:600">Output: '+r[0].value+' mL</div>':''; })() : '';
   const doneBy=item.logEntry?`<div class="done-by">✓ ${item.logEntry.caregiver} at ${fmt12(item.logEntry.givenTime||item.logEntry.timeStr)}</div>`:'';
   return `<div class="task-card status-${item.status}" style="${isLast?'border-radius:0 0 12px 12px':''}" onclick="openTaskLog('${item.schedId}','${item.time}')">
     <div class="task-check">${item.status==='done'?'✓':''}</div>
     <div class="task-info">
       <div class="task-name">${item.name}</div>
       <div class="task-sub">${item.dose?`<b>${item.dose}</b>`:''}</div>
-      ${doneBy}
+      ${doneBy}${fluidOut}
     </div>
     <div class="task-time-col">
       <div class="task-time">${fmt12(item.time)}</div>
