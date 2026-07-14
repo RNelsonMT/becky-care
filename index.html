@@ -1802,6 +1802,9 @@ function renderTherapy() {
 /* ── CONTACTS VIEW ──────────────────────────────────── */
 const CONTACT_CATS = ['Provider','Vendor','Family','Friend'];
 
+window.toggleContactCat = function(cat) { collapsedContactCats[cat] = !collapsedContactCats[cat]; renderContacts(); };
+window.toggleContactOrg = function(id) { collapsedContactOrgs[id] = (collapsedContactOrgs[id] === false) ? true : false; renderContacts(); };
+
 function renderContacts() {
   const el = document.getElementById('contacts-content');
   const grouped = {};
@@ -1827,7 +1830,7 @@ function renderContacts() {
 
     html += '<div style="margin-bottom:10px">';
     // Category header
-    html += '<div onclick="collapsedContactCats['' + cat + '']=!collapsedContactCats['' + cat + ''];renderContacts()" '
+    html += '<div onclick="toggleContactCat(\'' + cat + '\')" '
       + 'style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--navy);color:#fff;border-radius:' + (catCollapsed?'var(--radius)':'var(--radius) var(--radius) 0 0') + ';cursor:pointer;user-select:none">'
       + '<span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">' + cat + '</span>'
       + '<span style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;opacity:.7">' + totalCount + ' contacts</span>'
@@ -1858,7 +1861,7 @@ function renderContacts() {
         if (c.isOrg) {
           html += '<div style="display:flex;gap:6px;padding:0 14px 8px">';
           if (children.length) {
-            html += '<button onclick="event.stopPropagation();collapsedContactOrgs['' + c.id + '']=!collapsedContactOrgs['' + c.id + ''];renderContacts()" '
+            html += '<button onclick="event.stopPropagation();toggleContactOrg(\'' + c.id + '\')" style="background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--navy)">'
               + 'style="background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--navy)">'
               + (orgCollapsed?'&#9654; Show individuals':'&#9660; Hide individuals') + '</button>';
           }
