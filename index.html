@@ -629,7 +629,7 @@
     </div>
     <div class="form-group">
       <label style="display:flex;align-items:center;gap:8px;text-transform:none;font-size:14px;font-weight:600">
-        <input type="checkbox" id="contact-is-org" style="width:16px;height:16px;accent-color:var(--teal)">
+        <input type="checkbox" id="contact-is-org" style="width:18px;height:18px;accent-color:var(--teal);cursor:pointer">
         This is an organization or business
       </label>
     </div>
@@ -642,15 +642,15 @@
       <input type="text" id="contact-role" placeholder="e.g. Case Manager, Physical Therapist…">
     </div>
     <div class="form-group">
-      <label>Notes</label>
-      <textarea id="contact-notes" placeholder="Additional notes…"></textarea>
-    </div>
-    <div class="form-group">
       <label style="display:flex;align-items:center;justify-content:space-between">
         Contact Details
         <button type="button" onclick="addContactDetail()" style="background:var(--teal);color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;cursor:pointer">+ Add</button>
       </label>
       <div id="contact-details-list" style="display:flex;flex-direction:column;gap:6px;margin-top:6px"></div>
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="contact-notes" placeholder="Additional notes…"></textarea>
     </div>
     <div class="btn-row">
       <button class="btn btn-secondary" onclick="closeModal('modal-contact')">Cancel</button>
