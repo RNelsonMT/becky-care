@@ -790,6 +790,8 @@ let viewDate   = new Date();
 let currentView = 'today';
 let collapsedCats = {};
 let schedFilter = 'all';
+let collapsedContactCats = {};
+let collapsedContactOrgs = {};
 let logFilter   = 'all';
 let pendingLog  = null;
 let presetsSeeded = false;
@@ -1804,68 +1806,91 @@ function renderContacts() {
   const el = document.getElementById('contacts-content');
   const grouped = {};
   CONTACT_CATS.forEach(c => grouped[c] = []);
-  // Top-level contacts (no parentId)
   contacts.filter(c => !c.parentId).forEach(c => {
     if (grouped[c.cat]) grouped[c.cat].push(c);
   });
 
-  let html = `<div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
-    <h2 style="font-size:17px;font-weight:700">Contacts</h2>
-    <button onclick="openContactModal()" style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>
-  </div>`;
+  var html = '<div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">'
+    + '<h2 style="font-size:17px;font-weight:700">Contacts</h2>'
+    + '<button onclick="openContactModal()" style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>'
+    + '</div>';
 
-  CONTACT_CATS.forEach(cat => {
-    const items = grouped[cat];
+  CONTACT_CATS.forEach(function(cat) {
+    var items = grouped[cat];
     if (!items.length) return;
-    html += `<div class="contact-cat-header"><span class="contact-cat-label">${cat}</span></div>`;
-    items.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
-      const children = contacts.filter(x => x.parentId === c.id);
-      html += '<div class="contact-card" onclick="openContactModal(\'' + c.id + '\')">'
-        + '<div class="contact-name">' + c.name + (c.isOrg ? ' <span style="font-size:10px;font-weight:700;background:#e8f4fc;color:#1a5a8a;border-radius:4px;padding:1px 6px;vertical-align:middle">ORG</span>' : '') + '</div>'
-        + (c.role ? '<div class="contact-role">' + c.role + '</div>' : '')
-        + renderContactDetails(c)
-        + (c.notes ? '<div class="contact-detail" style="font-style:italic">' + c.notes + '</div>' : '')
-        + (c.isOrg ? '<button onclick="event.stopPropagation();openContactModal(null,\'' + c.id + '\')" style="margin-top:8px;background:none;border:1.5px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--navy)">+ Add individual</button>' : '')
-        + '</div>';
-      if (children.length) {
-        html += `<div class="contact-children">`;
-        children.sort((a,b) => a.name.localeCompare(b.name)).forEach(ch => {
-          html += '<div class="contact-card" onclick="openContactModal(\'' + ch.id + '\')">'
-            + '<div class="contact-name">' + ch.name + '</div>'
-            + (ch.role ? '<div class="contact-role">' + ch.role + '</div>' : '')
-            + renderContactDetails(ch)
-            + (ch.notes ? '<div class="contact-detail" style="font-style:italic">' + ch.notes + '</div>' : '')
-            + '</div>';
-        });
-        html += `</div>`;
-      }
-    });
+    items.sort(function(a,b){return a.name.localeCompare(b.name);});
+    var catCollapsed = collapsedContactCats[cat] || false;
+    var catCount = items.length;
+    // Count all individuals
+    var indivCount = contacts.filter(function(c){return items.some(function(p){return p.id===c.parentId;});}).length;
+    var totalCount = catCount + indivCount;
+
+    html += '<div style="margin-bottom:10px">';
+    // Category header
+    html += '<div onclick="collapsedContactCats['' + cat + '']=!collapsedContactCats['' + cat + ''];renderContacts()" '
+      + 'style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--navy);color:#fff;border-radius:' + (catCollapsed?'var(--radius)':'var(--radius) var(--radius) 0 0') + ';cursor:pointer;user-select:none">'
+      + '<span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">' + cat + '</span>'
+      + '<span style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;opacity:.7">' + totalCount + ' contacts</span>'
+      + '<span style="font-size:12px">' + (catCollapsed?'&#9654;':'&#9660;') + '</span></span>'
+      + '</div>';
+
+    if (!catCollapsed) {
+      html += '<div style="border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden">';
+      items.forEach(function(c, cidx) {
+        var children = contacts.filter(function(x){return x.parentId===c.id;}).sort(function(a,b){return a.name.localeCompare(b.name);});
+        var orgCollapsed = collapsedContactOrgs[c.id] !== false; // default collapsed
+        var isLast = cidx === items.length-1 && !children.length;
+
+        // Contact row
+        html += '<div style="background:#fff;border-bottom:1px solid var(--border)">';
+        html += '<div style="display:flex;align-items:center;padding:10px 14px;cursor:pointer" onclick="openContactModal('' + c.id + '')">'
+          + '<div style="flex:1;min-width:0">'
+          + '<div style="font-size:14px;font-weight:700">' + c.name + (c.isOrg?'&nbsp;<span style="font-size:9px;font-weight:700;background:#e8f4fc;color:#1a5a8a;border-radius:3px;padding:1px 5px">ORG</span>':'') + '</div>'
+          + (c.role?'<div style="font-size:12px;color:var(--teal);font-weight:600">' + c.role + '</div>':'')
+          + (c.relationship?'<div style="font-size:11px;color:var(--teal)">' + c.relationship + '</div>':'')
+          + renderContactDetails(c)
+          + (c.notes?'<div style="font-size:11px;color:var(--muted);font-style:italic;margin-top:2px">' + c.notes + '</div>':'')
+          + '</div>'
+          + (c.isOrg && children.length ? '<div style="font-size:11px;color:var(--muted);margin-right:8px">' + children.length + ' individual' + (children.length>1?'s':'') + '</div>' : '')
+          + '</div>';
+
+        // Expand/collapse individuals row
+        if (c.isOrg) {
+          html += '<div style="display:flex;gap:6px;padding:0 14px 8px">';
+          if (children.length) {
+            html += '<button onclick="event.stopPropagation();collapsedContactOrgs['' + c.id + '']=!collapsedContactOrgs['' + c.id + ''];renderContacts()" '
+              + 'style="background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--navy)">'
+              + (orgCollapsed?'&#9654; Show individuals':'&#9660; Hide individuals') + '</button>';
+          }
+          html += '<button onclick="event.stopPropagation();openContactModal(null,'' + c.id + '')" '
+            + 'style="background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--navy)">+ Add individual</button>';
+          html += '</div>';
+
+          // Show children if expanded
+          if (!orgCollapsed && children.length) {
+            children.forEach(function(ch) {
+              html += '<div style="background:#f8fafb;border-top:1px solid var(--border);padding:10px 14px 10px 28px;cursor:pointer;display:flex;align-items:flex-start;gap:10px" onclick="openContactModal('' + ch.id + '')">'
+                + '<div style="width:2px;background:var(--teal);border-radius:1px;flex-shrink:0;align-self:stretch;margin-right:4px"></div>'
+                + '<div style="flex:1;min-width:0">'
+                + '<div style="font-size:13px;font-weight:600">' + ch.name + '</div>'
+                + (ch.role?'<div style="font-size:11px;color:var(--teal);font-weight:600">' + ch.role + '</div>':'')
+                + renderContactDetails(ch)
+                + (ch.notes?'<div style="font-size:11px;color:var(--muted);font-style:italic;margin-top:2px">' + ch.notes + '</div>':'')
+                + '</div></div>';
+            });
+          }
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
   });
 
   if (!contacts.length) {
-    html += `<div class="empty-state"><div class="empty-icon">👤</div><p>No contacts yet.<br>Tap <b>+ Add</b> to add care providers, vendors, family, and friends.</p></div>`;
+    html += '<div class="empty-state"><div class="empty-icon">&#x1F464;</div><p>No contacts yet.<br>Tap <b>+ Add</b> to add care providers, vendors, family, and friends.</p></div>';
   }
   el.innerHTML = html;
-}
-
-function renderContactDetails(c) {
-  var details = c.details || [];
-  // Fallback for old records
-  if (!details.length) {
-    if (c.phone)   details.push({type:'Phone',   label:'', value:c.phone});
-    if (c.email)   details.push({type:'Email',   label:'', value:c.email});
-    if (c.address) details.push({type:'Address', label:'', value:c.address});
-  }
-  return details.map(function(d) {
-    var icon = {Phone:'📞',Email:'✉️',Website:'🌐',Address:'📍',Fax:'🖷'}[d.type] || '•';
-    var labelHtml = d.label ? '<span style="font-size:10px;font-weight:700;color:var(--muted);margin-right:3px">' + d.label + '</span>' : '';
-    var valHtml = '';
-    if (d.type==='Phone')   valHtml = '<a href="tel:' + d.value + '" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">' + d.value + '</a>';
-    else if (d.type==='Email')   valHtml = '<a href="mailto:' + d.value + '" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">' + d.value + '</a>';
-    else if (d.type==='Website') valHtml = '<a href="' + d.value + '" target="_blank" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">' + d.value + '</a>';
-    else valHtml = d.value;
-    return '<div class="contact-detail">' + icon + ' ' + labelHtml + valHtml + '</div>';
-  }).join('');
 }
 
 window.openContactModal = function(id, parentId) {
