@@ -1808,45 +1808,32 @@ window.toggleContactOrg = function(id) { collapsedContactOrgs[id] = (collapsedCo
 function renderContacts() {
   const el = document.getElementById('contacts-content');
   const grouped = {};
-  CONTACT_CATS.forEach(c => grouped[c] = []);
-  contacts.filter(c => !c.parentId).forEach(c => {
-    if (grouped[c.cat]) grouped[c.cat].push(c);
+  CONTACT_CATS.forEach(function(c){ grouped[c]=[]; });
+  contacts.filter(function(c){return !c.parentId;}).forEach(function(c){
+    if(grouped[c.cat]) grouped[c.cat].push(c);
   });
-
   var html = '<div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">'
     + '<h2 style="font-size:17px;font-weight:700">Contacts</h2>'
-    + '<button onclick="openContactModal()" style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>'
+    + '<button data-action="add-contact" style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>'
     + '</div>';
-
   CONTACT_CATS.forEach(function(cat) {
     var items = grouped[cat];
-    if (!items.length) return;
+    if(!items.length) return;
     items.sort(function(a,b){return a.name.localeCompare(b.name);});
     var catCollapsed = collapsedContactCats[cat] || false;
-    var catCount = items.length;
-    // Count all individuals
     var indivCount = contacts.filter(function(c){return items.some(function(p){return p.id===c.parentId;});}).length;
-    var totalCount = catCount + indivCount;
-
     html += '<div style="margin-bottom:10px">';
-    // Category header
-    html += '<div onclick="toggleContactCat(\'' + cat + '\')" '
-      + 'style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--navy);color:#fff;border-radius:' + (catCollapsed?'var(--radius)':'var(--radius) var(--radius) 0 0') + ';cursor:pointer;user-select:none">'
+    html += '<div data-toggle-cat="' + cat + '" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--navy);color:#fff;border-radius:' + (catCollapsed?'var(--radius)':'var(--radius) var(--radius) 0 0') + ';cursor:pointer">'
       + '<span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">' + cat + '</span>'
-      + '<span style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;opacity:.7">' + totalCount + ' contacts</span>'
-      + '<span style="font-size:12px">' + (catCollapsed?'&#9654;':'&#9660;') + '</span></span>'
-      + '</div>';
-
-    if (!catCollapsed) {
+      + '<span style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;opacity:.7">' + (items.length+indivCount) + ' contacts</span>'
+      + '<span>' + (catCollapsed?'&#9654;':'&#9660;') + '</span></span></div>';
+    if(!catCollapsed) {
       html += '<div style="border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden">';
-      items.forEach(function(c, cidx) {
+      items.forEach(function(c) {
         var children = contacts.filter(function(x){return x.parentId===c.id;}).sort(function(a,b){return a.name.localeCompare(b.name);});
-        var orgCollapsed = collapsedContactOrgs[c.id] !== false; // default collapsed
-        var isLast = cidx === items.length-1 && !children.length;
-
-        // Contact row
+        var orgCollapsed = collapsedContactOrgs[c.id] !== false;
         html += '<div style="background:#fff;border-bottom:1px solid var(--border)">';
-        html += '<div style="display:flex;align-items:center;padding:10px 14px;cursor:pointer" onclick="openContactModal('' + c.id + '')">'
+        html += '<div data-open-contact="' + c.id + '" style="display:flex;align-items:center;padding:10px 14px;cursor:pointer">'
           + '<div style="flex:1;min-width:0">'
           + '<div style="font-size:14px;font-weight:700">' + c.name + (c.isOrg?'&nbsp;<span style="font-size:9px;font-weight:700;background:#e8f4fc;color:#1a5a8a;border-radius:3px;padding:1px 5px">ORG</span>':'') + '</div>'
           + (c.role?'<div style="font-size:12px;color:var(--teal);font-weight:600">' + c.role + '</div>':'')
@@ -1854,25 +1841,16 @@ function renderContacts() {
           + renderContactDetails(c)
           + (c.notes?'<div style="font-size:11px;color:var(--muted);font-style:italic;margin-top:2px">' + c.notes + '</div>':'')
           + '</div>'
-          + (c.isOrg && children.length ? '<div style="font-size:11px;color:var(--muted);margin-right:8px">' + children.length + ' individual' + (children.length>1?'s':'') + '</div>' : '')
+          + (c.isOrg&&children.length?'<div style="font-size:11px;color:var(--muted);margin-right:8px">' + children.length + ' individual' + (children.length>1?'s':'') + '</div>':'')
           + '</div>';
-
-        // Expand/collapse individuals row
-        if (c.isOrg) {
+        if(c.isOrg) {
           html += '<div style="display:flex;gap:6px;padding:0 14px 8px">';
-          if (children.length) {
-            html += '<button onclick="event.stopPropagation();toggleContactOrg(\'' + c.id + '\')" style="background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--navy)">'
-              + 'style="background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--navy)">'
-              + (orgCollapsed?'&#9654; Show individuals':'&#9660; Hide individuals') + '</button>';
-          }
-          html += '<button onclick="event.stopPropagation();openContactModal(null,\'' + c.id + '\')" style="background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--navy)">+ Add individual</button>';
-            + 'style="background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--navy)">+ Add individual</button>';
+          if(children.length) html += '<button data-toggle-org="' + c.id + '" style="background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--navy)">' + (orgCollapsed?'&#9654; Show individuals':'&#9660; Hide individuals') + '</button>';
+          html += '<button data-add-individual="' + c.id + '" style="background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--navy)">+ Add individual</button>';
           html += '</div>';
-
-          // Show children if expanded
-          if (!orgCollapsed && children.length) {
+          if(!orgCollapsed&&children.length) {
             children.forEach(function(ch) {
-              html += '<div style="background:#f8fafb;border-top:1px solid var(--border);padding:10px 14px 10px 28px;cursor:pointer;display:flex;align-items:flex-start;gap:10px" onclick="openContactModal('' + ch.id + '')">'
+              html += '<div data-open-contact="' + ch.id + '" style="background:#f8fafb;border-top:1px solid var(--border);padding:10px 14px 10px 28px;cursor:pointer;display:flex;align-items:flex-start;gap:10px">'
                 + '<div style="width:2px;background:var(--teal);border-radius:1px;flex-shrink:0;align-self:stretch;margin-right:4px"></div>'
                 + '<div style="flex:1;min-width:0">'
                 + '<div style="font-size:13px;font-weight:600">' + ch.name + '</div>'
@@ -1889,11 +1867,21 @@ function renderContacts() {
     }
     html += '</div>';
   });
-
-  if (!contacts.length) {
-    html += '<div class="empty-state"><div class="empty-icon">&#x1F464;</div><p>No contacts yet.<br>Tap <b>+ Add</b> to add care providers, vendors, family, and friends.</p></div>';
-  }
+  if(!contacts.length) html += '<div class="empty-state"><div class="empty-icon">&#x1F464;</div><p>No contacts yet.</p></div>';
   el.innerHTML = html;
+  // Event delegation for all contact actions
+  el.addEventListener('click', function(e) {
+    var tc = e.target.closest('[data-toggle-cat]');
+    if(tc){ collapsedContactCats[tc.dataset.toggleCat]=!collapsedContactCats[tc.dataset.toggleCat]; renderContacts(); return; }
+    var to = e.target.closest('[data-toggle-org]');
+    if(to){ collapsedContactOrgs[to.dataset.toggleOrg]=(collapsedContactOrgs[to.dataset.toggleOrg]===false)?true:false; renderContacts(); return; }
+    var ai = e.target.closest('[data-add-individual]');
+    if(ai){ openContactModal(null, ai.dataset.addIndividual); return; }
+    var ac = e.target.closest('[data-add-contact]');
+    if(ac){ openContactModal(); return; }
+    var oc = e.target.closest('[data-open-contact]');
+    if(oc){ openContactModal(oc.dataset.openContact); return; }
+  }, {once:true});
 }
 
 window.openContactModal = function(id, parentId) {
