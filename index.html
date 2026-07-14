@@ -1865,7 +1865,7 @@ function renderContacts() {
               + 'style="background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--navy)">'
               + (orgCollapsed?'&#9654; Show individuals':'&#9660; Hide individuals') + '</button>';
           }
-          html += '<button onclick="event.stopPropagation();openContactModal(null,'' + c.id + '')" '
+          html += '<button onclick="event.stopPropagation();openContactModal(null,\'' + c.id + '\')" style="background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--navy)">+ Add individual</button>';
             + 'style="background:none;border:1.5px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;color:var(--navy)">+ Add individual</button>';
           html += '</div>';
 
