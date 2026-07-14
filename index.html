@@ -628,10 +628,13 @@
       </select>
     </div>
     <div class="form-group">
-      <label style="display:flex;align-items:center;gap:8px;text-transform:none;font-size:14px;font-weight:600">
-        <input type="checkbox" id="contact-is-org" style="width:18px;height:18px;accent-color:var(--teal);cursor:pointer">
-        This is an organization or business
-      </label>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--cream);border-radius:8px;cursor:pointer" onclick="var cb=document.getElementById('contact-is-org');cb.checked=!cb.checked;this.querySelector('.org-toggle').style.background=cb.checked?'var(--teal)':'#d0dde3';this.querySelector('.org-toggle-dot').style.transform=cb.checked?'translateX(20px)':'translateX(0)'">
+        <input type="checkbox" id="contact-is-org" style="display:none">
+        <div class="org-toggle" style="width:44px;height:24px;border-radius:12px;background:#d0dde3;position:relative;flex-shrink:0;transition:background .2s">
+          <div class="org-toggle-dot" style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+        </div>
+        <span style="font-size:14px;font-weight:600;color:var(--navy)">This is an organization or business</span>
+      </div>
     </div>
     <div class="form-group">
       <label>Name</label>
@@ -1870,7 +1873,12 @@ window.openContactModal = function(id, parentId) {
   document.getElementById('contact-parent-id').value = parentId || (c?.parentId || '');
   document.getElementById('contact-modal-title').textContent = id ? 'Edit Contact' : 'Add Contact';
   document.getElementById('contact-cat').value = c?.cat || 'Provider';
-  document.getElementById('contact-is-org').checked = c?.isOrg || false;
+  var isOrg = c?.isOrg || false;
+  document.getElementById('contact-is-org').checked = isOrg;
+  var toggle = document.querySelector('.org-toggle');
+  var dot = document.querySelector('.org-toggle-dot');
+  if (toggle) toggle.style.background = isOrg ? 'var(--teal)' : '#d0dde3';
+  if (dot) dot.style.transform = isOrg ? 'translateX(20px)' : 'translateX(0)';
   document.getElementById('contact-name').value = c?.name || '';
   document.getElementById('contact-role').value = c?.role || '';
   document.getElementById('contact-notes').value = c?.notes || '';
