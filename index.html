@@ -1806,6 +1806,7 @@ window.toggleContactCat = function(cat) { collapsedContactCats[cat] = !collapsed
 window.toggleContactOrg = function(id) { collapsedContactOrgs[id] = (collapsedContactOrgs[id] === false) ? true : false; renderContacts(); };
 
 function renderContacts() {
+  console.log('renderContacts: contacts=', contacts.length, 'CONTACT_CATS=', CONTACT_CATS);
   const el = document.getElementById('contacts-content');
   const grouped = {};
   CONTACT_CATS.forEach(function(c){ grouped[c]=[]; });
