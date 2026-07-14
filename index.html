@@ -1824,24 +1824,6 @@ function renderContactDetails(c) {
   }).join('');
 }
 
-function renderContactDetails(c) {
-  var details = c.details || [];
-  if (!details.length) {
-    if (c.phone)   details.push({type:'Phone',   label:'', value:c.phone});
-    if (c.email)   details.push({type:'Email',   label:'', value:c.email});
-    if (c.address) details.push({type:'Address', label:'', value:c.address});
-  }
-  return details.map(function(d) {
-    var icon = {Phone:'&#128222;',Email:'&#9993;',Website:'&#127760;',Address:'&#128205;',Fax:'Fax'}[d.type] || '';
-    var label = d.label ? '<span style="font-size:10px;font-weight:700;color:var(--muted);margin-right:3px">' + d.label + '</span>' : '';
-    var val = '';
-    if (d.type==='Phone')   val = '<a href="tel:' + d.value + '" style="color:var(--teal);text-decoration:none">' + d.value + '</a>';
-    else if (d.type==='Email')   val = '<a href="mailto:' + d.value + '" style="color:var(--teal);text-decoration:none">' + d.value + '</a>';
-    else if (d.type==='Website') val = '<a href="' + d.value + '" target="_blank" style="color:var(--teal);text-decoration:none">' + d.value + '</a>';
-    else val = d.value;
-    return '<div class="contact-detail">' + icon + ' ' + label + val + '</div>';
-  }).join('');
-}
 
 function renderContacts() {
   console.log('renderContacts: contacts=', contacts.length, 'CONTACT_CATS=', CONTACT_CATS);
