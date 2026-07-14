@@ -173,6 +173,13 @@
   .contact-detail{font-size:12px;color:var(--muted);margin-top:3px}
   .contact-cat-header{display:flex;align-items:center;justify-content:space-between;padding:8px 4px;margin-bottom:4px;margin-top:12px;border-bottom:1px solid var(--border)}
   .contact-cat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+  .contact-detail-row{display:flex;gap:6px;align-items:center}
+  .contact-detail-row select{flex:0 0 110px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none}
+  .contact-detail-row input{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;background:var(--cream);outline:none}
+  .contact-detail-row button{background:none;border:none;color:var(--warn);font-size:18px;cursor:pointer;padding:0 2px;flex-shrink:0}
+  .contact-detail-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-top:2px}
+  .contact-detail-item a{color:var(--teal);text-decoration:none}
+  .contact-detail-label{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-right:2px}
   .contact-children{margin-left:16px;border-left:2px solid var(--border);padding-left:12px;margin-bottom:8px}
 
   /* TODO */
@@ -621,6 +628,12 @@
       </select>
     </div>
     <div class="form-group">
+      <label style="display:flex;align-items:center;gap:8px;text-transform:none;font-size:14px;font-weight:600">
+        <input type="checkbox" id="contact-is-org" style="width:16px;height:16px;accent-color:var(--teal)">
+        This is an organization or business
+      </label>
+    </div>
+    <div class="form-group">
       <label>Name</label>
       <input type="text" id="contact-name" placeholder="Full name or business name">
     </div>
@@ -629,20 +642,15 @@
       <input type="text" id="contact-role" placeholder="e.g. Case Manager, Physical Therapist…">
     </div>
     <div class="form-group">
-      <label>Phone</label>
-      <input type="tel" id="contact-phone" placeholder="(406) 555-0000">
-    </div>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="contact-email" placeholder="email@example.com">
-    </div>
-    <div class="form-group">
-      <label>Address</label>
-      <textarea id="contact-address" placeholder="Street, City, State ZIP" style="min-height:60px"></textarea>
-    </div>
-    <div class="form-group">
       <label>Notes</label>
       <textarea id="contact-notes" placeholder="Additional notes…"></textarea>
+    </div>
+    <div class="form-group">
+      <label style="display:flex;align-items:center;justify-content:space-between">
+        Contact Details
+        <button type="button" onclick="addContactDetail()" style="background:var(--teal);color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;cursor:pointer">+ Add</button>
+      </label>
+      <div id="contact-details-list" style="display:flex;flex-direction:column;gap:6px;margin-top:6px"></div>
     </div>
     <div class="btn-row">
       <button class="btn btn-secondary" onclick="closeModal('modal-contact')">Cancel</button>
@@ -1808,25 +1816,22 @@ function renderContacts() {
     html += `<div class="contact-cat-header"><span class="contact-cat-label">${cat}</span></div>`;
     items.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
       const children = contacts.filter(x => x.parentId === c.id);
-      html += `<div class="contact-card" onclick="openContactModal('${c.id}')">
-        <div class="contact-name">${c.name}</div>
-        ${c.role ? `<div class="contact-role">${c.role}</div>` : ''}
-        ${c.phone ? `<div class="contact-detail">📞 <a href="tel:${c.phone}" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">${c.phone}</a></div>` : ''}
-        ${c.email ? `<div class="contact-detail">✉️ <a href="mailto:${c.email}" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">${c.email}</a></div>` : ''}
-        ${c.address ? `<div class="contact-detail">📍 ${c.address}</div>` : ''}
-        ${c.notes ? `<div class="contact-detail" style="font-style:italic">${c.notes}</div>` : ''}
-        ${children.length ? `<button onclick="event.stopPropagation();openContactModal(null,'${c.id}')" style="margin-top:8px;background:none;border:1.5px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--navy)">+ Add individual</button>` : `<button onclick="event.stopPropagation();openContactModal(null,'${c.id}')" style="margin-top:8px;background:none;border:1.5px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--navy)">+ Add individual</button>`}
-      </div>`;
+      html += '<div class="contact-card" onclick="openContactModal(\'' + c.id + '\')">'
+        + '<div class="contact-name">' + c.name + (c.isOrg ? ' <span style="font-size:10px;font-weight:700;background:#e8f4fc;color:#1a5a8a;border-radius:4px;padding:1px 6px;vertical-align:middle">ORG</span>' : '') + '</div>'
+        + (c.role ? '<div class="contact-role">' + c.role + '</div>' : '')
+        + renderContactDetails(c)
+        + (c.notes ? '<div class="contact-detail" style="font-style:italic">' + c.notes + '</div>' : '')
+        + (c.isOrg ? '<button onclick="event.stopPropagation();openContactModal(null,\'' + c.id + '\')" style="margin-top:8px;background:none;border:1.5px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--navy)">+ Add individual</button>' : '')
+        + '</div>';
       if (children.length) {
         html += `<div class="contact-children">`;
         children.sort((a,b) => a.name.localeCompare(b.name)).forEach(ch => {
-          html += `<div class="contact-card" onclick="openContactModal('${ch.id}')">
-            <div class="contact-name">${ch.name}</div>
-            ${ch.role ? `<div class="contact-role">${ch.role}</div>` : ''}
-            ${ch.phone ? `<div class="contact-detail">📞 <a href="tel:${ch.phone}" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">${ch.phone}</a></div>` : ''}
-            ${ch.email ? `<div class="contact-detail">✉️ <a href="mailto:${ch.email}" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">${ch.email}</a></div>` : ''}
-            ${ch.notes ? `<div class="contact-detail" style="font-style:italic">${ch.notes}</div>` : ''}
-          </div>`;
+          html += '<div class="contact-card" onclick="openContactModal(\'' + ch.id + '\')">'
+            + '<div class="contact-name">' + ch.name + '</div>'
+            + (ch.role ? '<div class="contact-role">' + ch.role + '</div>' : '')
+            + renderContactDetails(ch)
+            + (ch.notes ? '<div class="contact-detail" style="font-style:italic">' + ch.notes + '</div>' : '')
+            + '</div>';
         });
         html += `</div>`;
       }
@@ -1839,35 +1844,88 @@ function renderContacts() {
   el.innerHTML = html;
 }
 
+function renderContactDetails(c) {
+  var details = c.details || [];
+  // Fallback for old records
+  if (!details.length) {
+    if (c.phone)   details.push({type:'Phone',   label:'', value:c.phone});
+    if (c.email)   details.push({type:'Email',   label:'', value:c.email});
+    if (c.address) details.push({type:'Address', label:'', value:c.address});
+  }
+  return details.map(function(d) {
+    var icon = {Phone:'📞',Email:'✉️',Website:'🌐',Address:'📍',Fax:'🖷'}[d.type] || '•';
+    var labelHtml = d.label ? '<span style="font-size:10px;font-weight:700;color:var(--muted);margin-right:3px">' + d.label + '</span>' : '';
+    var valHtml = '';
+    if (d.type==='Phone')   valHtml = '<a href="tel:' + d.value + '" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">' + d.value + '</a>';
+    else if (d.type==='Email')   valHtml = '<a href="mailto:' + d.value + '" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">' + d.value + '</a>';
+    else if (d.type==='Website') valHtml = '<a href="' + d.value + '" target="_blank" onclick="event.stopPropagation()" style="color:var(--teal);text-decoration:none">' + d.value + '</a>';
+    else valHtml = d.value;
+    return '<div class="contact-detail">' + icon + ' ' + labelHtml + valHtml + '</div>';
+  }).join('');
+}
+
 window.openContactModal = function(id, parentId) {
   const c = id ? contacts.find(x => x.id === id) : null;
   document.getElementById('contact-id').value = id || '';
   document.getElementById('contact-parent-id').value = parentId || (c?.parentId || '');
   document.getElementById('contact-modal-title').textContent = id ? 'Edit Contact' : 'Add Contact';
-  document.getElementById('contact-cat').value    = c?.cat    || 'Provider';
-  document.getElementById('contact-name').value   = c?.name   || '';
-  document.getElementById('contact-role').value   = c?.role   || '';
-  document.getElementById('contact-phone').value  = c?.phone  || '';
-  document.getElementById('contact-email').value  = c?.email  || '';
-  document.getElementById('contact-address').value= c?.address|| '';
-  document.getElementById('contact-notes').value  = c?.notes  || '';
+  document.getElementById('contact-cat').value = c?.cat || 'Provider';
+  document.getElementById('contact-is-org').checked = c?.isOrg || false;
+  document.getElementById('contact-name').value = c?.name || '';
+  document.getElementById('contact-role').value = c?.role || '';
+  document.getElementById('contact-notes').value = c?.notes || '';
   document.getElementById('contact-delete-row').style.display = id ? 'block' : 'none';
+  // Populate contact details
+  var list = document.getElementById('contact-details-list');
+  list.innerHTML = '';
+  var details = c?.details || [];
+  // Migrate old single fields to details array
+  if (!details.length) {
+    if (c?.phone)   details.push({type:'Phone',   label:'Main',  value:c.phone});
+    if (c?.email)   details.push({type:'Email',   label:'Work',  value:c.email});
+    if (c?.address) details.push({type:'Address', label:'',      value:c.address});
+  }
+  details.forEach(function(d) { addContactDetailRow(d.type, d.label, d.value); });
   openModal('modal-contact');
 };
+
+window.addContactDetail = function() { addContactDetailRow('Phone','',''); };
+
+function addContactDetailRow(type, label, value) {
+  var list = document.getElementById('contact-details-list');
+  var row = document.createElement('div');
+  row.className = 'contact-detail-row';
+  row.innerHTML = '<select style="flex:0 0 100px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">'
+    + ['Phone','Email','Website','Address','Fax'].map(function(t){ return '<option' + (t===type?' selected':'') + '>' + t + '</option>'; }).join('')
+    + '</select>'
+    + '<input type="text" placeholder="Label (e.g. Mobile, Work)" value="' + (label||'') + '" style="flex:0 0 90px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">'
+    + '<input type="text" placeholder="Value" value="' + (value||'') + '" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">'
+    + '<button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--warn);font-size:18px;cursor:pointer;padding:0 2px">×</button>';
+  list.appendChild(row);
+}
 
 window.saveContact = async function() {
   const name = document.getElementById('contact-name').value.trim();
   if (!name) { showToast('Name is required'); return; }
   const id       = document.getElementById('contact-id').value;
   const parentId = document.getElementById('contact-parent-id').value;
+  // Collect contact details rows
+  var details = [];
+  document.querySelectorAll('#contact-details-list .contact-detail-row').forEach(function(row) {
+    var selects = row.querySelectorAll('select');
+    var inputs  = row.querySelectorAll('input');
+    var type  = selects[0] ? selects[0].value : '';
+    var label = inputs[0] ? inputs[0].value.trim() : '';
+    var value = inputs[1] ? inputs[1].value.trim() : '';
+    if (value) details.push({type, label, value});
+  });
   const data = {
     cat:      document.getElementById('contact-cat').value,
     name,
+    isOrg:    document.getElementById('contact-is-org').checked,
     role:     document.getElementById('contact-role').value.trim(),
-    phone:    document.getElementById('contact-phone').value.trim(),
-    email:    document.getElementById('contact-email').value.trim(),
-    address:  document.getElementById('contact-address').value.trim(),
     notes:    document.getElementById('contact-notes').value.trim(),
+    details:  details,
     parentId: parentId || '',
     updatedAt: serverTimestamp(),
   };
