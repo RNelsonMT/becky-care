@@ -620,7 +620,7 @@
     <input type="hidden" id="contact-parent-id">
     <div class="form-group">
       <label>Category</label>
-      <select id="contact-cat">
+      <select id="contact-cat" onchange="var rg=document.getElementById('contact-relationship-group');if(rg)rg.style.display=this.value==='Family'?'block':'none'">
         <option value="Provider">Provider</option>
         <option value="Vendor">Vendor</option>
         <option value="Family">Family</option>
@@ -650,6 +650,33 @@
         <button type="button" onclick="addContactDetail()" style="background:var(--teal);color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;cursor:pointer">+ Add</button>
       </label>
       <div id="contact-details-list" style="display:flex;flex-direction:column;gap:6px;margin-top:6px"></div>
+    </div>
+    <div class="form-group" id="contact-relationship-group" style="display:none">
+      <label>Relationship to Becky</label>
+      <select id="contact-relationship">
+        <option value="">Select relationship...</option>
+        <option>Spouse</option><option>Son</option><option>Daughter</option>
+        <option>Father</option><option>Father-In-Law</option>
+        <option>Mother</option><option>Mother-In-Law</option>
+        <option>Brother</option><option>Brother-In-Law</option>
+        <option>Sister</option><option>Sister-In-Law</option>
+        <option>Son-In-Law</option><option>Daughter-In-Law</option>
+        <option>Grandfather</option><option>Grandmother</option>
+        <option>Grandson</option><option>Granddaughter</option>
+        <option>Aunt</option><option>Uncle</option>
+        <option>Niece</option><option>Nephew</option>
+        <option>Stepfather</option><option>Stepmother</option>
+        <option>Stepbrother</option><option>Stepsister</option>
+        <option>Half-Sister</option><option>Half-Brother</option>
+        <option>Friend</option><option>Trust</option>
+        <option>Attorney</option><option>Law Firm</option>
+        <option>Accountant</option><option>Accounting Firm</option>
+        <option>Bank</option><option>Banker</option>
+        <option>Investment Advisor</option><option>Investment Firm</option>
+        <option>Charity</option><option>Institutional Trustee</option>
+        <option>Closely Held Entity</option><option>Creditor</option>
+        <option>Unknown</option>
+      </select>
     </div>
     <div class="form-group">
       <label>Notes</label>
@@ -1822,6 +1849,7 @@ function renderContacts() {
       html += '<div class="contact-card" onclick="openContactModal(\'' + c.id + '\')">'
         + '<div class="contact-name">' + c.name + (c.isOrg ? ' <span style="font-size:10px;font-weight:700;background:#e8f4fc;color:#1a5a8a;border-radius:4px;padding:1px 6px;vertical-align:middle">ORG</span>' : '') + '</div>'
         + (c.role ? '<div class="contact-role">' + c.role + '</div>' : '')
+        + (c.relationship ? '<div style="font-size:12px;color:var(--teal);font-weight:600;margin-top:1px">' + c.relationship + '</div>' : '')
         + renderContactDetails(c)
         + (c.notes ? '<div class="contact-detail" style="font-style:italic">' + c.notes + '</div>' : '')
         + (c.isOrg ? '<button onclick="event.stopPropagation();openContactModal(null,\'' + c.id + '\')" style="margin-top:8px;background:none;border:1.5px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--navy)">+ Add individual</button>' : '')
@@ -1882,6 +1910,12 @@ window.openContactModal = function(id, parentId) {
   document.getElementById('contact-name').value = c?.name || '';
   document.getElementById('contact-role').value = c?.role || '';
   document.getElementById('contact-notes').value = c?.notes || '';
+  var rg = document.getElementById('contact-relationship-group');
+  var re = document.getElementById('contact-relationship');
+  if (rg && re) {
+    rg.style.display = (c?.cat || 'Provider') === 'Family' ? 'block' : 'none';
+    re.value = c?.relationship || '';
+  }
   document.getElementById('contact-delete-row').style.display = id ? 'block' : 'none';
   // Populate contact details
   var list = document.getElementById('contact-details-list');
@@ -1931,6 +1965,7 @@ window.saveContact = async function() {
     cat:      document.getElementById('contact-cat').value,
     name,
     isOrg:    document.getElementById('contact-is-org').checked,
+    relationship: (document.getElementById('contact-relationship') && document.getElementById('contact-cat').value==='Family') ? document.getElementById('contact-relationship').value : '',
     role:     document.getElementById('contact-role').value.trim(),
     notes:    document.getElementById('contact-notes').value.trim(),
     details:  details,
