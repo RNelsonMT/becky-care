@@ -1869,19 +1869,6 @@ function renderContacts() {
   });
   if(!contacts.length) html += '<div class="empty-state"><div class="empty-icon">&#x1F464;</div><p>No contacts yet.</p></div>';
   el.innerHTML = html;
-  // Event delegation for all contact actions
-  el.addEventListener('click', function(e) {
-    var tc = e.target.closest('[data-toggle-cat]');
-    if(tc){ collapsedContactCats[tc.dataset.toggleCat]=!collapsedContactCats[tc.dataset.toggleCat]; renderContacts(); return; }
-    var to = e.target.closest('[data-toggle-org]');
-    if(to){ collapsedContactOrgs[to.dataset.toggleOrg]=(collapsedContactOrgs[to.dataset.toggleOrg]===false)?true:false; renderContacts(); return; }
-    var ai = e.target.closest('[data-add-individual]');
-    if(ai){ openContactModal(null, ai.dataset.addIndividual); return; }
-    var ac = e.target.closest('[data-add-contact]');
-    if(ac){ openContactModal(); return; }
-    var oc = e.target.closest('[data-open-contact]');
-    if(oc){ openContactModal(oc.dataset.openContact); return; }
-  }, {once:true});
 }
 
 window.openContactModal = function(id, parentId) {
@@ -2525,6 +2512,21 @@ function dateLabel(dateStr){
 
 setInterval(()=>{if(currentView==='today')renderToday();},60000);
 
+
+// Permanent contact event delegation
+document.addEventListener('click', function(e) {
+  if (!document.getElementById('contacts-content')) return;
+  var tc = e.target.closest('[data-toggle-cat]');
+  if(tc){ collapsedContactCats[tc.dataset.toggleCat]=!collapsedContactCats[tc.dataset.toggleCat]; renderContacts(); return; }
+  var to = e.target.closest('[data-toggle-org]');
+  if(to){ var id=to.dataset.toggleOrg; collapsedContactOrgs[id]=(collapsedContactOrgs[id]===false)?true:false; renderContacts(); return; }
+  var ai = e.target.closest('[data-add-individual]');
+  if(ai){ openContactModal(null, ai.dataset.addIndividual); return; }
+  var ac = e.target.closest('[data-add-contact]');
+  if(ac && currentView==='contacts'){ openContactModal(); return; }
+  var oc = e.target.closest('[data-open-contact]');
+  if(oc){ openContactModal(oc.dataset.openContact); return; }
+});
 // Register service worker for PWA offline support
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(err => console.log('SW reg failed:', err));
