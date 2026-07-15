@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Seed Appointments</title>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:600px;margin:40px auto;padding:20px;background:#f0f4f4;color:#1a2e3b}
+  h1{font-size:20px;margin-bottom:8px}
+  .status{background:#fff;border-radius:12px;padding:20px;margin-top:16px;max-height:400px;overflow-y:auto;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+  .item{font-size:13px;padding:3px 0;border-bottom:1px solid #f0f4f4}
+  .ok{color:#1e7e4c} .err{color:#c0392b}
+  button{background:#2a7f7f;color:#fff;border:none;border-radius:8px;padding:14px 28px;font-size:16px;font-weight:700;cursor:pointer;margin-top:12px}
+  button:disabled{opacity:.5}
+  #summary{font-size:16px;font-weight:700;margin-top:12px}
+</style>
+</head>
+<body>
+<h1>🗓 Becky's Care — Appointment Seeder</h1>
+<p>Adds upcoming appointments from MyChart as one-time scheduled items.</p>
+<button id="btn" onclick="runSeed()">Add Appointments Now</button>
+<div class="status" id="status" style="display:none">
+  <div id="log"></div>
+  <div id="summary"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyCxPjDCBYFLc2XDqXvHcbGuqMV7265w3HE",
+  authDomain: "care-tracker-383e0.firebaseapp.com",
+  projectId: "care-tracker-383e0",
+  storageBucket: "care-tracker-383e0.firebasestorage.app",
+  messagingSenderId: "696799569086",
+  appId: "1:696799569086:web:08b7e6356a018338a3aaef"
+});
+const db = getFirestore(app);
+const schedCol = collection(db, 'schedule');
+
+const APPOINTMENTS = [
+  // Dr. Kathleen Blair - PCP Follow-ups
+  { name:'Dr. Blair Follow-up', cat:'ther', onceDate:'2026-08-12', times:['14:25'], dose:'Dr. Kathleen Blair, DO - PCP', notes:'Benefis Medical Office Bldg 4, Suite 2' },
+  { name:'Dr. Blair Follow-up', cat:'ther', onceDate:'2026-08-18', times:['14:25'], dose:'Dr. Kathleen Blair, DO - PCP', notes:'Benefis Medical Office Bldg 4, Suite 2' },
+  { name:'Dr. Blair Follow-up', cat:'ther', onceDate:'2026-08-25', times:['14:25'], dose:'Dr. Kathleen Blair, DO - PCP', notes:'Benefis Medical Office Bldg 4, Suite 2' },
+  { name:'Dr. Blair Follow-up', cat:'ther', onceDate:'2026-09-01', times:['14:25'], dose:'Dr. Kathleen Blair, DO - PCP', notes:'Benefis Medical Office Bldg 4, Suite 2' },
+  { name:'Dr. Blair Follow-up', cat:'ther', onceDate:'2026-09-08', times:['14:25'], dose:'Dr. Kathleen Blair, DO - PCP', notes:'Benefis Medical Office Bldg 4, Suite 2' },
+
+  // Katia Michelotti PA - ENT
+  { name:'ENT - Michelotti', cat:'ther', onceDate:'2026-07-15', times:['12:45'], dose:'Katia Michelotti, PA - ENT', notes:'Benefis Medical Office Bldg 4' },
+  { name:'ENT - Michelotti', cat:'ther', onceDate:'2026-10-01', times:['14:25'], dose:'Katia Michelotti, PA - ENT', notes:'Benefis Medical Office Bldg 4' },
+
+  // Home Health Therapy sessions - July
+  { name:'Home Health Therapy', cat:'ther', onceDate:'2026-07-16', times:['09:00'], dose:'Benefis Home Health', notes:'PT/OT/SLP - confirm time with Julie Garza' },
+  { name:'Home Health Therapy', cat:'ther', onceDate:'2026-07-17', times:['09:00'], dose:'Benefis Home Health', notes:'PT/OT/SLP - confirm time with Julie Garza' },
+  { name:'Home Health Therapy', cat:'ther', onceDate:'2026-07-20', times:['09:00'], dose:'Benefis Home Health', notes:'PT/OT/SLP - confirm time with Julie Garza' },
+  { name:'Home Health Therapy', cat:'ther', onceDate:'2026-07-21', times:['09:00'], dose:'Benefis Home Health', notes:'PT/OT/SLP - confirm time with Julie Garza' },
+  { name:'Home Health Therapy', cat:'ther', onceDate:'2026-07-22', times:['09:00'], dose:'Benefis Home Health', notes:'PT/OT/SLP - confirm time with Julie Garza' },
+  { name:'Home Health Therapy', cat:'ther', onceDate:'2026-07-24', times:['09:00'], dose:'Benefis Home Health', notes:'PT/OT/SLP - confirm time with Julie Garza' },
+  { name:'Home Health Therapy', cat:'ther', onceDate:'2026-07-28', times:['09:00'], dose:'Benefis Home Health', notes:'PT/OT/SLP - confirm time with Julie Garza' },
+  { name:'Home Health Therapy', cat:'ther', onceDate:'2026-07-31', times:['09:00'], dose:'Benefis Home Health', notes:'PT/OT/SLP - confirm time with Julie Garza' },
+
+  // Home Health Therapy - August
+  { name:'Home Health Therapy', cat:'ther', onceDate:'2026-08-04', times:['09:00'], dose:'Benefis Home Health', notes:'PT/OT/SLP - confirm time with Julie Garza' },
+  { name:'Home Health Therapy', cat:'ther', onceDate:'2026-08-07', times:['09:00'], dose:'Benefis Home Health', notes:'PT/OT/SLP - confirm time with Julie Garza' },
+  { name:'Home Health Therapy', cat:'ther', onceDate:'2026-08-11', times:['09:00'], dose:'Benefis Home Health', notes:'PT/OT/SLP - confirm time with Julie Garza' },
+  { name:'Home Health Therapy', cat:'ther', onceDate:'2026-08-12', times:['09:00'], dose:'Benefis Home Health', notes:'PT/OT/SLP - confirm time with Julie Garza' },
+
+  // Virtual visit with Dr. Park (NRH)
+  { name:'Dr. Park Virtual Visit', cat:'ther', onceDate:'2026-08-10', times:['10:00'], dose:'Dr. Chihyung Kevin Park, MD - PMR', notes:'NRH Virtual appointment - confirm time' },
+];
+
+window.runSeed = async function() {
+  const btn = document.getElementById('btn');
+  const statusDiv = document.getElementById('status');
+  const logDiv = document.getElementById('log');
+  const summaryDiv = document.getElementById('summary');
+  btn.disabled = true; btn.textContent = 'Adding…';
+  statusDiv.style.display = 'block';
+
+  let ok = 0, skip = 0, fail = 0;
+
+  for (const appt of APPOINTMENTS) {
+    try {
+      // Check if already exists
+      const existing = await getDocs(query(schedCol,
+        where('name','==',appt.name),
+        where('onceDate','==',appt.onceDate)
+      ));
+      if (!existing.empty) {
+        logDiv.innerHTML += `<div class="item" style="color:#aaa">⏭ Already exists: ${appt.name} on ${appt.onceDate}</div>`;
+        skip++; continue;
+      }
+      await addDoc(schedCol, {
+        ...appt,
+        days: 'once',
+        customDays: [],
+        grace: 60,
+        medList: [],
+        updatedAt: serverTimestamp(),
+        createdAt: serverTimestamp(),
+      });
+      logDiv.innerHTML += `<div class="item ok">✓ ${appt.name} — ${appt.onceDate} @ ${appt.times[0]}</div>`;
+      ok++;
+    } catch(e) {
+      logDiv.innerHTML += `<div class="item err">✗ ${appt.name} — ${e.message}</div>`;
+      fail++;
+    }
+  }
+
+  summaryDiv.innerHTML = `✅ Done! ${ok} added, ${skip} skipped (already exist), ${fail} failed.`;
+  btn.textContent = 'Done';
+};
+</script>
+</body>
+</html>
