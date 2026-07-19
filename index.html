@@ -2002,16 +2002,26 @@ function addContactDetailRow(type, label, value) {
   row.className = 'contact-detail-row';
   var labelOpts = ['Work Main','Work Direct','Mobile','Home','Fax','Temp','Other'];
   var isOther = label && !labelOpts.slice(0,-1).includes(label);
-  var labelSel = '<select onchange="var ni=this.parentElement.querySelector('.label-other');if(ni)ni.style.display=this.value==='Other'?'inline':'none'" style="flex:0 0 108px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">'
-    + labelOpts.map(function(l){ return '<option' + ((isOther&&l==='Other')||(!isOther&&l===label)?' selected':'') + '>' + l + '</option>'; }).join('')
-    + '</select>'
-    + '<input type="text" class="label-other" placeholder="Label…" value="' + (isOther?label:'') + '" style="flex:0 0 80px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none;display:' + (isOther?'inline':'none') + '">';
-  row.innerHTML = '<select style="flex:0 0 90px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">'
-    + ['Phone','Email','Website','Address','Fax'].map(function(t){ return '<option' + (t===type?' selected':'') + '>' + t + '</option>'; }).join('')
-    + '</select>'
-    + labelSel
-    + '<input type="text" placeholder="Value" value="' + (value||'') + '" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">'
-    + '<button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--warn);font-size:18px;cursor:pointer;padding:0 2px">×</button>';
+  var typeHtml = '<select class="cd-type" style="flex:0 0 90px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">';
+  ['Phone','Email','Website','Address','Fax'].forEach(function(t){
+    typeHtml += '<option' + (t===type?' selected':'') + '>' + t + '</option>';
+  });
+  typeHtml += '</select>';
+  var labelHtml = '<select class="cd-label" style="flex:0 0 108px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">';
+  labelOpts.forEach(function(l){
+    var sel = (isOther&&l==='Other')||(!isOther&&l===label);
+    labelHtml += '<option' + (sel?' selected':'') + '>' + l + '</option>';
+  });
+  labelHtml += '</select>';
+  var otherHtml = '<input type="text" class="cd-other" placeholder="Label..." value="' + (isOther?label:'') + '" style="flex:0 0 80px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none;display:' + (isOther?'inline':'none') + '">';
+  var valHtml = '<input type="text" class="cd-value" placeholder="Value" value="' + (value||'') + '" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">';
+  var delHtml = '<button type="button" class="cd-del" style="background:none;border:none;color:var(--warn);font-size:18px;cursor:pointer;padding:0 2px">×</button>';
+  row.innerHTML = typeHtml + labelHtml + otherHtml + valHtml + delHtml;
+  row.querySelector('.cd-label').addEventListener('change', function() {
+    var oi = row.querySelector('.cd-other');
+    if (oi) oi.style.display = this.value === 'Other' ? 'inline' : 'none';
+  });
+  row.querySelector('.cd-del').addEventListener('click', function() { row.remove(); });
   list.appendChild(row);
 }
 
