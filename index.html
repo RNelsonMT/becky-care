@@ -1627,6 +1627,15 @@ window.saveQuickLog = async function() {
 };
 
 /* ── SCHEDULE VIEW ───────────────────────────────────── */
+window.setSchedDate = function(el, range) {
+  schedDateFilter = range;
+  document.querySelectorAll('.sched-date-chip').forEach(function(c){c.classList.remove('active');});
+  if (el) el.classList.add('active');
+  var cr = document.getElementById('sched-custom-range');
+  if (cr) cr.style.display = range==='custom' ? 'flex' : 'none';
+  renderSchedule();
+};
+
 window.filterSched = function(el,cat) {
   document.querySelectorAll('#sched-filter-row .filter-chip').forEach(c=>c.classList.remove('active'));
   el.classList.add('active'); schedFilter=cat; renderSchedule();
