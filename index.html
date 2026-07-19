@@ -1479,7 +1479,7 @@ window.saveQuickLog = async function() {
       fluidOutput: (document.getElementById('quick-cat').value==='cath' && document.getElementById('quick-fluid-val') && document.getElementById('quick-fluid-val').value) ? document.getElementById('quick-fluid-val').value : '',
       givenTime:document.getElementById('quick-time').value,
       notes:document.getElementById('quick-notes').value.trim(),
-      dateStr:fmtDate(new Date()),unscheduled:true,ts:serverTimestamp()
+      dateStr:(document.getElementById('quick-cat').value==='ther'&&document.getElementById('quick-date')&&document.getElementById('quick-date').value)?document.getElementById('quick-date').value:fmtDate(new Date()),unscheduled:true,ts:serverTimestamp()
     });
     closeModal('modal-quick'); showToast('✓ Logged');
   } catch(e){showToast('Error — check connection');}
