@@ -2254,6 +2254,7 @@ function renderReport(type, el) {
 }
 
 /* ── DAILY SCHEDULE ──────────────────────────────────── */
+window.renderDailyReport = function() { var el=document.getElementById('reports-content'); if(el) renderDailySchedule(el); };
 function renderDailySchedule(el) {
   const items = getDayItems(reportDate);
   const dateStr = fmtDate(reportDate);
@@ -2300,9 +2301,9 @@ function renderDailySchedule(el) {
   el.innerHTML += '<button class="print-btn" onclick="window.print()">Print</button></div>';
   el.innerHTML += '<div class="report-body">';
   el.innerHTML += '<div class="report-date-nav">';
-  el.innerHTML += '<button onclick="reportDate=new Date(reportDate.getTime()-86400000);renderReport('daily',document.getElementById('reports-content'))">&#8249;</button>';
+  el.innerHTML += '<button onclick="reportDate=new Date(reportDate.getTime()-86400000);renderDailyReport()">&#8249;</button>';
   el.innerHTML += '<input type="date" value="' + dateStr + '" onchange="reportDate=new Date(this.value+\'T12:00:00\');renderReport('daily',document.getElementById('reports-content'))">';
-  el.innerHTML += '<button onclick="reportDate=new Date(reportDate.getTime()+86400000);renderReport('daily',document.getElementById('reports-content'))">&#8250;</button>';
+  el.innerHTML += '<button onclick="reportDate=new Date(reportDate.getTime()+86400000);renderDailyReport()">&#8250;</button>';
   el.innerHTML += '</div>';
   el.innerHTML += items.length===0 ? '<div style="text-align:center;padding:32px;color:var(--muted)">No items scheduled.</div>' : rows;
   el.innerHTML += '<div style="margin-top:16px;font-size:11px;color:var(--muted);text-align:center">' + comp + ' of ' + items.length + ' items completed</div>';
