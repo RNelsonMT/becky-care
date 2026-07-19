@@ -2302,7 +2302,7 @@ function renderDailySchedule(el) {
   el.innerHTML += '<div class="report-body">';
   el.innerHTML += '<div class="report-date-nav">';
   el.innerHTML += '<button onclick="reportDate=new Date(reportDate.getTime()-86400000);renderDailyReport()">&#8249;</button>';
-  el.innerHTML += '<input type="date" value="' + dateStr + '" onchange="reportDate=new Date(this.value+\'T12:00:00\');renderReport('daily',document.getElementById('reports-content'))">';
+  el.innerHTML += '<input type="date" value="' + dateStr + '" onchange="reportDate=new Date(this.value+\'T12:00:00\');renderDailyReport()">';
   el.innerHTML += '<button onclick="reportDate=new Date(reportDate.getTime()+86400000);renderDailyReport()">&#8250;</button>';
   el.innerHTML += '</div>';
   el.innerHTML += items.length===0 ? '<div style="text-align:center;padding:32px;color:var(--muted)">No items scheduled.</div>' : rows;
