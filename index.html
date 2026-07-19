@@ -2291,30 +2291,22 @@ function renderDailySchedule(el) {
     </div>`;
   });
 
-  el.innerHTML = `
-    <button class="back-to-reports" onclick="closeReport()">‹ Reports</button>
-    <div class="report-view">
-      <div class="report-header">
-        <div>
-          <h2>Daily Schedule</h2>
-          <div class="report-header-sub">Becky Nelson · ${reportDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})}</div>
-        </div>
-        <button class="print-btn" onclick="window.print()">🖨 Print</button>
-      </div>
-      <div class="report-body">
-        <div class="report-date-nav">
-          <button onclick="reportDate=new Date(reportDate.getTime()-86400000);renderReports()">‹</button>
-          <input type="date" value="${dateStr}" onchange="reportDate=new Date(this.value+'T12:00:00');renderReports()">
-          <button onclick="reportDate=new Date(reportDate.getTime()+86400000);renderReports()">›</button>
-        </div>
-        ${items.length === 0
-          ? '<div style="text-align:center;padding:32px;color:var(--muted)">No items scheduled for this day.</div>'
-          : rows}
-        <div style="margin-top:16px;font-size:11px;color:var(--muted);text-align:center">
-          ${items.filter(i=>i.logEntry).length} of ${items.length} items completed
-        </div>
-      </div>
-    </div>`;
+  var dLabel = reportDate.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  var comp = items.filter(function(x){return x.logEntry;}).length;
+  el.innerHTML = '<button class="back-to-reports" onclick="closeReport()">&#8249; Reports</button>';
+  el.innerHTML += '<div class="report-view">';
+  el.innerHTML += '<div class="report-header"><div><h2>Daily Schedule</h2>';
+  el.innerHTML += '<div class="report-header-sub">Becky Nelson &middot; ' + dLabel + '</div></div>';
+  el.innerHTML += '<button class="print-btn" onclick="window.print()">Print</button></div>';
+  el.innerHTML += '<div class="report-body">';
+  el.innerHTML += '<div class="report-date-nav">';
+  el.innerHTML += '<button onclick="reportDate=new Date(reportDate.getTime()-86400000);renderReports()">&#8249;</button>';
+  el.innerHTML += '<input type="date" value="' + dateStr + '" onchange="reportDate=new Date(this.value+\'T12:00:00\');renderReports()">';
+  el.innerHTML += '<button onclick="reportDate=new Date(reportDate.getTime()+86400000);renderReports()">&#8250;</button>';
+  el.innerHTML += '</div>';
+  el.innerHTML += items.length===0 ? '<div style="text-align:center;padding:32px;color:var(--muted)">No items scheduled.</div>' : rows;
+  el.innerHTML += '<div style="margin-top:16px;font-size:11px;color:var(--muted);text-align:center">' + comp + ' of ' + items.length + ' items completed</div>';
+  el.innerHTML += '</div></div>';
 }
 
 /* ── MAR (Medication Administration Record) ──────────── */
