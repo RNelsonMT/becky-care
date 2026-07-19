@@ -2213,20 +2213,23 @@ function renderReports() {
   if (currentReport) { renderReport(currentReport, el); return; }
   var html = '<h2 style="font-size:17px;font-weight:700;margin-bottom:14px">Reports</h2>';
   html += '<div class="report-cards-wrap">';
-  html += '<div class="report-card" onclick="openReport(\"daily\")">';
+  html += '<div class="report-card" data-report="daily">';
   html += '<div style="flex:1"><div class="report-title">Daily Schedule</div>';
   html += '<div class="report-desc">All scheduled items for any day with completion status</div></div></div>';
-  html += '<div class="report-card" onclick="openReport(\"mar\")">';
+  html += '<div class="report-card" data-report="mar">';
   html += '<div style="flex:1"><div class="report-title">Medication Administration Record</div>';
   html += '<div class="report-desc">Weekly MAR showing each med given or missed by day</div></div></div>';
-  html += '<div class="report-card" onclick="openReport(\"weekly\")">';
+  html += '<div class="report-card" data-report="weekly">';
   html += '<div style="flex:1"><div class="report-title">Weekly Summary</div>';
   html += '<div class="report-desc">Overview of care activities for the week</div></div></div>';
-  html += '<div class="report-card" onclick="openReport(\"handoff\")">';
+  html += '<div class="report-card" data-report="handoff">';
   html += '<div style="flex:1"><div class="report-title">Caregiver Handoff</div>';
   html += '<div class="report-desc">Shift summary for incoming caregiver</div></div></div>';
   html += '</div>';
   el.innerHTML = html;
+  el.querySelectorAll('[data-report]').forEach(function(card) {
+    card.addEventListener('click', function() { openReport(this.dataset.report); });
+  });
 }
 
 window.openReport = function(type) {
