@@ -2556,7 +2556,7 @@ function renderSettings() {
                 ${p.url?`<div style="margin-top:3px;padding-left:8px"><a href="${p.url}" onclick="window.open('${p.url}','_blank','width=800,height=600,toolbar=1,location=1,scrollbars=1');return false;" style="font-size:11px;color:var(--teal);text-decoration:none;font-weight:600">Medication info ↗</a></div>`:''}
               </div>
               <div style="display:flex;gap:2px;flex-shrink:0;align-self:flex-start">
-                <button class="preset-edit-btn" data-edit-preset="${p.id}" data-edit-name="${p.name.replace(/"/g,'&quot;')}" title="Edit">✏️</button>
+                <button class="preset-edit-btn" data-edit-preset="${p.id}" data-edit-name="${p.name.replace(/"/g,'&quot;')}" data-edit-timing="${p.timing||''}" data-edit-instructions="${(p.instructions||'').replace(/"/g,'&quot;')}" data-edit-url="${p.url||''}" title="Edit">✏️</button>
                 <button class="preset-del-btn" data-delete-preset="${p.id}" title="Delete">×</button>
               </div>
             </div>
@@ -2595,22 +2595,34 @@ document.getElementById('settings-content').addEventListener('click', async func
       renderSettings(); return;
     }
     // Inject inline edit row below the item
+    const editTiming = editBtn.dataset.editTiming || '';
+    const editInstructions = editBtn.dataset.editInstructions || '';
+    const editUrl = editBtn.dataset.editUrl || '';
     const editRow = document.createElement('div');
     editRow.className = 'preset-edit-row';
-    editRow.innerHTML = `
-      <input type="text" value="${currentName.replace(/"/g,'&quot;')}" data-editing-id="${id}" placeholder="Edit preset name…">
-      <button class="preset-save-btn" data-save-preset="${id}">Save</button>
-      <button class="preset-cancel-btn" data-cancel-edit="true">Cancel</button>`;
+    editRow.style.cssText = 'background:var(--cream);border-radius:8px;padding:10px;margin-bottom:6px;display:flex;flex-direction:column;gap:8px';
+    editRow.innerHTML =
+      '<input type="text" value="' + currentName.replace(/"/g,'&quot;') + '" data-editing-id="' + id + '" placeholder="Preset name" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
+      + '<select data-edit-timing-sel style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;background:#fff;outline:none">'
+      + '<option value="Scheduled"' + (editTiming==='Scheduled'?' selected':'') + '>Scheduled</option>'
+      + '<option value="As Needed"' + (editTiming==='As Needed'?' selected':'') + '>As Needed (PRN)</option>'
+      + '</select>'
+      + '<input type="text" value="' + editInstructions.replace(/"/g,'&quot;') + '" data-edit-instructions-inp placeholder="Instructions / dose" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
+      + '<input type="text" value="' + editUrl.replace(/"/g,'&quot;') + '" data-edit-url-inp placeholder="Reference URL (optional)" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
+      + '<div style="display:flex;gap:8px"><button class="preset-save-btn btn btn-primary" data-save-preset="' + id + '" style="flex:1">Save</button>'
+      + '<button class="preset-cancel-btn btn btn-secondary" data-cancel-edit="true" style="flex:1">Cancel</button></div>';
     row.insertAdjacentElement('afterend', editRow);
     editRow.querySelector('input').focus();
-    editRow.querySelector('input').select();
     return;
   }
   // Save edited preset
   const saveBtn = e.target.closest('[data-save-preset]');
   if (saveBtn) {
     const id = saveBtn.dataset.savePreset;
-    const input = document.querySelector(`[data-editing-id="${id}"]`);
+    const input = document.querySelector('[data-editing-id="' + id + '"]');
+    const timingSel = document.querySelector('[data-edit-timing-sel]');
+    const instrInp  = document.querySelector('[data-edit-instructions-inp]');
+    const urlInp    = document.querySelector('[data-edit-url-inp]');
     const name = input ? input.value.trim() : '';
     if (!name) { showToast('Name cannot be empty'); return; }
     try {
@@ -2618,9 +2630,9 @@ document.getElementById('settings-content').addEventListener('click', async func
       await setDoc(doc(db,'presets',id), {
         cat:          existing?.cat || 'med',
         order:        existing?.order || 0,
-        timing:       existing?.timing || 'Scheduled',
-        instructions: existing?.instructions || '',
-        url:          existing?.url || '',
+        timing:       timingSel ? timingSel.value : (existing?.timing || 'Scheduled'),
+        instructions: instrInp  ? instrInp.value.trim()  : (existing?.instructions || ''),
+        url:          urlInp    ? urlInp.value.trim()    : (existing?.url || ''),
         name,
         updatedAt:    serverTimestamp()
       });
