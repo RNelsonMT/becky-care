@@ -1356,7 +1356,7 @@ function renderPresetGrid(gridId, inputId, cat, context) {
     const activeFilter = medFilterState[filterKey] || '';
     const filterBar = document.createElement('div');
     filterBar.style.cssText = 'display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap';
-    [['Scheduled','Scheduled'],['As Needed','As Needed']].forEach(([val,lbl]) => {
+    [['Scheduled','Scheduled'],['As Needed','As Needed (PRN)']].forEach(([val,lbl]) => {
       const chip = document.createElement('button');
       chip.type = 'button';
       chip.textContent = lbl;
@@ -1378,7 +1378,7 @@ function renderPresetGrid(gridId, inputId, cat, context) {
       input.style.display = 'none';
       return;
     }
-    catPresets = catPresets.filter(p => p.timing === activeFilter);
+    catPresets = catPresets.filter(p => p.timing === activeFilter).sort((a,b) => a.name.localeCompare(b.name));
   }
 
   catPresets.forEach(p => {
