@@ -1101,14 +1101,14 @@ function renderInstructions() {
   instructions.forEach(function(i){ if(grouped[i.cat]) grouped[i.cat].push(i); });
   var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
     + '<h2 style="font-size:17px;font-weight:700">Instructions &amp; Resources</h2>'
-    + '<button data-instr-add style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>'
+    + '<button onclick="instrEditId=\'new\';renderInstructions()" style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>'
     + '</div>';
   if (instrEditId === 'new') html += renderInstrEditor(null);
   INSTR_CATS.forEach(function(cat) {
     var items = grouped[cat];
     var collapsed = collapsedInstrCats[cat] || false;
     html += '<div style="margin-bottom:10px">';
-    html += '<div data-instr-toggle-cat="' + cat + '" style="background:var(--navy);color:#fff;padding:8px 14px;border-radius:8px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">'
+    html += '<div onclick="collapsedInstrCats[\'' + cat + '\']=!collapsedInstrCats[\'' + cat + '\'];renderInstructions()" style="background:var(--navy);color:#fff;padding:8px 14px;border-radius:8px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">'
       + '<span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">' + cat + '</span>'
       + '<span style="font-size:12px;opacity:.7">' + (collapsed?'&#9654;':'&#9660;') + ' ' + items.length + '</span></div>';
     if (!collapsed) {
@@ -1116,13 +1116,14 @@ function renderInstructions() {
       items.forEach(function(item) {
         if (instrEditId === item.id) { html += renderInstrEditor(item); }
         else {
+          var iid = item.id;
           html += '<div class="instr-card">'
             + '<div class="instr-title">' + item.title + '</div>'
             + '<div class="instr-body">' + (item.body||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>'
             + (item.updatedBy?'<div class="instr-meta">Updated by ' + item.updatedBy + '</div>':'')
             + '<div style="display:flex;gap:8px;margin-top:8px">'
-            + '<button class="instr-edit-btn" data-instr-edit="' + item.id + '">Edit</button>'
-            + '<button class="instr-edit-btn" style="color:var(--warn);border-color:var(--warn)" data-instr-del="' + item.id + '">Delete</button>'
+            + '<button class="instr-edit-btn" onclick="instrEditId=\'' + iid + '\';renderInstructions()">Edit</button>'
+            + '<button class="instr-edit-btn" style="color:var(--warn);border-color:var(--warn)" onclick="if(confirm(\'Delete this entry?\'))deleteDoc(doc(db,\'instructions\',\'' + iid + '\'));">Delete</button>'
             + '</div></div>';
         }
       });
