@@ -1148,6 +1148,7 @@ function renderInstructions() {
 function renderInstrEditor(item) {
   var id = item ? item.id : 'new';
   window._currentInstrId = id;
+  window._currentInstrId = id;
   var body = item ? (item.body||'').replace(/&/g,'&amp;').replace(/</g,'&lt;') : '';
   var html = '<div class="instr-editor">';
   html += '<div style="font-size:13px;font-weight:700;margin-bottom:10px">' + (item?'Edit Entry':'New Entry') + '</div>';
