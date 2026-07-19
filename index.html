@@ -1494,7 +1494,16 @@ window.filterSched = function(el,cat) {
 function renderSchedule() {
   const list=document.getElementById('sched-list');
   const items=schedule.filter(s=>schedFilter==='all'||s.cat===schedFilter)
-    .sort((a,b)=>((a.times||[''])[0]).localeCompare((b.times||[''])[0])||a.name.localeCompare(b.name));
+    .sort((a,b) => {
+      // One-time items sorted by date first
+      var aDate = a.days==='once' ? (a.onceDate||'9999') : '0000';
+      var bDate = b.days==='once' ? (b.onceDate||'9999') : '0000';
+      if (aDate !== bDate) return aDate.localeCompare(bDate);
+      // Then by time
+      var aTime = (a.times||[''])[0] || '';
+      var bTime = (b.times||[''])[0] || '';
+      return aTime.localeCompare(bTime) || a.name.localeCompare(b.name);
+    });
   if (!items.length){
     list.innerHTML=`<div class="empty-state"><div class="empty-icon">🗓</div><p>No items yet. Tap <b>Add Care Item</b> to get started.</p></div>`;return;
   }
