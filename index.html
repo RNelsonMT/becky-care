@@ -1083,6 +1083,84 @@ async function seedMedGroupsIfNeeded() {
   showToast('✓ Medication groups added to schedule');
 }
 
+/* instructions view */
+const INSTR_CATS = ['Medications','Equipment','Respiratory','Nutrition','General'];
+var collapsedInstrCats = {};
+var instrEditId = null;
+
+function renderInstructions() {
+  var el = document.getElementById('instructions-content');
+  if (!el) return;
+  var grouped = {};
+  INSTR_CATS.forEach(function(c){ grouped[c]=[]; });
+  instructions.forEach(function(i){ if(grouped[i.cat]) grouped[i.cat].push(i); });
+  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+    + '<h2 style="font-size:17px;font-weight:700">Instructions &amp; Resources</h2>'
+    + '<button data-instr-add style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>'
+    + '</div>';
+  if (instrEditId === 'new') html += renderInstrEditor(null);
+  INSTR_CATS.forEach(function(cat) {
+    var items = grouped[cat];
+    var collapsed = collapsedInstrCats[cat] || false;
+    html += '<div style="margin-bottom:10px">';
+    html += '<div data-instr-toggle-cat="' + cat + '" style="background:var(--navy);color:#fff;padding:8px 14px;border-radius:8px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">'
+      + '<span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">' + cat + '</span>'
+      + '<span style="font-size:12px;opacity:.7">' + (collapsed?'&#9654;':'&#9660;') + ' ' + items.length + '</span></div>';
+    if (!collapsed) {
+      if (!items.length) html += '<div style="font-size:13px;color:var(--muted);font-style:italic;padding:4px 8px">No entries yet.</div>';
+      items.forEach(function(item) {
+        if (instrEditId === item.id) { html += renderInstrEditor(item); }
+        else {
+          html += '<div class="instr-card">'
+            + '<div class="instr-title">' + item.title + '</div>'
+            + '<div class="instr-body">' + (item.body||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>'
+            + (item.updatedBy?'<div class="instr-meta">Updated by ' + item.updatedBy + '</div>':'')
+            + '<div style="display:flex;gap:8px;margin-top:8px">'
+            + '<button class="instr-edit-btn" data-instr-edit="' + item.id + '">Edit</button>'
+            + '<button class="instr-edit-btn" style="color:var(--warn);border-color:var(--warn)" data-instr-del="' + item.id + '">Delete</button>'
+            + '</div></div>';
+        }
+      });
+    }
+    html += '</div>';
+  });
+  el.innerHTML = html;
+  el.addEventListener('click', function handler(e) {
+    el.removeEventListener('click', handler);
+    var tc=e.target.closest('[data-instr-toggle-cat]'); if(tc){collapsedInstrCats[tc.dataset.instrToggleCat]=!collapsedInstrCats[tc.dataset.instrToggleCat];renderInstructions();return;}
+    var add=e.target.closest('[data-instr-add]'); if(add){instrEditId='new';renderInstructions();return;}
+    var edit=e.target.closest('[data-instr-edit]'); if(edit){instrEditId=edit.dataset.instrEdit;renderInstructions();return;}
+    var del=e.target.closest('[data-instr-del]'); if(del&&confirm('Delete this entry?')){deleteDoc(doc(db,'instructions',del.dataset.instrDel));instrEditId=null;return;}
+    var save=e.target.closest('[data-instr-save]'); if(save){saveInstruction(save.dataset.instrSave);return;}
+    var cancel=e.target.closest('[data-instr-cancel]'); if(cancel){instrEditId=null;renderInstructions();return;}
+  });
+}
+
+function renderInstrEditor(item) {
+  var id = item ? item.id : 'new';
+  var body = item ? (item.body||'').replace(/&/g,'&amp;').replace(/</g,'&lt;') : '';
+  var html = '<div class="instr-editor">';
+  html += '<div style="font-size:13px;font-weight:700;margin-bottom:10px">' + (item?'Edit Entry':'New Entry') + '</div>';
+  html += '<select id="instr-cat" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;background:var(--cream);outline:none;margin-bottom:8px;box-sizing:border-box">' + INSTR_CATS.map(function(c){return '<option'+(item&&item.cat===c?' selected':'')+'>'+c+'</option>';}).join('') + '</select>';
+  html += '<input type="text" id="instr-title" placeholder="Title" value="' + (item?(item.title||'').replace(/"/g,'&quot;'):'') + '" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;font-family:var(--font-ui);background:var(--cream);outline:none;margin-bottom:8px;box-sizing:border-box">';
+  html += '<textarea id="instr-body" rows="6" placeholder="Instructions..." style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;font-family:var(--font-ui);background:var(--cream);outline:none;resize:vertical;margin-bottom:8px;box-sizing:border-box">' + body + '</textarea>';
+  html += '<div style="display:flex;gap:8px"><button class="btn btn-primary" data-instr-save="' + id + '" style="flex:1">Save</button><button class="btn btn-secondary" data-instr-cancel style="flex:1">Cancel</button></div></div>';
+  return html;
+}
+
+window.saveInstruction = async function(id) {
+  var cat=document.getElementById('instr-cat')?document.getElementById('instr-cat').value:'General';
+  var title=document.getElementById('instr-title')?document.getElementById('instr-title').value.trim():'';
+  var body=document.getElementById('instr-body')?document.getElementById('instr-body').value.trim():'';
+  if (!title){showToast('Title is required');return;}
+  try{
+    var data={cat:cat,title:title,body:body,updatedBy:currentCaregiver||'',updatedAt:serverTimestamp()};
+    if(id==='new'){data.createdAt=serverTimestamp();await addDoc(instructionsCol,data);}
+    else{await setDoc(doc(db,'instructions',id),data);}
+    instrEditId=null; showToast('Saved');
+  }catch(e){showToast('Error saving');console.error(e);}
+};
+
 /* ── BACK BUTTON HANDLER ─────────────────────────────── */
 function pushViewState(view) {
   history.pushState({ view }, '', '#' + view);
