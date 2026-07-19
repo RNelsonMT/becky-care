@@ -1,5 +1,5 @@
 // Becky's Care Service Worker v2
-const CACHE = 'becky-care-v5';
+const CACHE = 'becky-care-v6';
 const ASSETS = [
   '/becky-care/',
   '/becky-care/index.html',
