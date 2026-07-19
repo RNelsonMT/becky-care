@@ -302,6 +302,19 @@
   .pin-label{color:#8aabb8;font-size:14px;margin-bottom:6px;text-align:center}
   #login-back{background:none;border:none;color:#8aabb8;font-size:13px;cursor:pointer;margin-top:16px;text-decoration:underline}
 
+  /* INSTRUCTIONS */
+  .instr-cat-header{background:var(--navy);color:#fff;padding:8px 14px;border-radius:8px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
+  .instr-cat-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+  .instr-card{background:#fff;border-radius:8px;padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  .instr-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px}
+  .instr-body{font-size:13px;color:#2a3e4a;line-height:1.7;white-space:pre-wrap}
+  .instr-meta{font-size:11px;color:var(--muted);margin-top:8px}
+  .instr-edit-btn{background:none;border:1.5px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--navy);margin-top:8px}
+  .instr-editor{background:#fff;border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .instr-editor input,.instr-editor select,.instr-editor textarea{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;font-family:var(--font-ui);color:var(--navy);background:var(--cream);outline:none;box-sizing:border-box;margin-bottom:8px}
+  .instr-editor textarea{min-height:150px;resize:vertical;white-space:pre-wrap}
+  .instr-editor input:focus,.instr-editor select:focus,.instr-editor textarea:focus{border-color:var(--teal)}
+
   /* MISC */
   .overdue-strip{background:var(--warn);color:#fff;text-align:center;font-size:12px;font-weight:700;padding:6px}
 
@@ -404,6 +417,10 @@
     <div class="sidebar-item" data-view="reports">
       <span class="nav-icon">📈</span>
       <span class="nav-label">Reports</span>
+    </div>
+    <div class="sidebar-item" data-view="instructions">
+      <span class="nav-icon">📖</span>
+      <span class="nav-label">Instructions &amp; Resources</span>
     </div>
   </div>
   <div id="sidebar-footer">
@@ -822,7 +839,8 @@ const logCol      = collection(db, 'log');
 const presetsCol  = collection(db, 'presets');
 const contactsCol = collection(db, 'contacts');
 const todosCol        = collection(db, 'todos');
-const measurementsCol = collection(db, 'measurements');
+const measurementsCol   = collection(db, 'measurements');
+const instructionsCol  = collection(db, 'instructions');
 
 /* ── CATEGORY CONFIG ─────────────────────────────────── */
 const CATS = {
@@ -916,7 +934,8 @@ let logEntries = [];
 let presets    = {};
 let contacts   = [];
 let todos        = [];
-let measurements = [];
+let measurements   = [];
+let instructions   = [];
 let viewDate   = new Date();
 let currentView = 'today';
 let collapsedCats = {};
@@ -980,6 +999,12 @@ seedPresetsIfEmpty();
 onSnapshot(contactsCol, snap => {
   contacts = snap.docs.map(d => ({ id:d.id, ...d.data() }));
   if (currentView==='contacts') renderContacts();
+}, err => console.error(err));
+
+// Instructions listener
+onSnapshot(query(instructionsCol, orderBy('cat','asc')), snap => {
+  instructions = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  if (currentView==='instructions') renderInstructions();
 }, err => console.error(err));
 
 // Measurements listener
@@ -1063,7 +1088,7 @@ function pushViewState(view) {
   history.pushState({ view }, '', '#' + view);
 }
 function activateView(view) {
-  const viewMap = { today:0, schedule:1, settings:2, therapy:3, measurements:4, log:5, contacts:6, todo:7, reports:8 };
+  const viewMap = { today:0, schedule:1, settings:2, therapy:3, measurements:4, log:5, contacts:6, todo:7, reports:8, instructions:9 };
   const tabs = document.querySelectorAll('.nav-tab');
   const idx = viewMap[view];
   if (idx === undefined || !tabs[idx]) return;
@@ -1108,6 +1133,7 @@ window.switchView = function(view, el) {
   if (view==='todo')     renderTodo();
   if (view==='reports')      renderReports();
   if (view==='measurements') renderMeasurements();
+  if (view==='instructions') renderInstructions();
   pushViewState(view);
 };
 
@@ -2556,7 +2582,7 @@ function renderSettings() {
                 ${p.url?`<div style="margin-top:3px;padding-left:8px"><a href="${p.url}" onclick="window.open('${p.url}','_blank','width=800,height=600,toolbar=1,location=1,scrollbars=1');return false;" style="font-size:11px;color:var(--teal);text-decoration:none;font-weight:600">Medication info ↗</a></div>`:''}
               </div>
               <div style="display:flex;gap:2px;flex-shrink:0;align-self:flex-start">
-                <button class="preset-edit-btn" data-edit-preset="${p.id}" data-edit-name="${p.name.replace(/"/g,'&quot;')}" data-edit-timing="${p.timing||''}" data-edit-instructions="${(p.instructions||'').replace(/"/g,'&quot;')}" data-edit-url="${p.url||''}" data-edit-notes="${(p.notes||'').replace(/"/g,'&quot;')}" title="Edit">✏️</button>
+                <button class="preset-edit-btn" data-edit-preset="${p.id}" data-edit-name="${p.name.replace(/"/g,'&quot;')}" title="Edit">✏️</button>
                 <button class="preset-del-btn" data-delete-preset="${p.id}" title="Delete">×</button>
               </div>
             </div>
@@ -2595,36 +2621,22 @@ document.getElementById('settings-content').addEventListener('click', async func
       renderSettings(); return;
     }
     // Inject inline edit row below the item
-    const editTiming = editBtn.dataset.editTiming || '';
-    const editNotes  = editBtn.dataset.editNotes  || '';
-    const editInstructions = editBtn.dataset.editInstructions || '';
-    const editUrl = editBtn.dataset.editUrl || '';
     const editRow = document.createElement('div');
     editRow.className = 'preset-edit-row';
-    editRow.style.cssText = 'background:var(--cream);border-radius:8px;padding:10px;margin-bottom:6px;display:flex;flex-direction:column;gap:8px';
-    editRow.innerHTML =
-      '<input type="text" value="' + currentName.replace(/"/g,'&quot;') + '" data-editing-id="' + id + '" placeholder="Preset name" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
-      + '<select data-edit-timing-sel style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;background:#fff;outline:none">'
-      + '<option value="Scheduled"' + (editTiming==='Scheduled'?' selected':'') + '>Scheduled</option>'
-      + '<option value="As Needed"' + (editTiming==='As Needed'?' selected':'') + '>As Needed (PRN)</option>'
-      + '</select>'
-      + '<input type="text" value="' + editInstructions.replace(/"/g,'&quot;') + '" data-edit-instructions-inp placeholder="Instructions / dose" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
-      + '<input type="text" value="' + editUrl.replace(/"/g,'&quot;') + '" data-edit-url-inp placeholder="Reference URL (optional)" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
-      + '<textarea data-edit-notes-inp placeholder="Caregiver notes (e.g. 10mL x2 + 16mL)" rows="2" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff;resize:vertical">' + (editBtn.dataset.editNotes||'') + '</textarea>'
-      + '<div style="display:flex;gap:8px"><button class="preset-save-btn btn btn-primary" data-save-preset="' + id + '" style="flex:1">Save</button>'
-      + '<button class="preset-cancel-btn btn btn-secondary" data-cancel-edit="true" style="flex:1">Cancel</button></div>';
+    editRow.innerHTML = `
+      <input type="text" value="${currentName.replace(/"/g,'&quot;')}" data-editing-id="${id}" placeholder="Edit preset name…">
+      <button class="preset-save-btn" data-save-preset="${id}">Save</button>
+      <button class="preset-cancel-btn" data-cancel-edit="true">Cancel</button>`;
     row.insertAdjacentElement('afterend', editRow);
     editRow.querySelector('input').focus();
+    editRow.querySelector('input').select();
     return;
   }
   // Save edited preset
   const saveBtn = e.target.closest('[data-save-preset]');
   if (saveBtn) {
     const id = saveBtn.dataset.savePreset;
-    const input = document.querySelector('[data-editing-id="' + id + '"]');
-    const timingSel = document.querySelector('[data-edit-timing-sel]');
-    const instrInp  = document.querySelector('[data-edit-instructions-inp]');
-    const urlInp    = document.querySelector('[data-edit-url-inp]');
+    const input = document.querySelector(`[data-editing-id="${id}"]`);
     const name = input ? input.value.trim() : '';
     if (!name) { showToast('Name cannot be empty'); return; }
     try {
@@ -2632,10 +2644,9 @@ document.getElementById('settings-content').addEventListener('click', async func
       await setDoc(doc(db,'presets',id), {
         cat:          existing?.cat || 'med',
         order:        existing?.order || 0,
-        timing:       timingSel ? timingSel.value : (existing?.timing || 'Scheduled'),
-        instructions: instrInp  ? instrInp.value.trim()  : (existing?.instructions || ''),
-        url:          urlInp    ? urlInp.value.trim()    : (existing?.url || ''),
-        notes:        document.querySelector('[data-edit-notes-inp]') ? document.querySelector('[data-edit-notes-inp]').value.trim() : (existing?.notes || ''),
+        timing:       existing?.timing || 'Scheduled',
+        instructions: existing?.instructions || '',
+        url:          existing?.url || '',
         name,
         updatedAt:    serverTimestamp()
       });
@@ -2761,6 +2772,7 @@ document.getElementById('sidebar-nav').addEventListener('click', function(e) {
   if (view==='todo')         renderTodo();
   if (view==='reports')      renderReports();
   if (view==='measurements') renderMeasurements();
+  if (view==='instructions') renderInstructions();
   pushViewState(view);
   closeSidebar();
 });
