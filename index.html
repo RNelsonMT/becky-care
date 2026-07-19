@@ -1152,7 +1152,7 @@ function getDayItems(date) {
       const [hh,mm]=t.split(':').map(Number);
       const scheduled=new Date(date); scheduled.setHours(hh,mm,0,0);
       const logEntry=getLogEntry(s.id,t,date);
-      items.push({schedId:s.id,cat:s.cat,name:s.name,dose:s.dose,time:t,scheduledTs:scheduled.getTime(),grace:s.grace||30,logEntry});
+      items.push({schedId:s.id,cat:s.cat,name:s.name,dose:s.dose,time:t,scheduledTs:scheduled.getTime(),grace:s.grace||30,logEntry,medList:s.medList||[]});
     });
   });
   items.sort((a,b)=>a.scheduledTs-b.scheduledTs);
