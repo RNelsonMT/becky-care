@@ -2616,12 +2616,13 @@ document.getElementById('settings-content').addEventListener('click', async func
     try {
       const existing = Object.values(presets).flat().find(x=>x.id===id);
       await setDoc(doc(db,'presets',id), {
-        cat:          existing?.cat || '',
+        cat:          existing?.cat || 'med',
         order:        existing?.order || 0,
-        timing:       existing?.timing || '',
+        timing:       existing?.timing || 'Scheduled',
         instructions: existing?.instructions || '',
         url:          existing?.url || '',
-        name
+        name,
+        updatedAt:    serverTimestamp()
       });
       showToast('✓ Preset updated');
     } catch(err) { console.error(err); showToast('Error — check connection'); }
