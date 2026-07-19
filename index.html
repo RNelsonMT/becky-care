@@ -2556,7 +2556,7 @@ function renderSettings() {
                 ${p.url?`<div style="margin-top:3px;padding-left:8px"><a href="${p.url}" onclick="window.open('${p.url}','_blank','width=800,height=600,toolbar=1,location=1,scrollbars=1');return false;" style="font-size:11px;color:var(--teal);text-decoration:none;font-weight:600">Medication info ↗</a></div>`:''}
               </div>
               <div style="display:flex;gap:2px;flex-shrink:0;align-self:flex-start">
-                <button class="preset-edit-btn" data-edit-preset="${p.id}" data-edit-name="${p.name.replace(/"/g,'&quot;')}" data-edit-timing="${p.timing||''}" data-edit-instructions="${(p.instructions||'').replace(/"/g,'&quot;')}" data-edit-url="${p.url||''}" title="Edit">✏️</button>
+                <button class="preset-edit-btn" data-edit-preset="${p.id}" data-edit-name="${p.name.replace(/"/g,'&quot;')}" data-edit-timing="${p.timing||''}" data-edit-instructions="${(p.instructions||'').replace(/"/g,'&quot;')}" data-edit-url="${p.url||''}" data-edit-notes="${(p.notes||'').replace(/"/g,'&quot;')}" title="Edit">✏️</button>
                 <button class="preset-del-btn" data-delete-preset="${p.id}" title="Delete">×</button>
               </div>
             </div>
@@ -2596,6 +2596,7 @@ document.getElementById('settings-content').addEventListener('click', async func
     }
     // Inject inline edit row below the item
     const editTiming = editBtn.dataset.editTiming || '';
+    const editNotes  = editBtn.dataset.editNotes  || '';
     const editInstructions = editBtn.dataset.editInstructions || '';
     const editUrl = editBtn.dataset.editUrl || '';
     const editRow = document.createElement('div');
@@ -2609,6 +2610,7 @@ document.getElementById('settings-content').addEventListener('click', async func
       + '</select>'
       + '<input type="text" value="' + editInstructions.replace(/"/g,'&quot;') + '" data-edit-instructions-inp placeholder="Instructions / dose" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
       + '<input type="text" value="' + editUrl.replace(/"/g,'&quot;') + '" data-edit-url-inp placeholder="Reference URL (optional)" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
+      + '<textarea data-edit-notes-inp placeholder="Caregiver notes (e.g. 10mL x2 + 16mL)" rows="2" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff;resize:vertical">' + (editBtn.dataset.editNotes||'') + '</textarea>'
       + '<div style="display:flex;gap:8px"><button class="preset-save-btn btn btn-primary" data-save-preset="' + id + '" style="flex:1">Save</button>'
       + '<button class="preset-cancel-btn btn btn-secondary" data-cancel-edit="true" style="flex:1">Cancel</button></div>';
     row.insertAdjacentElement('afterend', editRow);
@@ -2633,6 +2635,7 @@ document.getElementById('settings-content').addEventListener('click', async func
         timing:       timingSel ? timingSel.value : (existing?.timing || 'Scheduled'),
         instructions: instrInp  ? instrInp.value.trim()  : (existing?.instructions || ''),
         url:          urlInp    ? urlInp.value.trim()    : (existing?.url || ''),
+        notes:        document.querySelector('[data-edit-notes-inp]') ? document.querySelector('[data-edit-notes-inp]').value.trim() : (existing?.notes || ''),
         name,
         updatedAt:    serverTimestamp()
       });
