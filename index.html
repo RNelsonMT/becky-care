@@ -2530,7 +2530,12 @@ function renderSettings() {
 
   Object.keys(CATS).forEach(cat=>{
     const cfg=CATS[cat];
-    const catPresets=presets[cat]||[];
+    const rawPresets=presets[cat]||[];
+    const catPresets = cat==='med'
+      ? [...rawPresets.filter(p=>p.timing==='Scheduled').sort((a,b)=>a.name.localeCompare(b.name)),
+         ...rawPresets.filter(p=>p.timing==='As Needed').sort((a,b)=>a.name.localeCompare(b.name)),
+         ...rawPresets.filter(p=>!p.timing||p.timing==='').sort((a,b)=>a.name.localeCompare(b.name))]
+      : rawPresets;
     const collapsed=collapsedSettings[cat]||false;
     html+=`<div class="settings-section">
       <div data-toggle-cat="${cat}" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;border-radius:${collapsed?'12px':'12px 12px 0 0'};background:${cfg.hdrBg};color:${cfg.hdrColor};margin-bottom:${collapsed?'10px':'0'};user-select:none;">
