@@ -406,7 +406,7 @@
     </div>
   </div>
   <div id="sidebar-footer">
-    <button id="sidebar-add-btn" onclick="openQuickLog();closeSidebar()">+ Add Record</button>
+    <button id="sidebar-add-btn" onclick="openQuickLog();closeSidebar()">+ Log Record</button>
     <div id="sidebar-user" onclick="showCgSelect && showCgSelect()">👤 <span id="sidebar-user-name">Caregiver</span></div>
   </div>
 </div>
@@ -422,7 +422,7 @@
     <div id="clock">--:--</div>
     <div id="date-display"></div>
   </div>
-  <button onclick="openQuickLog()" style="margin-left:12px;background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">+ Add</button>
+  <button onclick="openQuickLog()" style="margin-left:12px;background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">+ Log Record</button>
 </div>
 
 
@@ -782,7 +782,7 @@
     <div class="form-group">
       <label style="display:flex;align-items:center;justify-content:space-between">
         Contact Details
-        <button type="button" onclick="addContactDetail()" style="background:var(--teal);color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;cursor:pointer">+ Add</button>
+        <button type="button" onclick="addContactDetail()" style="background:var(--teal);color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;cursor:pointer">+ Log Record</button>
       </label>
       <div id="contact-details-list" style="display:flex;flex-direction:column;gap:6px;margin-top:6px"></div>
     </div>
@@ -1988,7 +1988,7 @@ function renderContacts() {
   });
   var html = '<div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">'
     + '<h2 style="font-size:17px;font-weight:700">Contacts</h2>'
-    + '<button data-action="add-contact" style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>'
+    + '<button data-action="add-contact" style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Log Record</button>'
     + '</div>';
   CONTACT_CATS.forEach(function(cat) {
     var items = grouped[cat];
