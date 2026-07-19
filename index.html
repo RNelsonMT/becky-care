@@ -1147,13 +1147,14 @@ function renderInstructions() {
 
 function renderInstrEditor(item) {
   var id = item ? item.id : 'new';
+  window._currentInstrId = id;
   var body = item ? (item.body||'').replace(/&/g,'&amp;').replace(/</g,'&lt;') : '';
   var html = '<div class="instr-editor">';
   html += '<div style="font-size:13px;font-weight:700;margin-bottom:10px">' + (item?'Edit Entry':'New Entry') + '</div>';
   html += '<select id="instr-cat" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;background:var(--cream);outline:none;margin-bottom:8px;box-sizing:border-box">' + INSTR_CATS.map(function(c){return '<option'+(item&&item.cat===c?' selected':'')+'>'+c+'</option>';}).join('') + '</select>';
   html += '<input type="text" id="instr-title" placeholder="Title" value="' + (item?(item.title||'').replace(/"/g,'&quot;'):'') + '" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;font-family:var(--font-ui);background:var(--cream);outline:none;margin-bottom:8px;box-sizing:border-box">';
   html += '<textarea id="instr-body" rows="6" placeholder="Instructions..." style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:14px;font-family:var(--font-ui);background:var(--cream);outline:none;resize:vertical;margin-bottom:8px;box-sizing:border-box">' + body + '</textarea>';
-  html += '<div style="display:flex;gap:8px"><button class="btn btn-primary" data-instr-save="' + id + '" style="flex:1">Save</button><button class="btn btn-secondary" data-instr-cancel style="flex:1">Cancel</button></div></div>';
+  html += '<div style="display:flex;gap:8px"><button class="btn btn-primary" onclick="saveInstruction(window._currentInstrId)" style="flex:1">Save</button><button class="btn btn-secondary" onclick="instrEditId=null;renderInstructions()" style="flex:1">Cancel</button></div></div>';
   return html;
 }
 
