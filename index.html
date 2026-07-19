@@ -1185,6 +1185,7 @@ function renderTaskCard(item,now,isLast) {
     <div class="task-info">
       <div class="task-name">${item.name}</div>
       <div class="task-sub">${item.dose?`<b>${item.dose}</b>`:''}</div>
+      ${item.cat==='med'&&item.medList&&item.medList.length?`<div style="font-size:10px;color:var(--muted);margin-top:2px;line-height:1.5">${item.medList.map(m=>m.name).join(' &middot; ')}</div>`:''}
       ${doneBy}${cathOutput}
     </div>
     <div class="task-time-col">
