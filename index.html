@@ -1130,15 +1130,15 @@ function renderInstructions() {
     html += '</div>';
   });
   el.innerHTML = html;
-  el.addEventListener('click', function handler(e) {
-    el.removeEventListener('click', handler);
+  /* clicks handled by permanent delegation */
+  var _dummy = function(e) {
     var tc=e.target.closest('[data-instr-toggle-cat]'); if(tc){collapsedInstrCats[tc.dataset.instrToggleCat]=!collapsedInstrCats[tc.dataset.instrToggleCat];renderInstructions();return;}
     var add=e.target.closest('[data-instr-add]'); if(add){instrEditId='new';renderInstructions();return;}
     var edit=e.target.closest('[data-instr-edit]'); if(edit){instrEditId=edit.dataset.instrEdit;renderInstructions();return;}
     var del=e.target.closest('[data-instr-del]'); if(del&&confirm('Delete this entry?')){deleteDoc(doc(db,'instructions',del.dataset.instrDel));instrEditId=null;return;}
     var save=e.target.closest('[data-instr-save]'); if(save){saveInstruction(save.dataset.instrSave);return;}
     var cancel=e.target.closest('[data-instr-cancel]'); if(cancel){instrEditId=null;renderInstructions();return;}
-  });
+  };
 }
 
 function renderInstrEditor(item) {
