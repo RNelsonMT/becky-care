@@ -285,6 +285,22 @@
   .bp-row input{flex:1}
   .bp-sep{font-size:18px;font-weight:700;color:var(--muted)}
 
+  /* LOGIN SCREEN */
+  #login-screen{position:fixed;inset:0;background:var(--navy);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+  #login-screen h1{color:#fff;font-size:28px;font-weight:800;margin-bottom:4px}
+  .login-sub{color:#8aabb8;font-size:14px;margin-bottom:32px;text-align:center}
+  .cg-btn{width:100%;max-width:320px;padding:14px;margin-bottom:10px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.15);border-radius:12px;color:#fff;font-size:16px;font-weight:600;cursor:pointer;text-align:left;transition:background .15s}
+  .cg-btn:active{background:rgba(255,255,255,.18)}
+  .pin-display{display:flex;gap:12px;margin:20px 0;justify-content:center}
+  .pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid #8aabb8;transition:background .15s}
+  .pin-dot.filled{background:var(--teal);border-color:var(--teal)}
+  .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:260px}
+  .pin-key{background:rgba(255,255,255,.08);border:none;border-radius:12px;color:#fff;font-size:22px;font-weight:600;padding:16px;cursor:pointer;transition:background .15s}
+  .pin-key:active{background:rgba(255,255,255,.25)}
+  .pin-msg{color:#e57373;font-size:13px;margin-top:6px;min-height:18px;text-align:center}
+  .pin-label{color:#8aabb8;font-size:14px;margin-bottom:6px;text-align:center}
+  #login-back{background:none;border:none;color:#8aabb8;font-size:13px;cursor:pointer;margin-top:16px;text-decoration:underline}
+
   /* MISC */
   .overdue-strip{background:var(--warn);color:#fff;text-align:center;font-size:12px;font-weight:700;padding:6px}
 
@@ -304,6 +320,46 @@
 <body>
 
 <div id="sync-bar"><div id="sync-dot"></div><span id="sync-msg">Connecting…</span></div>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="display:none">
+  <div id="login-cg-select" style="width:100%;max-width:320px;text-align:center">
+    <h1>Becky's Care</h1>
+    <p class="login-sub">Who are you?</p>
+    <button class="cg-btn" onclick="selectCaregiver('Ron')">Ron</button>
+    <button class="cg-btn" onclick="selectCaregiver('Marcus')">Marcus</button>
+    <button class="cg-btn" onclick="selectCaregiver('Connor')">Connor</button>
+    <button class="cg-btn" onclick="selectCaregiver('Allie')">Allie</button>
+    <button class="cg-btn" onclick="selectCaregiver('Lisa')">Lisa</button>
+    <button class="cg-btn" onclick="selectCaregiver('Erin')">Erin</button>
+  </div>
+  <div id="login-pin-entry" style="display:none;width:100%;max-width:280px;text-align:center">
+    <h1>Becky's Care</h1>
+    <p class="pin-label" id="pin-label">Enter your PIN</p>
+    <div class="pin-display">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-msg" id="pin-msg"></div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key" onclick="pinDel()">&#9003;</button>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key" onclick="pinClear()">&#10005;</button>
+    </div>
+    <button id="login-back" onclick="showCgSelect()">&#8592; Back</button>
+  </div>
+</div>
 
 <div id="app-shell">
 <div id="sidebar">
