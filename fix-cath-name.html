@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Fix Cath Name</title>
+<style>body{font-family:system-ui,sans-serif;max-width:500px;margin:40px auto;padding:20px;background:#f0f4f4}
+h2{font-size:18px}#s{background:#fff;border-radius:10px;padding:16px;margin-top:12px;max-height:400px;overflow-y:auto}
+.ok{color:#1e7e4c}.err{color:#c0392b}
+button{background:#2a7f7f;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px}
+button:disabled{opacity:.5}</style>
+</head><body>
+<h2>🔄 Rename Straight Cath → Intermittent Cath</h2>
+<p>Updates the schedule item and all existing log records.</p>
+<button id="btn" onclick="run()">Run Update Now</button>
+<div id="s" style="display:none"></div>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,collection,getDocs,doc,updateDoc,query,where}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const db=getFirestore(initializeApp({apiKey:"AIzaSyCxPjDCBYFLc2XDqXvHcbGuqMV7265w3HE",authDomain:"care-tracker-383e0.firebaseapp.com",projectId:"care-tracker-383e0",storageBucket:"care-tracker-383e0.firebasestorage.app",messagingSenderId:"696799569086",appId:"1:696799569086:web:08b7e6356a018338a3aaef"}));
+
+window.run = async function() {
+  const btn=document.getElementById('btn');
+  const s=document.getElementById('s');
+  btn.disabled=true; btn.textContent='Running...'; s.style.display='block';
+  let ok=0, skip=0, err=0;
+
+  function log(msg, cls) { s.innerHTML += '<div class="'+cls+'">'+msg+'</div>'; s.scrollTop=s.scrollHeight; }
+
+  // 1. Update schedule items
+  log('Updating schedule items...','');
+  const schedSnap = await getDocs(query(collection(db,'schedule'), where('name','==','Straight Cath')));
+  log('Found '+schedSnap.size+' schedule item(s)','');
+  for (const d of schedSnap.docs) {
+    try { await updateDoc(doc(db,'schedule',d.id),{name:'Intermittent Cath'}); log('✓ Schedule: '+d.id,'ok'); ok++; }
+    catch(e) { log('✗ Schedule error: '+e.message,'err'); err++; }
+  }
+
+  // 2. Update log records
+  log('Updating log records...','');
+  const logSnap = await getDocs(query(collection(db,'log'), where('name','==','Straight Cath')));
+  log('Found '+logSnap.size+' log record(s)','');
+  for (const d of logSnap.docs) {
+    try { await updateDoc(doc(db,'log',d.id),{name:'Intermittent Cath'}); log('✓ Log: '+d.id,'ok'); ok++; }
+    catch(e) { log('✗ Log error: '+e.message,'err'); err++; }
+  }
+
+  // 3. Update presets if any
+  const presetSnap = await getDocs(query(collection(db,'presets'), where('name','==','Straight Cath')));
+  for (const d of presetSnap.docs) {
+    try { await updateDoc(doc(db,'presets',d.id),{name:'Intermittent Cath'}); log('✓ Preset: '+d.id,'ok'); ok++; }
+    catch(e) { log('✗ Preset error: '+e.message,'err'); err++; }
+  }
+
+  log('','');
+  log('<b>Done! '+ok+' records updated, '+err+' errors.</b>','ok');
+  log('You can close this page.','');
+  btn.textContent='Done';
+};
+</script>
+</body></html>
