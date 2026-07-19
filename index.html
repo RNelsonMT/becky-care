@@ -621,6 +621,10 @@
       <label>Notes (optional)</label>
       <textarea id="quick-notes" placeholder="Observations…"></textarea>
     </div>
+    <div class="form-group" id="quick-fluid-group" style="display:none">
+      <label>Fluid Output (mL)</label>
+      <input type="number" id="quick-fluid-val" placeholder="e.g. 350">
+    </div>
     <div class="btn-row">
       <button class="btn btn-secondary" onclick="closeModal('modal-quick')">Cancel</button>
       <button class="btn btn-primary" onclick="saveQuickLog()">Save Record</button>
@@ -1378,6 +1382,8 @@ window.updateAddPresets = function() {
 
 window.updateQuickPresets = function() {
   const cat = document.getElementById('quick-cat').value;
+  var fg = document.getElementById('quick-fluid-group');
+  if (fg) fg.style.display = cat === 'cath' ? 'block' : 'none';
   document.getElementById('quick-name').value = '';
   renderPresetGrid('quick-preset-grid','quick-name',cat,'quick');
 };
@@ -1386,6 +1392,10 @@ window.updateQuickPresets = function() {
 window.openQuickLog = function() {
   document.getElementById('quick-time').value = nowTime();
   document.getElementById('quick-cat').value = 'med';
+  var fg = document.getElementById('quick-fluid-group');
+  if (fg) fg.style.display = 'none';
+  var fv = document.getElementById('quick-fluid-val');
+  if (fv) fv.value = '';
   document.getElementById('quick-name').value = '';
   document.getElementById('quick-notes').value = '';
   updateQuickPresets();
@@ -1399,6 +1409,7 @@ window.saveQuickLog = async function() {
     await addDoc(logCol,{
       cat:document.getElementById('quick-cat').value,name,
       caregiver:document.getElementById('quick-caregiver').value,
+      fluidOutput: (document.getElementById('quick-cat').value==='cath' && document.getElementById('quick-fluid-val') && document.getElementById('quick-fluid-val').value) ? document.getElementById('quick-fluid-val').value : '',
       givenTime:document.getElementById('quick-time').value,
       notes:document.getElementById('quick-notes').value.trim(),
       dateStr:fmtDate(new Date()),unscheduled:true,ts:serverTimestamp()
