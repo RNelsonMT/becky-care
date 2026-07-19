@@ -468,6 +468,19 @@
   <!-- SCHEDULE -->
   <div id="view-schedule" class="view">
     <button class="add-btn" onclick="openAddSchedule()">＋ Add Scheduled Item</button>
+    <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px;scrollbar-width:none">
+      <div class="filter-chip active" onclick="setSchedDate(this,'all')">All Dates</div>
+      <div class="filter-chip" onclick="setSchedDate(this,'today')">Today</div>
+      <div class="filter-chip" onclick="setSchedDate(this,'week')">This Week</div>
+      <div class="filter-chip" onclick="setSchedDate(this,'future')">Upcoming</div>
+      <div class="filter-chip" onclick="setSchedDate(this,'past')">Past</div>
+      <div class="filter-chip" onclick="setSchedDate(this,'custom')">Custom Range</div>
+    </div>
+    <div id="sched-custom-range" style="display:none;gap:8px;margin-bottom:8px;align-items:center">
+      <input type="date" id="sched-date-start" onchange="renderSchedule()" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;background:var(--cream);outline:none;flex:1">
+      <span style="font-size:13px;color:var(--muted)">to</span>
+      <input type="date" id="sched-date-end" onchange="renderSchedule()" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;background:var(--cream);outline:none;flex:1">
+    </div>
     <div class="filter-row" id="sched-filter-row">
       <div class="filter-chip active" onclick="filterSched(this,'all')">All</div>
       <div class="filter-chip" onclick="filterSched(this,'med')">💊 Meds</div>
@@ -946,6 +959,8 @@ let viewDate   = new Date();
 let currentView = 'today';
 let collapsedCats = {};
 let schedFilter = 'all';
+let schedDateFilter = 'all'; // all, today, week, future, past, custom
+let schedCustomStart = ''; let schedCustomEnd = '';
 let collapsedContactCats = {};
 let collapsedContactOrgs = {};
 let logFilter   = 'all';
@@ -1619,7 +1634,20 @@ window.filterSched = function(el,cat) {
 
 function renderSchedule() {
   const list=document.getElementById('sched-list');
-  const items=schedule.filter(s=>schedFilter==='all'||s.cat===schedFilter)
+  const today = fmtDate(new Date());
+  const weekEnd = fmtDate(new Date(Date.now()+7*86400000));
+  const customStart = document.getElementById('sched-date-start') ? document.getElementById('sched-date-start').value : '';
+  const customEnd   = document.getElementById('sched-date-end')   ? document.getElementById('sched-date-end').value   : '';
+  const items=schedule.filter(s=>{
+    if (schedFilter!=='all' && s.cat!==schedFilter) return false;
+    if (schedDateFilter==='all') return true;
+    if (schedDateFilter==='today')  return s.days==='daily'||s.onceDate===today;
+    if (schedDateFilter==='week')   return s.days==='daily'||s.days==='weekday'||s.days==='weekend'||(s.onceDate&&s.onceDate>=today&&s.onceDate<=weekEnd);
+    if (schedDateFilter==='future') return s.days!=='once'||(s.onceDate&&s.onceDate>=today);
+    if (schedDateFilter==='past')   return s.days==='once'&&s.onceDate&&s.onceDate<today;
+    if (schedDateFilter==='custom') return !customStart||!customEnd||s.days!=='once'||(s.onceDate&&s.onceDate>=customStart&&s.onceDate<=customEnd);
+    return true;
+  })
     .sort((a,b) => {
       // One-time items sorted by date first
       var aDate = a.days==='once' ? (a.onceDate||'9999') : '0000';
