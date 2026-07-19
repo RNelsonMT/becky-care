@@ -2000,10 +2000,16 @@ function addContactDetailRow(type, label, value) {
   var list = document.getElementById('contact-details-list');
   var row = document.createElement('div');
   row.className = 'contact-detail-row';
-  row.innerHTML = '<select style="flex:0 0 100px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">'
+  var labelOpts = ['Work Main','Work Direct','Mobile','Home','Fax','Temp','Other'];
+  var isOther = label && !labelOpts.slice(0,-1).includes(label);
+  var labelSel = '<select onchange="var ni=this.parentElement.querySelector('.label-other');if(ni)ni.style.display=this.value==='Other'?'inline':'none'" style="flex:0 0 108px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">'
+    + labelOpts.map(function(l){ return '<option' + ((isOther&&l==='Other')||(!isOther&&l===label)?' selected':'') + '>' + l + '</option>'; }).join('')
+    + '</select>'
+    + '<input type="text" class="label-other" placeholder="Label…" value="' + (isOther?label:'') + '" style="flex:0 0 80px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none;display:' + (isOther?'inline':'none') + '">';
+  row.innerHTML = '<select style="flex:0 0 90px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">'
     + ['Phone','Email','Website','Address','Fax'].map(function(t){ return '<option' + (t===type?' selected':'') + '>' + t + '</option>'; }).join('')
     + '</select>'
-    + '<input type="text" placeholder="Label (e.g. Mobile, Work)" value="' + (label||'') + '" style="flex:0 0 90px;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">'
+    + labelSel
     + '<input type="text" placeholder="Value" value="' + (value||'') + '" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:7px 8px;font-size:13px;background:var(--cream);outline:none">'
     + '<button type="button" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--warn);font-size:18px;cursor:pointer;padding:0 2px">×</button>';
   list.appendChild(row);
@@ -2020,7 +2026,9 @@ window.saveContact = async function() {
     var selects = row.querySelectorAll('select');
     var inputs  = row.querySelectorAll('input');
     var type  = selects[0] ? selects[0].value : '';
-    var label = inputs[0] ? inputs[0].value.trim() : '';
+    var labelSel = selects[1] ? selects[1].value : '';
+    var labelOther = inputs[0] ? inputs[0].value.trim() : '';
+    var label = labelSel === 'Other' ? labelOther : labelSel;
     var value = inputs[1] ? inputs[1].value.trim() : '';
     if (value) details.push({type, label, value});
   });
