@@ -1167,6 +1167,7 @@ window.instrDelEntry  = async function(idx) {
   catch(e) { showToast('Error deleting'); }
 };
 window.saveInstruction = async function(id) {
+  if (!id) id = window._currentInstrId;
   var cat=document.getElementById('instr-cat')?document.getElementById('instr-cat').value:'General';
   var title=document.getElementById('instr-title')?document.getElementById('instr-title').value.trim():'';
   var body=document.getElementById('instr-body')?document.getElementById('instr-body').value.trim():'';
@@ -1176,7 +1177,7 @@ window.saveInstruction = async function(id) {
     if(id==='new'){data.createdAt=serverTimestamp();await addDoc(instructionsCol,data);}
     else{await setDoc(doc(db,'instructions',id),data);}
     instrEditId=null; showToast('Saved');
-  }catch(e){showToast('Error saving');console.error(e);}
+  }catch(e){showToast('Error: '+(e.code||e.message));console.error(e);}
 };
 
 /* ── BACK BUTTON HANDLER ─────────────────────────────── */
