@@ -1094,6 +1094,7 @@ var collapsedInstrCats = {};
 var instrEditId = null;
 
 function renderInstructions() {
+  window._instrIds = {};
   var el = document.getElementById('instructions-content');
   if (!el) return;
   var grouped = {};
@@ -1116,14 +1117,16 @@ function renderInstructions() {
       items.forEach(function(item) {
         if (instrEditId === item.id) { html += renderInstrEditor(item); }
         else {
-          var iid = item.id;
+          window._instrIds = window._instrIds || {};
+          var idx = Object.keys(window._instrIds).length;
+          window._instrIds[idx] = item.id;
           html += '<div class="instr-card">'
             + '<div class="instr-title">' + item.title + '</div>'
             + '<div class="instr-body">' + (item.body||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>'
             + (item.updatedBy?'<div class="instr-meta">Updated by ' + item.updatedBy + '</div>':'')
             + '<div style="display:flex;gap:8px;margin-top:8px">'
-            + '<button class="instr-edit-btn" onclick="instrEditId=\'' + iid + '\';renderInstructions()">Edit</button>'
-            + '<button class="instr-edit-btn" style="color:var(--warn);border-color:var(--warn)" onclick="if(confirm(\'Delete this entry?\'))deleteDoc(doc(db,\'instructions\',\'' + iid + '\'));">Delete</button>'
+            + '<button class="instr-edit-btn" onclick="instrEditEntry(' + idx + ')">Edit</button>'
+            + '<button class="instr-edit-btn" style="color:var(--warn);border-color:var(--warn)" onclick="instrDelEntry(' + idx + ')">Delete</button>'
             + '</div></div>';
         }
       });
@@ -1154,6 +1157,13 @@ function renderInstrEditor(item) {
   return html;
 }
 
+window._instrIds = {};
+window.instrEditEntry = function(idx) { instrEditId = window._instrIds[idx]; renderInstructions(); };
+window.instrDelEntry  = async function(idx) {
+  if (!confirm('Delete this entry?')) return;
+  try { await deleteDoc(doc(db,'instructions',window._instrIds[idx])); instrEditId=null; }
+  catch(e) { showToast('Error deleting'); }
+};
 window.saveInstruction = async function(id) {
   var cat=document.getElementById('instr-cat')?document.getElementById('instr-cat').value:'General';
   var title=document.getElementById('instr-title')?document.getElementById('instr-title').value.trim():'';
