@@ -1387,7 +1387,7 @@ window.openTaskLog = function(schedId,timeStr) {
   // Show skipped options for Suction and Cough Assist
   var skippedGroup = document.getElementById('log-skipped-group');
   if (skippedGroup) {
-    var showSkip = ['Suction','Cough Assist','Trach Care'].indexOf(item.name) >= 0;
+    var showSkip = ['Suction','Cough Assist','Trach Care','Bowel Care'].indexOf(item.name) >= 0;
     skippedGroup.style.display = showSkip ? 'block' : 'none';
     if (skippedGroup.querySelector('#skip-declined-btn')) {
       document.getElementById('skip-declined-btn').style.background = '#fff';
