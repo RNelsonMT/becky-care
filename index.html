@@ -468,7 +468,7 @@
   <!-- SCHEDULE -->
   <div id="view-schedule" class="view">
     <button class="add-btn" onclick="openAddSchedule()">＋ Add Scheduled Item</button>
-    <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px;scrollbar-width:none">
+    <div id="sched-date-row" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px;scrollbar-width:none">
       <div class="filter-chip active" onclick="setSchedDate(this,'all')">All Dates</div>
       <div class="filter-chip" onclick="setSchedDate(this,'today')">Today</div>
       <div class="filter-chip" onclick="setSchedDate(this,'week')">This Week</div>
@@ -1629,7 +1629,7 @@ window.saveQuickLog = async function() {
 /* ── SCHEDULE VIEW ───────────────────────────────────── */
 window.setSchedDate = function(el, range) {
   schedDateFilter = range;
-  document.querySelectorAll('.sched-date-chip').forEach(function(c){c.classList.remove('active');});
+  var dr=document.getElementById('sched-date-row'); if(dr) dr.querySelectorAll('.filter-chip').forEach(function(c){c.classList.remove('active');});
   if (el) el.classList.add('active');
   var cr = document.getElementById('sched-custom-range');
   if (cr) cr.style.display = range==='custom' ? 'flex' : 'none';
