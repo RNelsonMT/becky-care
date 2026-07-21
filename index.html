@@ -1692,7 +1692,7 @@ function renderSchedule() {
       </div>
       <div class="sched-actions">
         <button class="sched-btn" onclick="editItem('${s.id}')">Edit</button>
-        ${s.days==='once'?'<button class="sched-btn" onclick="copyItem(\'' + s.id + '\')" style="background:var(--cream);border:1.5px solid var(--teal);color:var(--teal)">Copy</button>':''}
+        ${s.days==='once'?'<button class="sched-btn sched-copy-btn" data-copy-id="'+s.id+'" style="background:var(--cream);border:1.5px solid var(--teal);color:var(--teal)">Copy</button>':''}
         <button class="sched-btn del" onclick="deleteItem('${s.id}')">✕</button>
       </div>
     </div>`;
@@ -1744,6 +1744,12 @@ window.openAddSchedule = function() {
   updateAddPresets();
   openModal('modal-add');
 };
+
+// Copy button delegation for schedule list
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('.sched-copy-btn');
+  if (btn) { copyItem(btn.dataset.copyId); }
+});
 
 window.copyItem = function(id) {
   var s = schedule.find(function(x){return x.id===id;});
