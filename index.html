@@ -1658,11 +1658,11 @@ function renderSchedule() {
     return true;
   })
     .sort((a,b) => {
-      // One-time items sorted by date first
-      var aDate = a.days==='once' ? (a.onceDate||'9999') : '0000';
-      var bDate = b.days==='once' ? (b.onceDate||'9999') : '0000';
-      if (aDate !== bDate) return aDate.localeCompare(bDate);
-      // Then by time
+      // One-time items: sort by date descending, recurring items after
+      var aDate = a.days==='once' ? (a.onceDate||'0000') : '9999';
+      var bDate = b.days==='once' ? (b.onceDate||'0000') : '9999';
+      if (aDate !== bDate) return bDate.localeCompare(aDate); // descending date
+      // Then by time ascending
       var aTime = (a.times||[''])[0] || '';
       var bTime = (b.times||[''])[0] || '';
       return aTime.localeCompare(bTime) || a.name.localeCompare(b.name);
