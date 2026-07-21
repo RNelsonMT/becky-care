@@ -1744,6 +1744,27 @@ window.openAddSchedule = function() {
   openModal('modal-add');
 };
 
+window.copyItem = function(id) {
+  var s = schedule.find(function(x){return x.id===id;});
+  if (!s) return;
+  // Open add form pre-filled with item data
+  document.getElementById('add-cat').value = s.cat || 'ther';
+  updateAddPresets();
+  document.getElementById('add-name').value = s.name || '';
+  document.getElementById('add-times').value = (s.times||[]).join(', ');
+  document.getElementById('add-days').value = 'once';
+  document.getElementById('add-dose').value = s.dose || '';
+  document.getElementById('add-notes').value = s.notes || '';
+  document.getElementById('add-url').value = s.url || '';
+  // Show once-date field
+  var onceDateGroup = document.getElementById('add-once-date-group');
+  if (onceDateGroup) onceDateGroup.style.display = 'block';
+  var onceDate = document.getElementById('add-once-date');
+  if (onceDate) onceDate.value = ''; // clear date so user picks new one
+  document.getElementById('add-modal-title').textContent = 'Copy Scheduled Item';
+  openModal('modal-add');
+};
+
 window.editItem = function(id) {
   const s=schedule.find(i=>i.id===id); if (!s) return;
   document.getElementById('edit-id').value=id;
