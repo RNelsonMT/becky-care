@@ -1351,6 +1351,15 @@ window.openTaskLog = function(schedId,timeStr) {
   const item=schedule.find(s=>s.id===schedId); if (!item) return;
   const dateStr=fmtDate(viewDate);
   const existing=getLogEntry(schedId,timeStr,viewDate);
+  // If already done, offer to undo
+  if (existing && !existing.skipped) {
+    if (confirm('Unmark "' + item.name + '" as done?')) {
+      import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js').then(({deleteDoc, doc}) => {
+        deleteDoc(doc(db,'log',existing.id)).then(() => showToast('Unmarked')).catch(e => showToast('Error: '+e.message));
+      });
+    }
+    return;
+  }
   pendingLog={schedId,timeStr,dateStr,name:item.name,cat:item.cat,existingId:existing?.id,medList:item.medList||[]};
   document.getElementById('log-modal-title').textContent=item.name;
   document.getElementById('log-modal-sub').textContent=CATS[item.cat].icon+' '+CATS[item.cat].label+' · '+fmt12(timeStr);
