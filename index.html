@@ -1628,6 +1628,7 @@ window.saveQuickLog = async function() {
 
 /* ── SCHEDULE VIEW ───────────────────────────────────── */
 window.setSchedDate = function(el, range) {
+  console.log('setSchedDate called:', range, 'schedDateFilter:', schedDateFilter);
   schedDateFilter = range;
   var dr=document.getElementById('sched-date-row'); if(dr) dr.querySelectorAll('.filter-chip').forEach(function(c){c.classList.remove('active');});
   if (el) el.classList.add('active');
