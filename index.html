@@ -1643,6 +1643,7 @@ window.filterSched = function(el,cat) {
 };
 
 function renderSchedule() {
+  console.log('renderSchedule: schedDateFilter=', schedDateFilter, 'items before filter:', schedule.length);
   const list=document.getElementById('sched-list');
   const today = fmtDate(new Date());
   const weekEnd = fmtDate(new Date(Date.now()+7*86400000));
