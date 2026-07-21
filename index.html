@@ -2845,7 +2845,9 @@ document.getElementById('settings-content').addEventListener('keydown', async fu
 window.openModal  = id => document.getElementById(id).classList.add('open');
 window.closeModal = id => document.getElementById(id).classList.remove('open');
 document.querySelectorAll('.modal-overlay').forEach(o=>{
-  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});
+  o.addEventListener('click',e=>{
+    if(e.target===o && !e.target.closest('input,textarea,select,button')) o.classList.remove('open');
+  });
 });
 
 /* ── TOAST ───────────────────────────────────────────── */
