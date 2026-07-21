@@ -1692,6 +1692,7 @@ function renderSchedule() {
       </div>
       <div class="sched-actions">
         <button class="sched-btn" onclick="editItem('${s.id}')">Edit</button>
+        ${s.days==='once'?`<button class="sched-btn" onclick="copyItem('${s.id}')" style="background:var(--cream);border:1.5px solid var(--teal);color:var(--teal)">Copy</button>`:''}
         <button class="sched-btn del" onclick="deleteItem('${s.id}')">✕</button>
       </div>
     </div>`;
