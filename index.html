@@ -1329,14 +1329,14 @@ function renderTaskCard(item,now,isLast) {
       ${doneBy}${cathOutput}
     </div>
     <div class="task-time-col">
+    <div class="task-time-col">
       <div class="task-time">${fmt12(item.time)}</div>
       <div class="task-delta">${delta}</div>
+      ${item.days==='once'&&item.onceDate?`<div style="font-size:10px;color:var(--muted);margin-top:2px">${item.onceDate}</div>`:''}
+      ${item.days==='once'?`<button onclick="event.stopPropagation();deleteSchedFromToday('${item.schedId}')" style="background:none;border:none;color:var(--warn);font-size:11px;cursor:pointer;margin-top:4px;padding:0">Delete</button>`:''}
     </div>
     ${item.status==='late'?'<div class="late-badge">Late</div>':''}
   </div>`;
-}
-
-function updateOverdueStrip(count) {
   const s=document.getElementById('overdue-strip');
   if (count>0){s.style.display='block';s.textContent=`⚠ ${count} item${count!==1?'s':''} overdue`;}
   else s.style.display='none';
