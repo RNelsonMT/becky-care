@@ -631,8 +631,22 @@
       </div>
     </div>
     <div class="form-group">
-      <label>Scheduled Times (comma-separated 24hr, e.g. 08:00, 20:00)</label>
-      <input type="text" id="add-times" placeholder="08:00, 14:00, 20:00">
+      <label>Scheduled Times</label>
+      <div id="add-times-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <select id="add-time-hour" style="border:1.5px solid var(--border);border-radius:8px;padding:8px;font-size:14px;background:var(--cream);outline:none">
+          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option>
+          <option selected>8</option><option>9</option><option>10</option><option>11</option><option>12</option>
+        </select>
+        <select id="add-time-min" style="border:1.5px solid var(--border);border-radius:8px;padding:8px;font-size:14px;background:var(--cream);outline:none">
+          <option value="00" selected>00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option>
+        </select>
+        <select id="add-time-ampm" style="border:1.5px solid var(--border);border-radius:8px;padding:8px;font-size:14px;background:var(--cream);outline:none">
+          <option>AM</option><option>PM</option>
+        </select>
+        <button type="button" onclick="addScheduleTime()" style="background:var(--teal);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:14px;font-weight:700;cursor:pointer">+ Add</button>
+      </div>
+      <input type="hidden" id="add-times" value="">
     </div>
     <div class="form-group">
       <label>Days</label>
@@ -1492,7 +1506,7 @@ let medFilterState = { add: 'all', quick: 'all' };
 function renderPresetGrid(gridId, inputId, cat, context) {
   const grid = document.getElementById(gridId);
   const input = document.getElementById(inputId);
-  let catPresets = presets[cat] || [];
+  let catPresets = (presets[cat] || []).filter(function(p,i,arr){return arr.findIndex(function(x){return x.name===p.name&&x.timing===p.timing;})===i;});
   grid.innerHTML = '';
 
   // For medications: show Scheduled/As Needed buttons first, collapse presets until one is picked
@@ -1727,10 +1741,50 @@ window.renderAddMedChecklist = function(selectedMeds) {
   el.innerHTML = html;
 };
 
+window.addScheduleTime = function() {
+  var h = parseInt(document.getElementById('add-time-hour').value);
+  var m = document.getElementById('add-time-min').value;
+  var ampm = document.getElementById('add-time-ampm').value;
+  var h24 = ampm==='AM' ? (h===12?0:h) : (h===12?12:h+12);
+  var timeStr = String(h24).padStart(2,'0') + ':' + m;
+  var current = document.getElementById('add-times').value;
+  var times = current ? current.split(',').map(function(t){return t.trim();}) : [];
+  if (!times.includes(timeStr)) {
+    times.push(timeStr);
+    times.sort();
+    document.getElementById('add-times').value = times.join(', ');
+    updateTimesList();
+  }
+};
+
+function updateTimesList() {
+  var el = document.getElementById('add-times-list');
+  if (!el) return;
+  var current = document.getElementById('add-times').value;
+  var times = current ? current.split(',').map(function(t){return t.trim();}).filter(Boolean) : [];
+  el.innerHTML = times.map(function(t) {
+    var parts = t.split(':');
+    var h = parseInt(parts[0]), m = parts[1]||'00';
+    var ampm = h>=12?'PM':'AM';
+    var h12 = h%12||12;
+    return '<span style="background:var(--navy);color:#fff;border-radius:20px;padding:4px 10px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px">'
+      + h12 + ':' + m + ' ' + ampm
+      + '<span onclick="removeScheduleTime(\'' + t + '\')" style="cursor:pointer;opacity:.7">&times;</span></span>';
+  }).join('');
+}
+
+window.removeScheduleTime = function(t) {
+  var current = document.getElementById('add-times').value;
+  var times = current ? current.split(',').map(function(x){return x.trim();}).filter(function(x){return x!==t;}) : [];
+  document.getElementById('add-times').value = times.join(', ');
+  updateTimesList();
+};
+
 window.openAddSchedule = function() {
   document.getElementById('edit-id').value='';
   document.getElementById('add-modal-title').textContent='Add Care Item';
   ['add-dose','add-times'].forEach(id=>document.getElementById(id).value='');
+  updateTimesList();
   document.getElementById('add-cat').value='med';
   document.getElementById('add-days').value='daily';
   document.getElementById('add-once-date').value='';
