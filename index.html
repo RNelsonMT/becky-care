@@ -1325,10 +1325,9 @@ function renderTaskCard(item,now,isLast) {
     <div class="task-info">
       <div class="task-name">${item.name}</div>
       <div class="task-sub">${item.dose?`<b>${item.dose}</b>`:''}</div>
-      ${item.cat==='med'&&item.medList&&item.medList.length?`<div style="font-size:10px;color:var(--muted);margin-top:2px;line-height:1.5">${item.medList.map(m=>m.name).join(' &middot; ')}</div>`:''}
+      ${item.cat==='med'&&item.medList&&item.medList.length?`<div style="font-size:10px;color:var(--muted);margin-top:2px;line-height:1.5">${item.medList.map(m=>m.name).join(' · ')}</div>`:''}
       ${doneBy}${cathOutput}
     </div>
-    <div class="task-time-col">
     <div class="task-time-col">
       <div class="task-time">${fmt12(item.time)}</div>
       <div class="task-delta">${delta}</div>
@@ -1337,10 +1336,8 @@ function renderTaskCard(item,now,isLast) {
     </div>
     ${item.status==='late'?'<div class="late-badge">Late</div>':''}
   </div>`;
-  const s=document.getElementById('overdue-strip');
-  if (count>0){s.style.display='block';s.textContent=`⚠ ${count} item${count!==1?'s':''} overdue`;}
-  else s.style.display='none';
 }
+
 function updateBadge(count) {
   const b=document.getElementById('badge-late');
   if (count>0){b.style.display='';b.textContent=count;}else b.style.display='none';
