@@ -1680,11 +1680,21 @@ function renderSchedule() {
     return true;
   })
     .sort((a,b) => {
-      // One-time items: sort by date ascending, recurring items after
-      var aDate = a.days==='once' ? (a.onceDate||'0000') : '9999';
-      var bDate = b.days==='once' ? (b.onceDate||'0000') : '9999';
-      if (aDate !== bDate) return aDate.localeCompare(bDate); // ascending date
-      // Then by time ascending
+      // If filtering by date/range, sort purely by time ascending
+      if (schedDateFilter !== 'all') {
+        var aTime = (a.times||[''])[0] || '';
+        var bTime = (b.times||[''])[0] || '';
+        return aTime.localeCompare(bTime) || a.name.localeCompare(b.name);
+      }
+      // Default: recurring items first by time, then one-time by date then time
+      var aIsOnce = a.days==='once';
+      var bIsOnce = b.days==='once';
+      if (aIsOnce && !bIsOnce) return 1;
+      if (!aIsOnce && bIsOnce) return -1;
+      if (aIsOnce && bIsOnce) {
+        var dateCmp = (a.onceDate||'').localeCompare(b.onceDate||'');
+        if (dateCmp !== 0) return dateCmp;
+      }
       var aTime = (a.times||[''])[0] || '';
       var bTime = (b.times||[''])[0] || '';
       return aTime.localeCompare(bTime) || a.name.localeCompare(b.name);
