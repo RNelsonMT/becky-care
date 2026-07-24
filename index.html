@@ -2856,15 +2856,27 @@ document.getElementById('settings-content').addEventListener('click', async func
       renderSettings(); return;
     }
     // Inject inline edit row below the item
+    const existing = Object.values(presets).flat().find(x=>x.id===id);
     const editRow = document.createElement('div');
-    editRow.className = 'preset-edit-row';
-    editRow.innerHTML = `
-      <input type="text" value="${currentName.replace(/"/g,'&quot;')}" data-editing-id="${id}" placeholder="Edit preset name…">
-      <button class="preset-save-btn" data-save-preset="${id}">Save</button>
-      <button class="preset-cancel-btn" data-cancel-edit="true">Cancel</button>`;
+    editRow.style.cssText = 'background:var(--cream);border-radius:8px;padding:12px;margin-bottom:6px;display:flex;flex-direction:column;gap:8px;border:1.5px solid var(--teal)';
+    var timingOpts = ['Scheduled','As Needed'].map(function(t){return '<option'+(existing?.timing===t?' selected':'')+'>'+t+'</option>';}).join('');
+    var routeOpts = ['PEG Tube','IV','Oral','Sublingual','Topical','Inhaled','Other'].map(function(r){return '<option'+(existing?.route===r?' selected':'')+'>'+r+'</option>';}).join('');
+    var hOpts = [1,2,3,4,5,6,7,8,9,10,11,12].map(function(h){return '<option'+(h===8?' selected':'')+'>'+h+'</option>';}).join('');
+    var mOpts = ['00','15','30','45'].map(function(m){return '<option>'+m+'</option>';}).join('');
+    editRow.innerHTML =
+      '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Edit Medication</div>'
+      +'<input type="text" value="'+currentName.replace(/"/g,'&quot;')+'" data-editing-id="'+id+'" placeholder="Medication name" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
+      +'<div style="display:flex;gap:8px"><select class="ed-timing" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px;font-size:13px;background:#fff;outline:none">'+timingOpts+'</select>'
+      +'<select class="ed-route" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px;font-size:13px;background:#fff;outline:none">'+routeOpts+'</select></div>'
+      +'<input type="text" class="ed-dose" placeholder="Dose (e.g. 600mg, 10 mL)" value="'+(existing?.dose||'').replace(/"/g,'&quot;')+'" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
+      +'<div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px;color:var(--muted);white-space:nowrap">Default time:</span>'
+      +'<select class="ed-hr" style="border:1.5px solid var(--border);border-radius:8px;padding:7px;font-size:13px;background:#fff;outline:none">'+hOpts+'</select>'
+      +'<select class="ed-min" style="border:1.5px solid var(--border);border-radius:8px;padding:7px;font-size:13px;background:#fff;outline:none">'+mOpts+'</select>'
+      +'<select class="ed-ampm" style="border:1.5px solid var(--border);border-radius:8px;padding:7px;font-size:13px;background:#fff;outline:none"><option>AM</option><option>PM</option></select></div>'
+      +'<input type="text" class="ed-instr" placeholder="Instructions / notes" value="'+(existing?.instructions||'').replace(/"/g,'&quot;')+'" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
+      +'<div style="display:flex;gap:8px"><button class="preset-save-btn" data-save-preset="'+id+'" style="flex:1;padding:10px">Save</button><button class="preset-cancel-btn" data-cancel-edit="true" style="flex:1;padding:10px">Cancel</button></div>';
     row.insertAdjacentElement('afterend', editRow);
     editRow.querySelector('input').focus();
-    editRow.querySelector('input').select();
     return;
   }
   // Save edited preset
@@ -2875,13 +2887,26 @@ document.getElementById('settings-content').addEventListener('click', async func
     const name = input ? input.value.trim() : '';
     if (!name) { showToast('Name cannot be empty'); return; }
     try {
-      const existing = Object.values(presets).flat().find(x=>x.id===id);
+      const existing2 = Object.values(presets).flat().find(x=>x.id===id);
+      const editRow2 = document.getElementById('preset-row-'+id)?.nextElementSibling;
+      var timing2 = editRow2?.querySelector('.ed-timing')?.value || existing2?.timing || 'Scheduled';
+      var route2  = editRow2?.querySelector('.ed-route')?.value  || existing2?.route  || 'PEG Tube';
+      var dose2   = editRow2?.querySelector('.ed-dose')?.value.trim()  || existing2?.dose  || '';
+      var instr2  = editRow2?.querySelector('.ed-instr')?.value.trim() || existing2?.instructions || '';
+      var hr2     = editRow2?.querySelector('.ed-hr')?.value    || '8';
+      var min2    = editRow2?.querySelector('.ed-min')?.value   || '00';
+      var ampm2   = editRow2?.querySelector('.ed-ampm')?.value  || 'AM';
+      var h24     = ampm2==='AM' ? (parseInt(hr2)===12?0:parseInt(hr2)) : (parseInt(hr2)===12?12:parseInt(hr2)+12);
+      var defTime = String(h24).padStart(2,'0')+':'+min2;
       await setDoc(doc(db,'presets',id), {
-        cat:          existing?.cat || 'med',
-        order:        existing?.order || 0,
-        timing:       existing?.timing || 'Scheduled',
-        instructions: existing?.instructions || '',
-        url:          existing?.url || '',
+        cat:          existing2?.cat || 'med',
+        order:        existing2?.order || 0,
+        timing:       timing2,
+        route:        route2,
+        dose:         dose2,
+        defaultTime:  defTime,
+        instructions: instr2,
+        url:          existing2?.url || '',
         name,
         updatedAt:    serverTimestamp()
       });
