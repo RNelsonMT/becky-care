@@ -1132,7 +1132,7 @@ window.renderInstructions = function() {
   instructions.forEach(function(i){ if(grouped[i.cat]) grouped[i.cat].push(i); });
   var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
     + '<h2 style="font-size:17px;font-weight:700">Instructions &amp; Resources</h2>'
-    + '<button onclick="instrEditId=\'new\';renderInstructions()" style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>'
+    + '<button data-instr-new style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>'
     + '</div>';
   if (instrEditId === 'new') html += renderInstrEditor(null);
   INSTR_CATS.forEach(function(cat) {
