@@ -1352,6 +1352,13 @@ function renderTaskCard(item,now,isLast) {
   </div>`;
 }
 
+function updateOverdueStrip(count) {
+  const s=document.getElementById('overdue-strip');
+  if (!s) return;
+  if (count>0){s.style.display='block';s.textContent='⚠ '+count+' item'+(count!==1?'s':'')+' overdue';}
+  else s.style.display='none';
+}
+
 function updateBadge(count) {
   const b=document.getElementById('badge-late');
   if (count>0){b.style.display='';b.textContent=count;}else b.style.display='none';
