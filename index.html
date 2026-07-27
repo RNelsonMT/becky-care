@@ -1123,7 +1123,7 @@ const INSTR_CATS = ['Medications','Equipment','Respiratory','Nutrition','General
 var collapsedInstrCats = {};
 var instrEditId = null;
 
-function renderInstructions() {
+window.renderInstructions = function() {
   window._instrIds = {};
   var el = document.getElementById('instructions-content');
   if (!el) return;
@@ -1175,7 +1175,7 @@ function renderInstructions() {
   };
 }
 
-function renderInstrEditor(item) {
+window.renderInstrEditor = function(item) {
   var id = item ? item.id : 'new';
   window._currentInstrId = id;
   window._currentInstrId = id;
