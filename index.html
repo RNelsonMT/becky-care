@@ -1196,6 +1196,14 @@ window.instrDelEntry  = async function(idx) {
   try { await deleteDoc(doc(db,'instructions',window._instrIds[idx])); instrEditId=null; }
   catch(e) { showToast('Error deleting'); }
 };
+// Permanent delegation: Instructions + Add button
+document.addEventListener('click', function(e) {
+  if (e.target.closest('[data-instr-new]')) {
+    instrEditId = 'new';
+    renderInstructions();
+  }
+});
+
 window.saveInstruction = async function(id) {
   if (!id) id = window._currentInstrId;
   var cat=document.getElementById('instr-cat')?document.getElementById('instr-cat').value:'General';
