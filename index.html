@@ -2810,6 +2810,7 @@ function renderSettings() {
     const catPresets = cat==='med'
       ? [...rawPresets.filter(p=>p.timing==='Scheduled').sort((a,b)=>a.name.localeCompare(b.name)),
          ...rawPresets.filter(p=>p.timing==='As Needed').sort((a,b)=>a.name.localeCompare(b.name)),
+         ...rawPresets.filter(p=>p.timing==='Discontinued').sort((a,b)=>a.name.localeCompare(b.name)),
          ...rawPresets.filter(p=>!p.timing||p.timing==='').sort((a,b)=>a.name.localeCompare(b.name))]
       : rawPresets;
     const collapsed=collapsedSettings[cat]||false;
@@ -2874,7 +2875,7 @@ document.getElementById('settings-content').addEventListener('click', async func
     const existing = Object.values(presets).flat().find(x=>x.id===id);
     const editRow = document.createElement('div');
     editRow.style.cssText = 'background:var(--cream);border-radius:8px;padding:12px;margin-bottom:6px;display:flex;flex-direction:column;gap:8px;border:1.5px solid var(--teal)';
-    var timingOpts = ['Scheduled','As Needed'].map(function(t){return '<option'+(existing?.timing===t?' selected':'')+'>'+t+'</option>';}).join('');
+    var timingOpts = ['Scheduled','As Needed','Discontinued'].map(function(t){return '<option'+(existing?.timing===t?' selected':'')+'>'+t+'</option>';}).join('');
     var routeOpts = ['PEG Tube','IV','Oral','Sublingual','Topical','Inhaled','Other'].map(function(r){return '<option'+(existing?.route===r?' selected':'')+'>'+r+'</option>';}).join('');
     var hOpts = [1,2,3,4,5,6,7,8,9,10,11,12].map(function(h){return '<option'+(h===8?' selected':'')+'>'+h+'</option>';}).join('');
     var mOpts = ['00','15','30','45'].map(function(m){return '<option>'+m+'</option>';}).join('');
