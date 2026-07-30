@@ -1530,7 +1530,7 @@ function renderPresetGrid(gridId, inputId, cat, context) {
     const activeFilter = medFilterState[filterKey] || '';
     const filterBar = document.createElement('div');
     filterBar.style.cssText = 'display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap';
-    [['Scheduled','Scheduled'],['As Needed','As Needed (PRN)']].forEach(([val,lbl]) => {
+    [['Scheduled','Scheduled'],['As Needed','As Needed (PRN)'],['Discontinued','Discontinued']].forEach(([val,lbl]) => {
       const chip = document.createElement('button');
       chip.type = 'button';
       chip.textContent = lbl;
