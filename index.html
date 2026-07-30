@@ -626,8 +626,10 @@
     <!-- Med group selector - shown only for Medication category -->
     <div id="add-med-group-section" style="display:none">
       <div class="form-group">
-        <label>Medications in this group</label>
-        <div id="add-med-checklist" style="max-height:200px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;padding:8px;background:var(--cream)"></div>
+        <div id="add-med-group-toggle" onclick="toggleMedGroup()" style="font-size:13px;font-weight:700;color:var(--teal);cursor:pointer;user-select:none;padding:4px 0">&#9656; This is a med group &mdash; select multiple meds</div>
+        <div id="add-med-group-body" style="display:none">
+          <div id="add-med-checklist" style="max-height:200px;overflow-y:auto;border:1.5px solid var(--border);border-radius:8px;padding:8px;background:var(--cream)"></div>
+        </div>
       </div>
     </div>
     <div class="form-group">
@@ -1787,6 +1789,15 @@ window.renderAddMedChecklist = function(selectedMeds) {
   });
 };
 
+window.toggleMedGroup = function(forceOpen) {
+  var body = document.getElementById('add-med-group-body');
+  var tog  = document.getElementById('add-med-group-toggle');
+  if (!body || !tog) return;
+  var open = forceOpen === true ? true : (forceOpen === false ? false : body.style.display === 'none');
+  body.style.display = open ? 'block' : 'none';
+  tog.innerHTML = (open ? '&#9662;' : '&#9656;') + ' This is a med group &mdash; select multiple meds';
+};
+
 window.addScheduleTime = function() {
   var h = parseInt(document.getElementById('add-time-hour').value);
   var m = document.getElementById('add-time-min').value;
@@ -1841,6 +1852,7 @@ window.openAddSchedule = function() {
   document.querySelectorAll('#custom-days input[type=checkbox]').forEach(cb=>cb.checked=false);
   updateAddPresets();
   renderAddMedChecklist([]);
+  toggleMedGroup(false);
   openModal('modal-add');
 };
 
@@ -1890,7 +1902,7 @@ window.editItem = function(id) {
   // Show med group section if med category
   if (s.cat === 'med') {
     const medSection = document.getElementById('add-med-group-section');
-    if (medSection) { medSection.style.display = 'block'; renderAddMedChecklist(s.medList||[]); }
+    if (medSection) { medSection.style.display = 'block'; renderAddMedChecklist(s.medList||[]); toggleMedGroup((s.medList||[]).length > 0); }
   }
   // Pre-select matching preset or show text field with value
   const grid=document.getElementById('add-preset-grid');
