@@ -1749,7 +1749,7 @@ window.renderAddMedChecklist = function(selectedMeds) {
   const asNeeded  = allMeds.filter(m => m.timing === 'As Needed');
   const discontinued = allMeds.filter(m => m.timing === 'Discontinued');
   function medRow(m) {
-    const isChecked = selected.some(s => s.name === m.name);
+    const isChecked = selected.some(s => (s && (s.name || s)) === m.name);
     const dc = m.timing === 'Discontinued';
     return `<label style="display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;border-radius:6px${dc?';opacity:.6':''}">
         <input type="checkbox" value="${m.name}" data-dose="${m.instructions||''}" ${isChecked?'checked':''} style="width:16px;height:16px;accent-color:var(--teal);cursor:pointer">
@@ -1884,7 +1884,7 @@ window.editItem = function(id) {
   // Show med group section if med category
   if (s.cat === 'med') {
     const medSection = document.getElementById('add-med-group-section');
-    if (medSection) { medSection.style.display = 'block'; renderAddMedChecklist(s.medList||[]); }
+    if (medSection) { medSection.style.display = 'block'; console.log('editItem medList:', JSON.stringify(s.medList)); renderAddMedChecklist(s.medList||[]); }
   }
   // Pre-select matching preset or show text field with value
   const grid=document.getElementById('add-preset-grid');
