@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Import Caretaker Notes</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:680px;margin:20px auto;padding:14px;background:#f0f4f4;color:#1a2e3b}
+h2{font-size:19px;margin-bottom:4px} .sub{font-size:13px;color:#5a7080;margin-bottom:14px}
+.date-hdr{background:#1a2e3b;color:#fff;padding:7px 12px;border-radius:8px;font-size:13px;font-weight:700;margin:14px 0 6px}
+.row{background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:6px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.row.dup{border:1.5px solid #d09000;background:#fff8ea}
+.flag{font-size:10px;color:#b8860b;font-weight:700;margin-top:4px}
+.r1{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.r1 input[type=checkbox]{width:18px;height:18px;accent-color:#2a7f7f;flex-shrink:0}
+.r2{display:flex;gap:6px;flex-wrap:wrap}
+input[type=text],input[type=time],input[type=date],select{border:1.5px solid #c5d5da;border-radius:7px;padding:6px 8px;font-size:13px;font-family:inherit;background:#fafcfc;outline:none}
+input:focus,select:focus{border-color:#2a7f7f}
+.f-time{width:100px}.f-date{width:130px}.f-cat{width:118px}.f-name{flex:1;min-width:150px;font-weight:600}.f-cg{width:95px}.f-ml{width:70px}.f-notes{flex:1 1 100%}
+textarea{width:100%;box-sizing:border-box;height:110px;font-family:monospace;font-size:11px;border:1.5px solid #c5d5da;border-radius:8px;padding:8px;margin-bottom:8px}
+button{background:#2a7f7f;color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:15px;font-weight:700;cursor:pointer}
+button:disabled{opacity:.5} .secondary{background:#fff;color:#2a7f7f;border:1.5px solid #2a7f7f}
+#status{background:#fff;border-radius:8px;padding:12px;margin-top:10px;font-size:13px;max-height:220px;overflow-y:auto;display:none}
+.ok{color:#1e7e4c}.err{color:#c0392b}
+</style></head><body>
+<h2>📓 Import Caretaker Notes</h2>
+<div class="sub">Every field is editable. Uncheck anything wrong or already recorded, then commit. Yellow rows look like possible duplicates of existing log entries.</div>
+<details style="margin-bottom:10px"><summary style="font-size:13px;color:#2a7f7f;cursor:pointer;font-weight:700">Paste new batch (JSON from Claude)</summary>
+<textarea id="json-in" placeholder='[{"dateStr":"2026-07-24","givenTime":"04:00","cat":"med","name":"Tylenol","caregiver":"Vivian","notes":"20.5 mL"}]'></textarea>
+<button class="secondary" onclick="loadJson()" style="padding:8px 14px;font-size:13px">Load Batch</button>
+</details>
+<div id="list"></div>
+<button id="commit" onclick="commit()" disabled>Commit Selected Entries</button>
+<div id="status"></div>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,collection,addDoc,getDocs,query,where,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const db=getFirestore(initializeApp({apiKey:"AIzaSyCxPjDCBYFLc2XDqXvHcbGuqMV7265w3HE",authDomain:"care-tracker-383e0.firebaseapp.com",projectId:"care-tracker-383e0",storageBucket:"care-tracker-383e0.firebasestorage.app",messagingSenderId:"696799569086",appId:"1:696799569086:web:08b7e6356a018338a3aaef"}));
+
+const CATS = {med:"💊 Medication",vent:"🌬 Respiratory",feed:"🥤 Nutrition",cath:"🔵 Bowel & Urine",test:"🧪 Testing",ther:"🏃 Medical & Therapy"};
+const CAREGIVERS = ['Ron','Marcus','Connor','Allie','Lisa','Erin','Vivian','Jamie'];
+let nameLists = {}; // cat -> [names] from presets + schedule, same sources as the app's log form
+
+async function loadLookups() {
+  Object.keys(CATS).forEach(k => nameLists[k] = new Set());
+  try {
+    const ps = await getDocs(collection(db,'presets'));
+    ps.docs.forEach(d => { const p = d.data(); if (nameLists[p.cat] && p.timing !== 'Discontinued') nameLists[p.cat].add(p.name); });
+    const ss = await getDocs(collection(db,'schedule'));
+    ss.docs.forEach(d => { const s = d.data(); if (nameLists[s.cat]) nameLists[s.cat].add(s.name); });
+  } catch(e) { console.error('lookup load failed', e); }
+  // Build datalists
+  let dl = '';
+  Object.keys(nameLists).forEach(k => {
+    dl += `<datalist id="dl-${k}">` + [...nameLists[k]].sort().map(n=>`<option value="${n.replace(/"/g,'&quot;')}">`).join('') + '</datalist>';
+  });
+  dl += '<datalist id="dl-cg">' + CAREGIVERS.map(n=>`<option value="${n}">`).join('') + '</datalist>';
+  document.body.insertAdjacentHTML('beforeend', dl);
+}
+
+// ===== BATCH: notebook pages 7/23-7/30 (transcribed 7/30) =====
+let entries = [
+ {dateStr:"2026-07-24",givenTime:"04:00",cat:"med",name:"Tylenol",caregiver:"Vivian",notes:"20.5 mL",checked:true},
+ {dateStr:"2026-07-24",givenTime:"04:30",cat:"cath",name:"Intermittent Cath",caregiver:"Vivian",fluidOutput:"300",checked:true},
+ {dateStr:"2026-07-24",givenTime:"06:00",cat:"cath",name:"Bowel Care",caregiver:"Vivian",notes:"No BM; stayed in w/chair in kitchen",checked:true},
+ {dateStr:"2026-07-24",givenTime:"10:10",cat:"cath",name:"Intermittent Cath",caregiver:"",fluidOutput:"300",checked:true},
+ {dateStr:"2026-07-24",givenTime:"10:20",cat:"med",name:"Tylenol",caregiver:"",notes:"20.5 mL",checked:true},
+ {dateStr:"2026-07-24",givenTime:"12:00",cat:"med",name:"Afternoon Meds",caregiver:"",checked:true},
+ {dateStr:"2026-07-24",givenTime:"15:15",cat:"cath",name:"Intermittent Cath",caregiver:"",fluidOutput:"300",checked:true},
+ {dateStr:"2026-07-24",givenTime:"17:40",cat:"cath",name:"Intermittent Cath",caregiver:"",fluidOutput:"500",notes:"time partly illegible (x:40)",checked:false},
+ {dateStr:"2026-07-24",givenTime:"18:27",cat:"med",name:"Tylenol",caregiver:"",notes:"20.5 mL",checked:true},
+ {dateStr:"2026-07-24",givenTime:"18:30",cat:"cath",name:"Bowel Care",caregiver:"",notes:"BM - 3 small",checked:true},
+ {dateStr:"2026-07-24",givenTime:"18:45",cat:"feed",name:"Protein Shake",caregiver:"",notes:"with meds (notebook says morning meds - likely evening)",checked:false},
+ {dateStr:"2026-07-25",givenTime:"09:00",cat:"cath",name:"Intermittent Cath",caregiver:"",fluidOutput:"400",notes:"date assumed 7/25",checked:false},
+ {dateStr:"2026-07-25",givenTime:"14:00",cat:"cath",name:"Intermittent Cath",caregiver:"",fluidOutput:"700",notes:"date assumed 7/25; notebook shows only '2:00 700'",checked:false},
+ {dateStr:"2026-07-25",givenTime:"19:00",cat:"cath",name:"Intermittent Cath",caregiver:"",fluidOutput:"500",notes:"date assumed 7/25; notebook shows only '7:00 500'",checked:false},
+ {dateStr:"2026-07-26",givenTime:"21:45",cat:"vent",name:"Mask Adjustment",caregiver:"Jamie",checked:true},
+ {dateStr:"2026-07-27",givenTime:"03:00",cat:"feed",name:"Feeding Tube Complete",caregiver:"Jamie",checked:true},
+ {dateStr:"2026-07-27",givenTime:"05:00",cat:"cath",name:"Bowel Care",caregiver:"Jamie",notes:"Call light, bathroom - No BM",checked:true},
+ {dateStr:"2026-07-27",givenTime:"05:15",cat:"cath",name:"Intermittent Cath",caregiver:"Jamie",fluidOutput:"800",checked:true},
+ {dateStr:"2026-07-27",givenTime:"09:15",cat:"med",name:"Morning Meds",caregiver:"Jamie",checked:true},
+ {dateStr:"2026-07-27",givenTime:"10:00",cat:"vent",name:"O2 Tank Change",caregiver:"Jamie",notes:"went outside",checked:true},
+ {dateStr:"2026-07-27",givenTime:"14:30",cat:"med",name:"Afternoon Meds",caregiver:"Allie",notes:"+ Tylenol 20 mL",checked:true},
+ {dateStr:"2026-07-27",givenTime:"15:30",cat:"cath",name:"Intermittent Cath",caregiver:"Allie",fluidOutput:"225",checked:true},
+ {dateStr:"2026-07-27",givenTime:"20:15",cat:"med",name:"Oxybutynin + Tylenol",caregiver:"",notes:"notebook: 'Oxy, Tylenol' - assumed 8:15 PM 7/27",checked:false},
+ {dateStr:"2026-07-27",givenTime:"20:15",cat:"cath",name:"Intermittent Cath",caregiver:"",fluidOutput:"275",notes:"assumed 8:15 PM 7/27",checked:false},
+ {dateStr:"2026-07-28",givenTime:"03:08",cat:"feed",name:"Feeding Tube Complete",caregiver:"Jamie",notes:"turned Becky to her R side",checked:true},
+ {dateStr:"2026-07-28",givenTime:"03:16",cat:"cath",name:"Intermittent Cath",caregiver:"Jamie",fluidOutput:"800",notes:"restroom first, no BM (gassy)",checked:true},
+ {dateStr:"2026-07-28",givenTime:"04:45",cat:"med",name:"Tylenol",caregiver:"Jamie",notes:"20 mL - Becky requested",checked:true},
+ {dateStr:"2026-07-28",givenTime:"05:30",cat:"cath",name:"Bowel Care",caregiver:"Jamie",notes:"No BM; up in w/c, can't sleep",checked:true},
+ {dateStr:"2026-07-28",givenTime:"10:20",cat:"cath",name:"Intermittent Cath",caregiver:"Allie",fluidOutput:"350",checked:true},
+ {dateStr:"2026-07-28",givenTime:"13:00",cat:"vent",name:"O2 Tank Change",caregiver:"Allie",checked:true},
+ {dateStr:"2026-07-28",givenTime:"15:20",cat:"cath",name:"Intermittent Cath",caregiver:"Allie",fluidOutput:"375",checked:true},
+ {dateStr:"2026-07-28",givenTime:"15:30",cat:"med",name:"Afternoon Meds",caregiver:"Allie",notes:"+ Tylenol 20 mL",checked:true},
+ {dateStr:"2026-07-28",givenTime:"20:30",cat:"cath",name:"Intermittent Cath",caregiver:"Ron",notes:"per Vivian's note: 'Ron says they did cath around 8:30pm' - volume not recorded",checked:false},
+ {dateStr:"2026-07-29",givenTime:"03:45",cat:"cath",name:"Bowel Care",caregiver:"Vivian",notes:"Awake, bathroom, No BM",checked:true},
+ {dateStr:"2026-07-29",givenTime:"03:50",cat:"cath",name:"Intermittent Cath",caregiver:"Vivian",fluidOutput:"600",notes:"time approximate",checked:true},
+ {dateStr:"2026-07-29",givenTime:"09:15",cat:"med",name:"Morning Meds",caregiver:"Allie",checked:true},
+ {dateStr:"2026-07-29",givenTime:"09:30",cat:"cath",name:"Intermittent Cath",caregiver:"Allie",fluidOutput:"400",checked:true},
+ {dateStr:"2026-07-29",givenTime:"12:20",cat:"cath",name:"Bowel Care",caregiver:"Allie",notes:"BM",checked:true},
+ {dateStr:"2026-07-29",givenTime:"12:30",cat:"vent",name:"O2 Tank Change",caregiver:"Allie",checked:true},
+ {dateStr:"2026-07-29",givenTime:"14:30",cat:"med",name:"Afternoon Meds",caregiver:"Allie",notes:"+ Tylenol 20 mL",checked:true},
+ {dateStr:"2026-07-29",givenTime:"15:00",cat:"cath",name:"Intermittent Cath",caregiver:"Allie",fluidOutput:"300",checked:true},
+ {dateStr:"2026-07-30",givenTime:"03:12",cat:"ther",name:"Repositioned",caregiver:"Jamie",notes:"Turned Becky to her R side",checked:false},
+ {dateStr:"2026-07-30",givenTime:"04:02",cat:"vent",name:"BPap Water Refill",caregiver:"Jamie",notes:"tank empty, filled w/ distilled H2O",checked:true},
+ {dateStr:"2026-07-30",givenTime:"05:30",cat:"cath",name:"Intermittent Cath",caregiver:"Jamie",fluidOutput:"900",notes:"restroom first, No BM (gassy). HIGH OUTPUT",checked:true}
+];
+
+window.loadJson = function() {
+  try {
+    const arr = JSON.parse(document.getElementById('json-in').value);
+    entries = arr.map(e => ({checked:true, ...e}));
+    render(); checkDupes();
+  } catch(e) { alert('Invalid JSON: ' + e.message); }
+};
+
+function catOpts(sel) { return Object.keys(CATS).map(k=>`<option value="${k}"${k===sel?' selected':''}>${CATS[k]}</option>`).join(''); }
+function esc(s) { return (s||'').replace(/"/g,'&quot;'); }
+
+function render() {
+  const list = document.getElementById('list');
+  const byDate = {};
+  entries.forEach((e,i) => { (byDate[e.dateStr] = byDate[e.dateStr] || []).push(i); });
+  let html = '';
+  Object.keys(byDate).sort().forEach(d => {
+    html += `<div class="date-hdr">${d}</div>`;
+    byDate[d].sort((a,b)=>entries[a].givenTime.localeCompare(entries[b].givenTime)).forEach(i => {
+      const e = entries[i];
+      html += `<div class="row${e.dup?' dup':''}">
+        <div class="r1">
+          <input type="checkbox" data-i="${i}" data-f="checked" ${e.checked?'checked':''}>
+          <input type="date" class="f-date" data-i="${i}" data-f="dateStr" value="${e.dateStr}">
+          <input type="time" class="f-time" data-i="${i}" data-f="givenTime" value="${e.givenTime}">
+          <select class="f-cat" data-i="${i}" data-f="cat">${catOpts(e.cat)}</select>
+        </div>
+        <div class="r2">
+          <input type="text" class="f-name" data-i="${i}" data-f="name" value="${esc(e.name)}" placeholder="Name" list="dl-${e.cat}">
+          <input type="text" class="f-cg" data-i="${i}" data-f="caregiver" value="${esc(e.caregiver)}" placeholder="Caregiver" list="dl-cg">
+          <input type="text" class="f-ml" data-i="${i}" data-f="fluidOutput" value="${esc(e.fluidOutput)}" placeholder="mL">
+          <input type="text" class="f-notes" data-i="${i}" data-f="notes" value="${esc(e.notes)}" placeholder="Notes">
+        </div>
+        ${e.dup?'<div class="flag">⚠ possible duplicate: '+e.dup+'</div>':''}
+      </div>`;
+    });
+  });
+  list.innerHTML = html;
+  list.querySelectorAll('input,select').forEach(el => {
+    el.addEventListener('change', function() {
+      const i = +this.dataset.i, f = this.dataset.f;
+      if (f === 'checked') { entries[i].checked = this.checked; return; }
+      entries[i][f] = this.value;
+      if (f === 'cat') {
+        const nameInp = this.closest('.row').querySelector('.f-name');
+        if (nameInp) nameInp.setAttribute('list', 'dl-' + this.value);
+      }
+      if (f === 'dateStr') render(); // regroup under new date header
+    });
+  });
+  document.getElementById('commit').disabled = false;
+}
+
+async function checkDupes() {
+  const dates = [...new Set(entries.map(e=>e.dateStr))];
+  for (const d of dates) {
+    const snap = await getDocs(query(collection(db,'log'), where('dateStr','==',d)));
+    const existing = snap.docs.map(x=>x.data());
+    entries.filter(e=>e.dateStr===d).forEach(e => {
+      const hit = existing.find(x => x.name===e.name && (x.givenTime===e.givenTime || (e.fluidOutput && x.fluidOutput===e.fluidOutput)));
+      if (hit) { e.dup = (hit.name + ' @ ' + (hit.givenTime||'?') + (hit.caregiver?' by '+hit.caregiver:'')); e.checked = false; }
+    });
+  }
+  render();
+}
+
+window.commit = async function() {
+  const btn = document.getElementById('commit');
+  const st = document.getElementById('status');
+  btn.disabled = true; st.style.display = 'block'; st.innerHTML = '';
+  let ok = 0, err = 0;
+  for (const e of entries.filter(x=>x.checked)) {
+    try {
+      const data = {cat:e.cat, name:e.name, caregiver:e.caregiver||'', dateStr:e.dateStr, givenTime:e.givenTime, timeStr:e.givenTime, notes:e.notes||'', unscheduled:true, importedFromNotes:true, ts:serverTimestamp()};
+      if (e.fluidOutput) data.fluidOutput = e.fluidOutput;
+      await addDoc(collection(db,'log'), data);
+      st.innerHTML += `<div class="ok">✓ ${e.dateStr} ${e.givenTime} ${e.name}</div>`; ok++;
+    } catch(x) { st.innerHTML += `<div class="err">✗ ${e.name}: ${x.message}</div>`; err++; }
+    st.scrollTop = st.scrollHeight;
+  }
+  st.innerHTML += `<div><b>Done — ${ok} added, ${err} errors.</b></div>`;
+  btn.textContent = 'Committed';
+};
+
+loadLookups().then(() => { render(); checkDupes(); });
+</script></body></html>
