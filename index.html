@@ -615,12 +615,12 @@
       </select>
     </div>
     <div class="form-group">
-      <label>Description</label>
+      <label>Name</label>
       <div class="preset-grid" id="add-preset-grid"></div>
-      <input type="text" id="add-name" placeholder="Type description…" style="margin-top:4px">
+      <input type="text" id="add-name" placeholder="Or type a name…" style="margin-top:4px">
     </div>
     <div class="form-group">
-      <label>Dose / Detail</label>
+      <label>Dose / Notes (optional)</label>
       <input type="text" id="add-dose" placeholder="e.g. 1 tab PO, 300mL over 1hr…">
     </div>
     <!-- Med group selector - shown only for Medication category -->
@@ -1747,23 +1747,40 @@ window.renderAddMedChecklist = function(selectedMeds) {
   }
   const scheduled = allMeds.filter(m => m.timing === 'Scheduled');
   const asNeeded  = allMeds.filter(m => m.timing === 'As Needed');
-  const groups = [['Scheduled', scheduled], ['As Needed', asNeeded]];
-  let html = '';
-  groups.forEach(([label, meds]) => {
-    if (!meds.length) return;
-    html += `<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:6px 4px 4px">${label}</div>`;
-    meds.forEach(m => {
-      const isChecked = selected.some(s => s.name === m.name);
-      html += `<label style="display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;border-radius:6px">
+  const discontinued = allMeds.filter(m => m.timing === 'Discontinued');
+  function medRow(m) {
+    const isChecked = selected.some(s => s.name === m.name);
+    const dc = m.timing === 'Discontinued';
+    return `<label style="display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;border-radius:6px${dc?';opacity:.6':''}">
         <input type="checkbox" value="${m.name}" data-dose="${m.instructions||''}" ${isChecked?'checked':''} style="width:16px;height:16px;accent-color:var(--teal);cursor:pointer">
         <div>
-          <div style="font-size:13px;font-weight:500">${m.name}</div>
+          <div style="font-size:13px;font-weight:500">${m.name}${dc?' <span style=\"font-size:10px;color:var(--warn);font-weight:700\">DISCONTINUED</span>':''}</div>
           ${m.instructions?`<div style="font-size:11px;color:var(--muted)">${m.instructions}</div>`:''}
         </div>
       </label>`;
-    });
+  }
+  let html = '<div style="font-size:11px;color:var(--muted);padding:2px 4px 6px">Checked meds appear on the Today card for this group.</div>';
+  [['Scheduled', scheduled], ['As Needed (PRN)', asNeeded]].forEach(([label, meds]) => {
+    if (!meds.length) return;
+    html += `<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:6px 4px 4px">${label}</div>`;
+    meds.forEach(m => { html += medRow(m); });
   });
+  // Discontinued: collapsed by default, but auto-expanded if any are still checked
+  const anyDcChecked = discontinued.some(m => selected.some(s => s.name === m.name));
+  if (discontinued.length) {
+    html += `<div style="padding:6px 4px 4px"><span id="add-med-dc-toggle" style="font-size:11px;color:var(--teal);font-weight:700;cursor:pointer;text-decoration:underline">${anyDcChecked?'Hide':'Show'} discontinued (${discontinued.length})</span></div>`;
+    html += `<div id="add-med-dc-list" style="display:${anyDcChecked?'block':'none'}">`;
+    discontinued.forEach(m => { html += medRow(m); });
+    html += '</div>';
+  }
   el.innerHTML = html;
+  const dcToggle = document.getElementById('add-med-dc-toggle');
+  if (dcToggle) dcToggle.addEventListener('click', function() {
+    const list = document.getElementById('add-med-dc-list');
+    const showing = list.style.display !== 'none';
+    list.style.display = showing ? 'none' : 'block';
+    this.textContent = (showing ? 'Show' : 'Hide') + ' discontinued (' + discontinued.length + ')';
+  });
 };
 
 window.addScheduleTime = function() {
