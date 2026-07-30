@@ -1774,6 +1774,8 @@ window.renderAddMedChecklist = function(selectedMeds) {
     html += '</div>';
   }
   el.innerHTML = html;
+  console.log('renderAddMedChecklist: selected=', selected.length, 'allMeds=', allMeds.length, 'checkedBoxes=', el.querySelectorAll('input:checked').length,
+    'sampleMatch=', allMeds.length&&selected.length ? JSON.stringify({sel:selected[0].name||selected[0], preset:allMeds.map(m=>m.name).find(n=>n===(selected[0].name||selected[0]))||'NO MATCH'}) : 'n/a');
   const dcToggle = document.getElementById('add-med-dc-toggle');
   if (dcToggle) dcToggle.addEventListener('click', function() {
     const list = document.getElementById('add-med-dc-list');
