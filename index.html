@@ -1752,9 +1752,10 @@ window.renderAddMedChecklist = function(selectedMeds) {
     el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px">No medication presets found. Add them in Care Items first.</div>';
     return;
   }
-  const scheduled = allMeds.filter(m => m.timing === 'Scheduled');
-  const asNeeded  = allMeds.filter(m => m.timing === 'As Needed');
-  const discontinued = allMeds.filter(m => m.timing === 'Discontinued');
+  const byName = (a,b) => a.name.localeCompare(b.name);
+  const scheduled = allMeds.filter(m => m.timing === 'Scheduled').sort(byName);
+  const asNeeded  = allMeds.filter(m => m.timing === 'As Needed').sort(byName);
+  const discontinued = allMeds.filter(m => m.timing === 'Discontinued').sort(byName);
   function medRow(m) {
     const isChecked = selected.some(s => (s && (s.name || s)) === m.name);
     const dc = m.timing === 'Discontinued';
