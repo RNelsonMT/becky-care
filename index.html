@@ -496,9 +496,17 @@
 
   <!-- LOG -->
   <div id="view-log" class="view">
-    <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-      <input type="date" id="log-date-filter" onchange="renderLog()" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);color:var(--navy);background:var(--cream);outline:none;flex:1">
-      <button onclick="document.getElementById('log-date-filter').value='';renderLog()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--muted);cursor:pointer">All Dates</button>
+    <div id="log-date-row" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:6px;scrollbar-width:none">
+      <div class="filter-chip active" onclick="setLogDate(this,'all')">All Dates</div>
+      <div class="filter-chip" onclick="setLogDate(this,'today')">Today</div>
+      <div class="filter-chip" onclick="setLogDate(this,'yesterday')">Yesterday</div>
+      <div class="filter-chip" onclick="setLogDate(this,'week')">This Week</div>
+      <div class="filter-chip" onclick="setLogDate(this,'custom')">Custom Range</div>
+    </div>
+    <div id="log-custom-range" style="display:none;gap:8px;margin-bottom:8px;align-items:center">
+      <input type="date" id="log-date-start" onchange="setLogDate(null,'custom')" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;background:var(--cream);outline:none;flex:1">
+      <span style="font-size:13px;color:var(--muted)">to</span>
+      <input type="date" id="log-date-end" onchange="setLogDate(null,'custom')" style="border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:13px;background:var(--cream);outline:none;flex:1">
     </div>
     <div class="filter-row" id="log-filter-row">
       <div class="filter-chip active" onclick="filterLog(this,'all')">All</div>
@@ -985,6 +993,7 @@ let schedCustomStart = ''; let schedCustomEnd = '';
 let collapsedContactCats = {};
 let collapsedContactOrgs = {};
 let logFilter   = 'all';
+let logDateFilter = 'all';
 let pendingLog  = null;
 let presetsSeeded = false;
 
@@ -1972,10 +1981,31 @@ window.filterLog = function(el,cat) {
   el.classList.add('active'); logFilter=cat; renderLog();
 };
 
+window.setLogDate = function(el, range) {
+  logDateFilter = range;
+  var dr = document.getElementById('log-date-row');
+  if (el && dr) { dr.querySelectorAll('.filter-chip').forEach(function(c){c.classList.remove('active');}); el.classList.add('active'); }
+  var cr = document.getElementById('log-custom-range');
+  if (cr) cr.style.display = range==='custom' ? 'flex' : 'none';
+  renderLog();
+};
+
 function renderLog() {
   const content=document.getElementById('log-content');
-  const dateFilter = document.getElementById('log-date-filter') ? document.getElementById('log-date-filter').value : '';
-  const filtered=logEntries.filter(e=>(logFilter==='all'||e.cat===logFilter)&&(!dateFilter||e.dateStr===dateFilter));
+  const today = fmtDate(new Date());
+  const yesterday = fmtDate(new Date(Date.now()-86400000));
+  const weekAgo = fmtDate(new Date(Date.now()-6*86400000));
+  const cs = document.getElementById('log-date-start') ? document.getElementById('log-date-start').value : '';
+  const ce = document.getElementById('log-date-end') ? document.getElementById('log-date-end').value : '';
+  const filtered=logEntries.filter(e=>{
+    if (logFilter!=='all' && e.cat!==logFilter) return false;
+    const d = e.dateStr || '';
+    if (logDateFilter==='today')     return d===today;
+    if (logDateFilter==='yesterday') return d===yesterday;
+    if (logDateFilter==='week')      return d>=weekAgo && d<=today;
+    if (logDateFilter==='custom')    return (!cs||d>=cs) && (!ce||d<=ce);
+    return true;
+  });
   if (!filtered.length){
     content.innerHTML=`<div class="empty-state"><div class="empty-icon">📝</div><p>No records yet.</p></div>`;return;
   }
