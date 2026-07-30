@@ -123,7 +123,8 @@
   .modal-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
   .form-group{margin-bottom:14px}
   .form-group label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px}
-  .form-group select,.form-group input,.form-group textarea{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:15px;font-family:var(--font-ui);color:var(--navy);background:var(--cream);appearance:none;outline:none}
+  .form-group select,.form-group input:not([type=checkbox]),.form-group textarea{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:15px;font-family:var(--font-ui);color:var(--navy);background:var(--cream);appearance:none;outline:none}
+  .form-group input[type=checkbox]{appearance:auto;-webkit-appearance:auto;width:16px;height:16px;accent-color:var(--teal)}
   .form-group select:focus,.form-group input:focus,.form-group textarea:focus{border-color:var(--teal)}
   .form-group textarea{min-height:72px;resize:vertical}
   .btn-row{display:flex;gap:10px;margin-top:18px}
@@ -1737,7 +1738,6 @@ function renderSchedule() {
 
 /* ── MED GROUP CHECKLIST (in schedule modal) ─────────── */
 window.renderAddMedChecklist = function(selectedMeds) {
-  console.log('CHECKLIST RENDER, arg=', selectedMeds===undefined?'undefined':JSON.stringify(selectedMeds).slice(0,60)); console.trace();
   const el = document.getElementById('add-med-checklist');
   if (!el) return;
   let selected;
@@ -1781,9 +1781,6 @@ window.renderAddMedChecklist = function(selectedMeds) {
     html += '</div>';
   }
   el.innerHTML = html;
-  el.addEventListener('change', function(ev) {
-    if (ev.target.type === 'checkbox') console.log('CHECKBOX CHANGE:', ev.target.value, '->', ev.target.checked, '| total checked:', el.querySelectorAll('input:checked').length);
-  });
   const dcToggle = document.getElementById('add-med-dc-toggle');
   if (dcToggle) dcToggle.addEventListener('click', function() {
     const list = document.getElementById('add-med-dc-list');
