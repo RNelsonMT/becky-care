@@ -1737,6 +1737,7 @@ function renderSchedule() {
 
 /* ── MED GROUP CHECKLIST (in schedule modal) ─────────── */
 window.renderAddMedChecklist = function(selectedMeds) {
+  console.log('CHECKLIST RENDER, arg=', selectedMeds===undefined?'undefined':JSON.stringify(selectedMeds).slice(0,60)); console.trace();
   const el = document.getElementById('add-med-checklist');
   if (!el) return;
   let selected;
@@ -1780,6 +1781,9 @@ window.renderAddMedChecklist = function(selectedMeds) {
     html += '</div>';
   }
   el.innerHTML = html;
+  el.addEventListener('change', function(ev) {
+    if (ev.target.type === 'checkbox') console.log('CHECKBOX CHANGE:', ev.target.value, '->', ev.target.checked, '| total checked:', el.querySelectorAll('input:checked').length);
+  });
   const dcToggle = document.getElementById('add-med-dc-toggle');
   if (dcToggle) dcToggle.addEventListener('click', function() {
     const list = document.getElementById('add-med-dc-list');
