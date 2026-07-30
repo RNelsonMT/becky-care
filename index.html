@@ -1663,7 +1663,6 @@ window.saveQuickLog = async function() {
 
 /* ── SCHEDULE VIEW ───────────────────────────────────── */
 window.setSchedDate = function(el, range) {
-  console.log('setSchedDate called:', range, 'schedDateFilter:', schedDateFilter);
   schedDateFilter = range;
   var dr=document.getElementById('sched-date-row'); if(dr) dr.querySelectorAll('.filter-chip').forEach(function(c){c.classList.remove('active');});
   if (el) el.classList.add('active');
@@ -1678,7 +1677,6 @@ window.filterSched = function(el,cat) {
 };
 
 function renderSchedule() {
-  console.log('renderSchedule: schedDateFilter=', schedDateFilter, 'items before filter:', schedule.length);
   const list=document.getElementById('sched-list');
   const today = fmtDate(new Date());
   const weekEnd = fmtDate(new Date(Date.now()+7*86400000));
@@ -1739,7 +1737,13 @@ function renderSchedule() {
 window.renderAddMedChecklist = function(selectedMeds) {
   const el = document.getElementById('add-med-checklist');
   if (!el) return;
-  const selected = selectedMeds || [];
+  let selected;
+  if (selectedMeds === undefined) {
+    // Re-render (e.g. Firestore snapshot refresh): keep what's currently checked in the DOM
+    selected = Array.from(el.querySelectorAll('input:checked')).map(function(cb){ return {name: cb.value}; });
+  } else {
+    selected = selectedMeds || [];
+  }
   const allMeds = presets['med'] || [];
   if (!allMeds.length) {
     el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px">No medication presets found. Add them in Care Items first.</div>';
@@ -1774,11 +1778,6 @@ window.renderAddMedChecklist = function(selectedMeds) {
     html += '</div>';
   }
   el.innerHTML = html;
-  console.log('renderAddMedChecklist: selected=', selected.length, 'allMeds=', allMeds.length, 'checkedBoxes=', el.querySelectorAll('input:checked').length,
-    'sampleMatch=', allMeds.length&&selected.length ? JSON.stringify({sel:selected[0].name||selected[0], preset:allMeds.map(m=>m.name).find(n=>n===(selected[0].name||selected[0]))||'NO MATCH'}) : 'n/a');
-  setTimeout(function() {
-    console.log('CHECKLIST 1s LATER: checkedBoxes=', el.querySelectorAll('input:checked').length, 'visible=', el.offsetParent!==null);
-  }, 1000);
   const dcToggle = document.getElementById('add-med-dc-toggle');
   if (dcToggle) dcToggle.addEventListener('click', function() {
     const list = document.getElementById('add-med-dc-list');
@@ -1828,6 +1827,7 @@ window.removeScheduleTime = function(t) {
 };
 
 window.openAddSchedule = function() {
+  window._addFormClean = true;
   document.getElementById('edit-id').value='';
   document.getElementById('add-modal-title').textContent='Add Care Item';
   ['add-dose','add-times'].forEach(id=>document.getElementById(id).value='');
@@ -1840,6 +1840,7 @@ window.openAddSchedule = function() {
   document.getElementById('custom-days').style.display='none';
   document.querySelectorAll('#custom-days input[type=checkbox]').forEach(cb=>cb.checked=false);
   updateAddPresets();
+  renderAddMedChecklist([]);
   openModal('modal-add');
 };
 
@@ -1889,7 +1890,7 @@ window.editItem = function(id) {
   // Show med group section if med category
   if (s.cat === 'med') {
     const medSection = document.getElementById('add-med-group-section');
-    if (medSection) { medSection.style.display = 'block'; console.log('editItem medList:', JSON.stringify(s.medList)); renderAddMedChecklist(s.medList||[]); }
+    if (medSection) { medSection.style.display = 'block'; renderAddMedChecklist(s.medList||[]); }
   }
   // Pre-select matching preset or show text field with value
   const grid=document.getElementById('add-preset-grid');
