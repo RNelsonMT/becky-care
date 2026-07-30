@@ -34,7 +34,7 @@ import{getFirestore,collection,addDoc,getDocs,query,where,serverTimestamp}from"h
 const db=getFirestore(initializeApp({apiKey:"AIzaSyCxPjDCBYFLc2XDqXvHcbGuqMV7265w3HE",authDomain:"care-tracker-383e0.firebaseapp.com",projectId:"care-tracker-383e0",storageBucket:"care-tracker-383e0.firebasestorage.app",messagingSenderId:"696799569086",appId:"1:696799569086:web:08b7e6356a018338a3aaef"}));
 
 const CATS = {med:"💊 Medication",vent:"🌬 Respiratory",feed:"🥤 Nutrition",cath:"🔵 Bowel & Urine",test:"🧪 Testing",ther:"🏃 Medical & Therapy"};
-const CAREGIVERS = ['Ron','Marcus','Connor','Allie','Lisa','Erin','Vivian','Jamie'];
+const CAREGIVERS = ['Ron','Marcus','Connor','Allie','Lisa','Erin','Nurse / Staff','Other'];
 let nameLists = {}; // cat -> [names] from presets + schedule, same sources as the app's log form
 
 async function loadLookups() {
