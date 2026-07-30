@@ -45,13 +45,6 @@ async function loadLookups() {
     const ss = await getDocs(collection(db,'schedule'));
     ss.docs.forEach(d => { const s = d.data(); if (nameLists[s.cat]) nameLists[s.cat].add(s.name); });
   } catch(e) { console.error('lookup load failed', e); }
-  // Build datalists
-  let dl = '';
-  Object.keys(nameLists).forEach(k => {
-    dl += `<datalist id="dl-${k}">` + [...nameLists[k]].sort().map(n=>`<option value="${n.replace(/"/g,'&quot;')}">`).join('') + '</datalist>';
-  });
-  dl += '<datalist id="dl-cg">' + CAREGIVERS.map(n=>`<option value="${n}">`).join('') + '</datalist>';
-  document.body.insertAdjacentHTML('beforeend', dl);
 }
 
 // ===== BATCH: notebook pages 7/23-7/30 (transcribed 7/30) =====
@@ -111,6 +104,17 @@ window.loadJson = function() {
 };
 
 function catOpts(sel) { return Object.keys(CATS).map(k=>`<option value="${k}"${k===sel?' selected':''}>${CATS[k]}</option>`).join(''); }
+function nameOpts(cat, sel) {
+  let names = [...(nameLists[cat] || [])].sort();
+  if (sel && !names.includes(sel)) names.unshift(sel); // keep batch value even if not a preset
+  return names.map(n=>`<option value="${n.replace(/"/g,'&quot;')}"${n===sel?' selected':''}>${n}</option>`).join('')
+    + '<option value="__other__">Other…</option>';
+}
+function cgOpts(sel) {
+  let opts = ['', ...CAREGIVERS];
+  if (sel && !opts.includes(sel)) opts.splice(1, 0, sel); // keep non-standard names like Vivian
+  return opts.map(c=>`<option value="${c.replace(/"/g,'&quot;')}"${c===sel?' selected':''}>${c||'(unknown)'}</option>`).join('');
+}
 function esc(s) { return (s||'').replace(/"/g,'&quot;'); }
 
 function render() {
@@ -130,8 +134,8 @@ function render() {
           <select class="f-cat" data-i="${i}" data-f="cat">${catOpts(e.cat)}</select>
         </div>
         <div class="r2">
-          <input type="text" class="f-name" data-i="${i}" data-f="name" value="${esc(e.name)}" placeholder="Name" list="dl-${e.cat}">
-          <input type="text" class="f-cg" data-i="${i}" data-f="caregiver" value="${esc(e.caregiver)}" placeholder="Caregiver" list="dl-cg">
+          <select class="f-name" data-i="${i}" data-f="name">${nameOpts(e.cat, e.name)}</select>
+          <select class="f-cg" data-i="${i}" data-f="caregiver">${cgOpts(e.caregiver)}</select>
           <input type="text" class="f-ml" data-i="${i}" data-f="fluidOutput" value="${esc(e.fluidOutput)}" placeholder="mL">
           <input type="text" class="f-notes" data-i="${i}" data-f="notes" value="${esc(e.notes)}" placeholder="Notes">
         </div>
@@ -144,10 +148,15 @@ function render() {
     el.addEventListener('change', function() {
       const i = +this.dataset.i, f = this.dataset.f;
       if (f === 'checked') { entries[i].checked = this.checked; return; }
+      if (f === 'name' && this.value === '__other__') {
+        const custom = prompt('Enter item name:');
+        if (custom) { entries[i].name = custom; }
+        render(); return;
+      }
       entries[i][f] = this.value;
       if (f === 'cat') {
-        const nameInp = this.closest('.row').querySelector('.f-name');
-        if (nameInp) nameInp.setAttribute('list', 'dl-' + this.value);
+        const nameSel = this.closest('.row').querySelector('.f-name');
+        if (nameSel) nameSel.innerHTML = nameOpts(this.value, entries[i].name);
       }
       if (f === 'dateStr') render(); // regroup under new date header
     });
