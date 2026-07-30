@@ -496,6 +496,10 @@
 
   <!-- LOG -->
   <div id="view-log" class="view">
+    <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+      <input type="date" id="log-date-filter" onchange="renderLog()" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);color:var(--navy);background:var(--cream);outline:none;flex:1">
+      <button onclick="document.getElementById('log-date-filter').value='';renderLog()" style="background:none;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--muted);cursor:pointer">All Dates</button>
+    </div>
     <div class="filter-row" id="log-filter-row">
       <div class="filter-chip active" onclick="filterLog(this,'all')">All</div>
       <div class="filter-chip" onclick="filterLog(this,'med')">💊 Meds</div>
@@ -1970,7 +1974,8 @@ window.filterLog = function(el,cat) {
 
 function renderLog() {
   const content=document.getElementById('log-content');
-  const filtered=logEntries.filter(e=>logFilter==='all'||e.cat===logFilter);
+  const dateFilter = document.getElementById('log-date-filter') ? document.getElementById('log-date-filter').value : '';
+  const filtered=logEntries.filter(e=>(logFilter==='all'||e.cat===logFilter)&&(!dateFilter||e.dateStr===dateFilter));
   if (!filtered.length){
     content.innerHTML=`<div class="empty-state"><div class="empty-icon">📝</div><p>No records yet.</p></div>`;return;
   }
