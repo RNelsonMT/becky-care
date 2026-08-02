@@ -586,6 +586,10 @@
         <option>Nurse / Staff</option><option>Other</option>
       </select>
     </div>
+    <div class="form-group" id="log-covered-section" style="display:none">
+      <label>Already done earlier today?</label>
+      <div id="log-covered-list"></div>
+    </div>
     <div class="form-group">
       <label>Time given</label>
       <input type="time" id="log-time">
@@ -1403,6 +1407,30 @@ window.openTaskLog = function(schedId,timeStr) {
     return;
   }
   pendingLog={schedId,timeStr,dateStr,name:item.name,cat:item.cat,existingId:existing?.id,medList:item.medList||[]};
+  // Offer same-day unscheduled entries with matching name as "covered by" candidates
+  var covSec = document.getElementById('log-covered-section');
+  var covList = document.getElementById('log-covered-list');
+  if (covSec && covList) {
+    var candidates = logEntries.filter(function(e) {
+      return e.dateStr === dateStr && !e.schedId && e.name === item.name;
+    });
+    window._covCandidates = candidates;
+    if (candidates.length) {
+      var h = '';
+      candidates.forEach(function(c, ci) {
+        h += '<button type="button" class="cov-btn" data-cov-idx="' + ci + '" style="display:block;width:100%;text-align:left;background:var(--cream);border:1.5px solid var(--teal);border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:13px;cursor:pointer;color:var(--navy)">'
+          + '✓ Covered by ' + fmt12(c.givenTime || '') + ' entry'
+          + (c.caregiver ? ' · ' + c.caregiver : '')
+          + (c.fluidOutput ? ' · ' + c.fluidOutput + ' mL' : '')
+          + '</button>';
+      });
+      covList.innerHTML = h;
+      covSec.style.display = 'block';
+    } else {
+      covSec.style.display = 'none';
+      covList.innerHTML = '';
+    }
+  }
   document.getElementById('log-modal-title').textContent=item.name;
   document.getElementById('log-modal-sub').textContent=CATS[item.cat].icon+' '+CATS[item.cat].label+' · '+fmt12(timeStr);
   document.getElementById('log-caregiver').value='Ron';
@@ -1870,6 +1898,26 @@ window.openAddSchedule = function() {
   toggleMedGroup(false);
   openModal('modal-add');
 };
+
+// Covered-by button delegation (scheduled log modal)
+document.addEventListener('click', async function(e) {
+  var btn = e.target.closest('.cov-btn');
+  if (!btn || !pendingLog) return;
+  var c = (window._covCandidates || [])[+btn.dataset.covIdx];
+  if (!c) return;
+  try {
+    await addDoc(logCol, {
+      schedId: pendingLog.schedId, timeStr: pendingLog.timeStr, dateStr: pendingLog.dateStr,
+      cat: pendingLog.cat, name: pendingLog.name,
+      caregiver: c.caregiver || '', givenTime: c.givenTime || '',
+      fluidOutput: c.fluidOutput || '',
+      notes: 'Covered by earlier ' + fmt12(c.givenTime || '') + ' entry',
+      coveredBy: c.id, ts: serverTimestamp()
+    });
+    closeModal('modal-log');
+    showToast('Marked as covered');
+  } catch(err) { showToast('Error: ' + err.message); }
+});
 
 // Copy button delegation for schedule list
 document.addEventListener('click', function(e) {
