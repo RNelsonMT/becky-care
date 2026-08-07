@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dedup Presets</title>
+<style>body{font-family:system-ui,sans-serif;max-width:600px;margin:40px auto;padding:20px;background:#f0f4f4;color:#1a2e3b}
+h2{font-size:18px}#s{background:#fff;border-radius:10px;padding:16px;margin-top:12px;max-height:500px;overflow-y:auto;font-size:13px}
+.ok{color:#1e7e4c}.err{color:#c0392b}.warn{color:#b8860b}
+button{background:#2a7f7f;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px}
+button:disabled{opacity:.5}</style>
+</head><body>
+<h2>🧹 Remove Duplicate Presets</h2>
+<p style="font-size:13px">Groups presets by category + name (case-insensitive). Keeps the most recently updated copy of each; deletes the rest. Shows everything it does.</p>
+<button id="btn" onclick="run()">Remove Duplicates Now</button>
+<div id="s" style="display:none"></div>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,collection,getDocs,doc,deleteDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const db=getFirestore(initializeApp({apiKey:"AIzaSyCxPjDCBYFLc2XDqXvHcbGuqMV7265w3HE",authDomain:"care-tracker-383e0.firebaseapp.com",projectId:"care-tracker-383e0",storageBucket:"care-tracker-383e0.firebasestorage.app",messagingSenderId:"696799569086",appId:"1:696799569086:web:08b7e6356a018338a3aaef"}));
+
+window.run = async function() {
+  const btn=document.getElementById('btn');
+  const s=document.getElementById('s');
+  btn.disabled=true; btn.textContent='Running...'; s.style.display='block'; s.innerHTML='';
+  function log(msg,cls){s.innerHTML+='<div class="'+(cls||'')+'">'+msg+'</div>';s.scrollTop=s.scrollHeight;}
+
+  const snap = await getDocs(collection(db,'presets'));
+  const all = snap.docs.map(d=>({id:d.id,...d.data()}));
+  log('Found '+all.length+' total presets');
+
+  const groups = {};
+  all.forEach(p=>{
+    const key=(p.cat||'')+'|'+(p.name||'').toLowerCase().trim();
+    (groups[key]=groups[key]||[]).push(p);
+  });
+
+  let deleted=0, uniqueCount=0;
+  for (const key of Object.keys(groups)) {
+    const g=groups[key];
+    uniqueCount++;
+    if (g.length<=1) continue;
+    // Keep the copy with the newest updatedAt; prefer ones with more filled fields on tie
+    g.sort((a,b)=>{
+      const at=a.updatedAt?.seconds||0, bt=b.updatedAt?.seconds||0;
+      if (bt!==at) return bt-at;
+      const af=['timing','instructions','dose','route','defaultTime','notes','url'].filter(f=>a[f]).length;
+      const bf=['timing','instructions','dose','route','defaultTime','notes','url'].filter(f=>b[f]).length;
+      return bf-af;
+    });
+    log('<b>'+g[0].name+'</b> — '+g.length+' copies, keeping newest','warn');
+    for (let i=1;i<g.length;i++) {
+      try { await deleteDoc(doc(db,'presets',g[i].id)); log('&nbsp;&nbsp;✓ deleted '+g[i].id,'ok'); deleted++; }
+      catch(e){ log('&nbsp;&nbsp;✗ '+e.message,'err'); }
+    }
+  }
+  log('');
+  log('<b>Done — '+deleted+' duplicates removed, '+uniqueCount+' unique presets remain.</b>','ok');
+  btn.textContent='Done';
+};
+</script></body></html>
