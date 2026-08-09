@@ -1446,7 +1446,7 @@ window.openTaskLog = function(schedId,timeStr) {
   document.getElementById('log-modal-title').textContent=item.name;
   document.getElementById('log-modal-sub').textContent=CATS[item.cat].icon+' '+CATS[item.cat].label+' · '+fmt12(timeStr);
   document.getElementById('log-caregiver').value='Ron';
-  document.getElementById('log-time').value=nowTime();
+  document.getElementById('log-time').value=timeStr||nowTime();
   document.getElementById('log-notes').value=existing?.notes||'';
 
   // Med group checklist
