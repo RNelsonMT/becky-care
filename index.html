@@ -800,6 +800,10 @@
       <label>Date</label>
       <input type="date" id="edit-log-date">
     </div>
+    <div class="form-group" id="edit-log-fluid-group" style="display:none">
+      <label>Fluid Output (mL)</label>
+      <input type="number" id="edit-log-fluid" placeholder="e.g. 350">
+    </div>
     <div class="form-group">
       <label>Notes</label>
       <textarea id="edit-log-notes" placeholder="Observations…"></textarea>
@@ -2100,6 +2104,11 @@ window.openEditLog = function(id) {
   document.getElementById('edit-log-time').value=e.givenTime||'';
   document.getElementById('edit-log-date').value=e.dateStr||fmtDate(new Date());
   document.getElementById('edit-log-notes').value=e.notes||'';
+  var fg=document.getElementById('edit-log-fluid-group');
+  if (fg) {
+    fg.style.display = (e.cat==='cath' || e.fluidOutput) ? 'block' : 'none';
+    document.getElementById('edit-log-fluid').value = e.fluidOutput || '';
+  }
   openModal('modal-edit-log');
 };
 
@@ -2117,6 +2126,7 @@ window.saveEditLog = async function() {
       givenTime:document.getElementById('edit-log-time').value,
       dateStr:document.getElementById('edit-log-date').value,
       notes:document.getElementById('edit-log-notes').value.trim(),
+      fluidOutput:document.getElementById('edit-log-fluid') ? document.getElementById('edit-log-fluid').value.trim() : (e.fluidOutput||''),
       editedAt:serverTimestamp()
     });
     closeModal('modal-edit-log'); showToast('✓ Record updated');
