@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Seed Appointments (Aug 25 MyChart)</title>
+<style>body{font-family:system-ui,sans-serif;max-width:600px;margin:40px auto;padding:20px;background:#f0f4f4;color:#1a2e3b}
+h2{font-size:18px}#s{background:#fff;border-radius:10px;padding:16px;margin-top:12px;max-height:520px;overflow-y:auto;font-size:13px}
+.ok{color:#1e7e4c}.err{color:#c0392b}.warn{color:#b8860b}.skip{color:#5a7080}
+button{background:#2a7f7f;color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px}
+button:disabled{opacity:.5}</style>
+</head><body>
+<h2>📅 Import MyChart Appointments (pulled 8/25)</h2>
+<p style="font-size:13px">Adds 17 upcoming appointments (home visits at 9:00 AM placeholder), removes 3 stale rescheduled items, and skips anything already in the schedule.</p>
+<button id="btn" onclick="run()">Run Import Now</button>
+<div id="s" style="display:none"></div>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,collection,addDoc,getDocs,doc,deleteDoc,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const db=getFirestore(initializeApp({apiKey:"AIzaSyCxPjDCBYFLc2XDqXvHcbGuqMV7265w3HE",authDomain:"care-tracker-383e0.firebaseapp.com",projectId:"care-tracker-383e0",storageBucket:"care-tracker-383e0.firebasestorage.app",messagingSenderId:"696799569086",appId:"1:696799569086:web:08b7e6356a018338a3aaef"}));
+
+const appts=[
+ {onceDate:"2026-08-26",times:["09:00"],name:"PT Home Visit - Sheila D"},
+ {onceDate:"2026-08-26",times:["09:00"],name:"OT Home Visit - Kimberly L"},
+ {onceDate:"2026-08-27",times:["09:00"],name:"Speech Therapy Home Visit - Laurie Grisham"},
+ {onceDate:"2026-08-27",times:["09:00"],name:"PT Home Visit - Sheila D"},
+ {onceDate:"2026-08-27",times:["09:00"],name:"OT Home Visit - Kimberly L"},
+ {onceDate:"2026-08-31",times:["09:00"],name:"OT Home Visit - Kimberly L"},
+ {onceDate:"2026-09-01",times:["09:00"],name:"Skilled Nursing Home Visit - Nurse Lona L"},
+ {onceDate:"2026-09-01",times:["09:00"],name:"PT Home Visit - Sheila D"},
+ {onceDate:"2026-09-02",times:["09:00"],name:"OT Home Visit - Kimberly L"},
+ {onceDate:"2026-09-02",times:["09:00"],name:"PT Home Visit - Sheila D"},
+ {onceDate:"2026-09-03",times:["09:00"],name:"Speech Therapy Home Visit - Laurie Grisham"},
+ {onceDate:"2026-09-04",times:["09:00"],name:"PT Home Visit - Sheila D"},
+ {onceDate:"2026-09-07",times:["09:00"],name:"Speech Therapy Discharge - Laurie Grisham"},
+ {onceDate:"2026-09-08",times:["09:00"],name:"Skilled Nursing Discharge - Nurse Lona L"},
+ {onceDate:"2026-09-08",times:["09:00"],name:"PT Home Visit - Sheila D"},
+ {onceDate:"2026-09-09",times:["09:00"],name:"PT Discharge - Robert G"},
+ {onceDate:"2026-09-16",times:["13:00"],name:"Speech Therapy Evaluation - Leigha Ludwig (arrive 12:45)"},
+ {onceDate:"2026-09-16",times:["14:30"],name:"PT Evaluation - Dean O (arrive 2:15)"},
+ {onceDate:"2026-09-16",times:["15:30"],name:"OT Evaluation - Courtney M (arrive 3:15)"},
+ {onceDate:"2026-10-01",times:["13:00"],name:"Hearing Test - Jill Aitken, ENT (arrive 12:45)"},
+ {onceDate:"2026-10-01",times:["13:30"],name:"New Patient ENT Visit - Katia Michelotti, PA"},
+ {onceDate:"2026-10-29",times:["09:00"],name:"Follow Up - Dr. Kathleen Blair (arrive 8:45)"}
+];
+// Stale items superseded by this MyChart pull: match by onceDate + old 14:25 time
+const stale=[
+ {onceDate:"2026-10-01",time:"14:25",match:"ENT"},
+ {onceDate:"2026-09-01",time:"14:25",match:"Blair"},
+ {onceDate:"2026-09-08",time:"14:25",match:"Blair"}
+];
+
+window.run=async function(){
+ const btn=document.getElementById('btn'), s=document.getElementById('s');
+ btn.disabled=true; btn.textContent='Running...'; s.style.display='block'; s.innerHTML='';
+ function log(m,c){s.innerHTML+='<div class="'+(c||'')+'">'+m+'</div>';s.scrollTop=s.scrollHeight;}
+
+ const snap=await getDocs(collection(db,'schedule'));
+ const existing=snap.docs.map(d=>({id:d.id,...d.data()}));
+
+ // 1. Remove stale rescheduled items
+ log('<b>Removing stale items...</b>');
+ for(const st of stale){
+  const hits=existing.filter(e=>e.days==='once'&&e.onceDate===st.onceDate&&(e.times||[]).includes(st.time)&&(e.name||'').toLowerCase().includes(st.match.toLowerCase()));
+  if(!hits.length){log('&nbsp;&nbsp;none found for '+st.onceDate+' '+st.match,'skip');continue;}
+  for(const h of hits){
+   try{await deleteDoc(doc(db,'schedule',h.id));log('&nbsp;&nbsp;✓ removed '+h.name+' ('+st.onceDate+')','warn');}
+   catch(e){log('&nbsp;&nbsp;✗ '+e.message,'err');}
+  }
+ }
+
+ // 2. Add new appointments, skipping duplicates by name+date
+ log('<b>Adding appointments...</b>');
+ let added=0,skipped=0;
+ for(const a of appts){
+  const dup=existing.find(e=>e.days==='once'&&e.onceDate===a.onceDate&&(e.name||'').toLowerCase()===a.name.toLowerCase());
+  if(dup){log('&nbsp;&nbsp;skip (exists): '+a.onceDate+' '+a.name,'skip');skipped++;continue;}
+  try{
+   await addDoc(collection(db,'schedule'),{cat:'ther',name:a.name,times:a.times,days:'once',onceDate:a.onceDate,medList:[],grace:30,dose:'',createdAt:serverTimestamp()});
+   log('&nbsp;&nbsp;✓ '+a.onceDate+' '+a.times[0]+' '+a.name,'ok');added++;
+  }catch(e){log('&nbsp;&nbsp;✗ '+a.name+': '+e.message,'err');}
+ }
+ log('');
+ log('<b>Done — '+added+' added, '+skipped+' skipped as existing.</b>','ok');
+ log('Home visits use a 9:00 AM placeholder — edit times in the Schedule tab when the agency confirms.','warn');
+ btn.textContent='Done';
+};
+</script></body></html>
