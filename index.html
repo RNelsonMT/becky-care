@@ -3002,7 +3002,7 @@ function renderSettings() {
           <div class="preset-list-item" id="preset-row-${p.id}" style="flex-direction:column;align-items:stretch;gap:4px">
             <div style="display:flex;align-items:center;gap:8px">
               <div style="flex:1;min-width:0">
-                <div style="font-size:14px;font-weight:600">${p.name}${p.timing?` <span style="font-size:10px;font-weight:700;border-radius:4px;padding:2px 6px;background:${p.timing==='Scheduled'?'#e8f4fc':'#fef3e2'};color:${p.timing==='Scheduled'?'#1a5a8a':'#a05000'}">${p.timing}</span>`:''}</div>
+                <div style="font-size:14px;font-weight:600">${p.name}${p.timing?` <span style="font-size:10px;font-weight:700;border-radius:4px;padding:2px 6px;background:${p.timing==='Scheduled'?'#e8f4fc':'#fef3e2'};color:${p.timing==='Scheduled'?'#1a5a8a':'#a05000'}">${p.timing}</span>`:''}${p.regular?` <span style="font-size:9px;font-weight:700;border-radius:8px;padding:2px 6px;background:var(--teal);color:#fff">REGULAR${(p.regFreq||p.regTimes)?' · '+[p.regFreq,p.regTimes].filter(Boolean).join(' · '):''}</span>`:''}</div>
                 ${p.instructions?`<div style="font-size:11px;color:var(--muted);margin-top:2px;padding-left:8px">${p.instructions}</div>`:''}
                 ${p.url?`<div style="margin-top:3px;padding-left:8px"><a href="${p.url}" onclick="window.open('${p.url}','_blank','width=800,height=600,toolbar=1,location=1,scrollbars=1');return false;" style="font-size:11px;color:var(--teal);text-decoration:none;font-weight:600">Medication info ↗</a></div>`:''}
               </div>
