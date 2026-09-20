@@ -1852,7 +1852,7 @@ window.renderAddMedChecklist = function(selectedMeds) {
         <input type="checkbox" value="${m.name}" data-dose="${m.instructions||''}" ${isChecked?'checked':''} style="width:16px;height:16px;accent-color:var(--teal);cursor:pointer">
         <div>
           <div style="font-size:13px;font-weight:500">${m.name}${dc?' <span style=\"font-size:10px;color:var(--warn);font-weight:700\">DISCONTINUED</span>':''}</div>
-          ${m.instructions?`<div style="font-size:11px;color:var(--muted)">${m.instructions}</div>`:''}
+          ${m.instructions?`<div style="font-size:11px;color:var(--muted)">${m.instructions}</div>`:''}${m.regular&&(m.regFreq||m.regTimes)?`<div style="font-size:10px;color:var(--teal);font-weight:600">${[m.regFreq,m.regTimes].filter(Boolean).join(' · ')}</div>`:''}
         </div>
       </label>`;
   }
