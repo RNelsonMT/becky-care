@@ -465,7 +465,7 @@
     </div>
     <div id="today-content" style="max-height:calc(60vh - 60px);overflow-y:auto"></div>
     <div id="today-log-panel" style="height:33vh;display:flex;flex-direction:column;margin-top:10px;border-top:2px solid var(--border);padding-top:8px">
-      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px">Today's Log</div>
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px">Last 24 Hours</div>
       <div id="today-log-list" style="flex:1;overflow-y:auto"></div>
     </div>
   </div>
@@ -1318,14 +1318,20 @@ window.shiftDay = function(n) {
 function renderTodayLog() {
   var el = document.getElementById('today-log-list');
   if (!el) return;
-  var d = fmtDate(viewDate);
-  var rows = logEntries.filter(function(e){ return e.dateStr === d; })
-    .sort(function(a,b){ return (b.givenTime||'').localeCompare(a.givenTime||''); });
+  var cutoff = Date.now() - 24*3600000;
+  var rows = logEntries.filter(function(e){
+    if (!e.dateStr) return false;
+    var t = new Date(e.dateStr + 'T' + (e.givenTime || '00:00') + ':00').getTime();
+    return t >= cutoff && t <= Date.now() + 3600000;
+  }).sort(function(a,b){
+    var ta = a.dateStr + (a.givenTime||''), tb = b.dateStr + (b.givenTime||'');
+    return tb.localeCompare(ta);
+  });
   if (!rows.length) { el.innerHTML = '<div style="font-size:12px;color:var(--muted);font-style:italic;padding:6px 2px">No entries yet.</div>'; return; }
   var h = '';
   rows.forEach(function(e) {
     h += '<div style="display:flex;align-items:baseline;gap:8px;padding:5px 2px;border-bottom:1px solid var(--border);font-size:12px">'
-      + '<span style="font-family:monospace;font-weight:700;color:var(--teal);min-width:62px">' + fmt12(e.givenTime||'') + '</span>'
+      + '<span style="font-family:monospace;font-weight:700;color:var(--teal);min-width:80px">' + (e.dateStr!==fmtDate(new Date())?'Yest ':'') + fmt12(e.givenTime||'') + '</span>'
       + '<span style="flex:1"><b>' + (e.name||'') + '</b>'
       + (e.fluidOutput ? ' <span style="color:#9060d0;font-weight:700">&middot; ' + e.fluidOutput + ' mL</span>' : '')
       + (e.skipped ? ' <span style="color:var(--warn)">&middot; ' + (e.skipReason||'Skipped') + '</span>' : '')
