@@ -1332,7 +1332,7 @@ function renderTodayLog() {
   var today0 = fmtDate(new Date());
   var divIns = false;
   rows.forEach(function(e) {
-    if (!divIns && e.dateStr !== today0) { h += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0 4px"><div style="font-size:12px;font-weight:700;letter-spacing:.5px;color:var(--muted);text-transform:uppercase;margin-left:4.5ch;font-style:italic">Yesterday</div><div style="flex:1;height:1px;background:var(--border)"></div></div>'; divIns = true; }
+    if (!divIns && e.dateStr !== today0) { h += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0 4px"><div style="font-size:12px;font-weight:700;letter-spacing:.5px;color:#435968;margin-left:4.5ch;font-style:italic">Yesterday</div><div style="flex:1;height:1px;background:var(--border)"></div></div>'; divIns = true; }
     h += '<div style="display:flex;align-items:baseline;gap:8px;padding:5px 2px;border-bottom:1px solid var(--border);font-size:12px">'
       + '<span style="font-family:monospace;font-weight:700;color:var(--teal);min-width:80px">' + fmt12(e.givenTime||'') + '</span>'
       + '<span style="flex:1"><b>' + (e.name||'') + '</b>'
