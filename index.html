@@ -1095,7 +1095,7 @@ onSnapshot(presetsCol, snap => {
   Object.keys(CATS).forEach(k => presets[k] = []);
   snap.docs.forEach(d => {
     const data = d.data();
-    if (presets[data.cat]) presets[data.cat].push({ id:d.id, name:data.name, order:data.order||0, timing:data.timing||'', instructions:data.instructions||'', url:data.url||'', dose:data.dose||'', route:data.route||'', defaultTime:data.defaultTime||'', notes:data.notes||'' });
+    if (presets[data.cat]) presets[data.cat].push({ id:d.id, name:data.name, order:data.order||0, timing:data.timing||'', instructions:data.instructions||'', url:data.url||'', dose:data.dose||'', route:data.route||'', defaultTime:data.defaultTime||'', notes:data.notes||'', regular:data.regular||false, regFreq:data.regFreq||'', regTimes:data.regTimes||'' });
   });
   Object.keys(presets).forEach(k => presets[k].sort((a,b) => a.order - b.order));
   if (currentView==='settings') renderSettings();
@@ -3059,6 +3059,9 @@ document.getElementById('settings-content').addEventListener('click', async func
       +'<div style="display:flex;gap:8px"><select class="ed-timing" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px;font-size:13px;background:#fff;outline:none">'+timingOpts+'</select>'
       +'<select class="ed-route" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px;font-size:13px;background:#fff;outline:none">'+routeOpts+'</select></div>'
       +'<input type="text" class="ed-dose" placeholder="Dose (e.g. 600mg, 10 mL)" value="'+(existing?.dose||'').replace(/"/g,'&quot;')+'" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
+      +'<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer"><input type="checkbox" class="ed-regular"'+(existing?.regular?' checked':'')+'> Taken regularly (though as-needed)</label>'
+      +'<div style="display:flex;gap:8px"><input type="text" class="ed-regfreq" placeholder="Frequency (e.g. 3x daily)" value="'+(existing?.regFreq||'').replace(/"/g,'&quot;')+'" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;font-family:var(--font-ui);outline:none;background:#fff">'
+      +'<input type="text" class="ed-regtimes" placeholder="Typical times (e.g. 10 AM, 2 PM)" value="'+(existing?.regTimes||'').replace(/"/g,'&quot;')+'" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;font-family:var(--font-ui);outline:none;background:#fff"></div>'
       +'<div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px;color:var(--muted);white-space:nowrap">Default time:</span>'
       +'<select class="ed-hr" style="border:1.5px solid var(--border);border-radius:8px;padding:7px;font-size:13px;background:#fff;outline:none">'+hOpts+'</select>'
       +'<select class="ed-min" style="border:1.5px solid var(--border);border-radius:8px;padding:7px;font-size:13px;background:#fff;outline:none">'+mOpts+'</select>'
@@ -3092,6 +3095,9 @@ document.getElementById('settings-content').addEventListener('click', async func
         cat:          existing2?.cat || 'med',
         order:        existing2?.order || 0,
         timing:       timing2,
+        regular:      editRow2?.querySelector('.ed-regular')?.checked || false,
+        regFreq:      editRow2?.querySelector('.ed-regfreq')?.value.trim() || '',
+        regTimes:     editRow2?.querySelector('.ed-regtimes')?.value.trim() || '',
         route:        route2,
         dose:         dose2,
         defaultTime:  defTime,
