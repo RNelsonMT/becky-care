@@ -490,7 +490,7 @@
       <div class="filter-chip active" onclick="filterSched(this,'all')">All</div>
       <div class="filter-chip" onclick="filterSched(this,'med')">💊 Meds</div>
       <div class="filter-chip" onclick="filterSched(this,'vent')">🌬 Resp</div>
-      <div class="filter-chip" onclick="filterSched(this,'feed')">🥤 Nutrition</div>
+      <div class="filter-chip" onclick="filterSched(this,'feed')">🥤 Nutrition & Hydration</div>
       <div class="filter-chip" onclick="filterSched(this,'cath')">🔵 Bowel</div>
       <div class="filter-chip" onclick="filterSched(this,'test')">🧪 Testing</div>
       <div class="filter-chip" onclick="filterSched(this,'ther')">🏃 Med &amp; Thrpy Appts</div>
@@ -516,7 +516,7 @@
       <div class="filter-chip active" onclick="filterLog(this,'all')">All</div>
       <div class="filter-chip" onclick="filterLog(this,'med')">💊 Meds</div>
       <div class="filter-chip" onclick="filterLog(this,'vent')">🌬 Resp</div>
-      <div class="filter-chip" onclick="filterLog(this,'feed')">🥤 Nutrition</div>
+      <div class="filter-chip" onclick="filterLog(this,'feed')">🥤 Nutrition & Hydration</div>
       <div class="filter-chip" onclick="filterLog(this,'cath')">🔵 Bowel</div>
       <div class="filter-chip" onclick="filterLog(this,'test')">🧪 Testing</div>
       <div class="filter-chip" onclick="filterLog(this,'ther')">🏃 Therapy</div>
@@ -606,6 +606,14 @@
       <label>Fluid Output (mL)</label>
       <input type="number" id="log-fluid-output-val" placeholder="e.g. 350">
     </div>
+    <div class="form-group" id="log-urine-group" style="display:none">
+      <label>Urine Color</label>
+      <select id="log-urine"><option value=""></option><option>Dark</option><option>Light</option><option>Clear</option></select>
+    </div>
+    <div class="form-group" id="log-stool-group" style="display:none">
+      <label>Stool</label>
+      <select id="log-stool"><option value=""></option><option>Hard</option><option>Soft</option><option>Liquid</option></select>
+    </div>
     <div id="log-trach-tasks" style="display:none" class="form-group">
       <label>Trach Care Tasks</label>
       <label style="display:flex;align-items:center;gap:8px;padding:5px 2px;font-size:14px;cursor:pointer"><input type="checkbox" value="Changed Gauze"> Change Gauze</label>
@@ -636,7 +644,7 @@
       <select id="add-cat" onchange="updateAddPresets()">
         <option value="med">💊 Medication</option>
         <option value="vent">🌬 Respiratory</option>
-        <option value="feed">🥤 Nutrition</option>
+        <option value="feed">🥤 Nutrition & Hydration</option>
         <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
         <option value="ther">🏃 Medical &amp; Therapy</option>
@@ -731,7 +739,7 @@
       <select id="quick-cat" onchange="updateQuickPresets()">
         <option value="med">💊 Medication</option>
         <option value="vent">🌬 Respiratory</option>
-        <option value="feed">🥤 Nutrition</option>
+        <option value="feed">🥤 Nutrition & Hydration</option>
         <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
         <option value="ther">🏃 Medical &amp; Therapy</option>
@@ -766,6 +774,14 @@
       <label>Fluid Output (mL)</label>
       <input type="number" id="quick-fluid-val" placeholder="e.g. 350">
     </div>
+    <div class="form-group" id="quick-urine-group" style="display:none">
+      <label>Urine Color</label>
+      <select id="quick-urine"><option value=""></option><option>Dark</option><option>Light</option><option>Clear</option></select>
+    </div>
+    <div class="form-group" id="quick-stool-group" style="display:none">
+      <label>Stool</label>
+      <select id="quick-stool"><option value=""></option><option>Hard</option><option>Soft</option><option>Liquid</option></select>
+    </div>
     <div class="btn-row">
       <button class="btn btn-secondary" onclick="closeModal('modal-quick')">Cancel</button>
       <button class="btn btn-primary" onclick="saveQuickLog()">Save Record</button>
@@ -785,7 +801,7 @@
       <select id="edit-log-cat">
         <option value="med">💊 Medication</option>
         <option value="vent">🌬 Respiratory</option>
-        <option value="feed">🥤 Nutrition</option>
+        <option value="feed">🥤 Nutrition & Hydration</option>
         <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
         <option value="ther">🏃 Medical &amp; Therapy</option>
@@ -912,7 +928,7 @@ const instructionsCol  = collection(db, 'instructions');
 const CATS = {
   med:  { label:'Medications',   icon:'💊', color:'#4da6d0', hdrBg:'#1e3a5f', hdrColor:'#7ec8e3' },
   vent: { label:'Respiratory',   icon:'🌬', color:'#4dc896', hdrBg:'#1a3a2e', hdrColor:'#6ecfa0' },
-  feed: { label:'Nutrition',     icon:'🥤', color:'#e08840', hdrBg:'#3a2a1a', hdrColor:'#f0b060' },
+  feed: { label:'Nutrition & Hydration',     icon:'🥤', color:'#e08840', hdrBg:'#3a2a1a', hdrColor:'#f0b060' },
   cath: { label:'Bowel & Urine', icon:'🔵', color:'#9060d0', hdrBg:'#2e1a3a', hdrColor:'#b060f0' },
   test: { label:'Testing',       icon:'🧪', color:'#78b040', hdrBg:'#1a2e1a', hdrColor:'#a0d070' },
   ther: { label:'Medical & Therapy',        icon:'🏃', color:'#9060d0', hdrBg:'#2a1a3a', hdrColor:'#d090f0' },
@@ -1520,6 +1536,10 @@ window.openTaskLog = function(schedId,timeStr) {
   // Show fluid output field for Straight Cath
   var trachGroup=document.getElementById('log-trach-tasks');
   if(trachGroup){trachGroup.style.display=(item.name||'').toLowerCase().indexOf('trach')>=0?'block':'none';trachGroup.querySelectorAll('input').forEach(function(cb){cb.checked=false;});}
+  var ug=document.getElementById('log-urine-group'), sg=document.getElementById('log-stool-group');
+  var lname=(item.name||'').toLowerCase();
+  if (ug){ug.style.display=lname.indexOf('cath')>=0?'block':'none';document.getElementById('log-urine').value='';}
+  if (sg){sg.style.display=(lname.indexOf('bowel')>=0||lname==='bm')?'block':'none';document.getElementById('log-stool').value='';}
   var fluidOutputGroup = document.getElementById('log-fluid-output');
   if (fluidOutputGroup) {
     var showFluid = item.name === 'Straight Cath' || item.cat === 'cath';
@@ -1563,6 +1583,9 @@ window.saveLog = async function() {
     let notes = document.getElementById('log-notes').value.trim();
     var tc=document.querySelectorAll('#log-trach-tasks input:checked');
     if(tc.length){notes=(notes?notes+' | ':'')+Array.from(tc).map(function(x){return x.value;}).join(', ');}
+    var uv=(document.getElementById('log-urine')||{}).value||'', sv=(document.getElementById('log-stool')||{}).value||'';
+    if(uv){notes=(notes?notes+' | ':'')+'Urine: '+uv;}
+    if(sv){notes=(notes?notes+' | ':'')+'Stool: '+sv;}
 
     // Check if this is a med group with individual selections
     const checkedBoxes = document.querySelectorAll('.med-check-box.checked');
@@ -1594,6 +1617,7 @@ window.saveLog = async function() {
       // Standard single entry
       const entry={schedId:pendingLog.schedId,timeStr:pendingLog.timeStr,dateStr:pendingLog.dateStr,
         cat:pendingLog.cat,name:pendingLog.name,caregiver,givenTime,notes,
+        urineColor:uv,stoolType:sv,
         unscheduled:false,ts:serverTimestamp()};
       if (pendingLog.existingId) await setDoc(doc(db,'log',pendingLog.existingId),entry);
       else await addDoc(logCol,entry);
@@ -1716,6 +1740,9 @@ window.updateQuickPresets = function() {
   const cat = document.getElementById('quick-cat').value;
   var fg = document.getElementById('quick-fluid-group');
   if (fg) fg.style.display = cat === 'cath' ? 'block' : 'none';
+  var qug=document.getElementById('quick-urine-group'), qsg=document.getElementById('quick-stool-group');
+  if (qug){qug.style.display=cat==='cath'?'block':'none';document.getElementById('quick-urine').value='';}
+  if (qsg){qsg.style.display=cat==='cath'?'block':'none';document.getElementById('quick-stool').value='';}
   var dg = document.getElementById('quick-date-group');
   if (dg) dg.style.display = cat === 'ther' ? 'block' : 'none';
   document.getElementById('quick-name').value = '';
@@ -1749,7 +1776,9 @@ window.saveQuickLog = async function() {
       caregiver:document.getElementById('quick-caregiver').value,
       fluidOutput: (document.getElementById('quick-cat').value==='cath' && document.getElementById('quick-fluid-val') && document.getElementById('quick-fluid-val').value) ? document.getElementById('quick-fluid-val').value : '',
       givenTime:document.getElementById('quick-time').value,
-      notes:document.getElementById('quick-notes').value.trim(),
+      urineColor:(document.getElementById('quick-urine')||{}).value||'',
+      stoolType:(document.getElementById('quick-stool')||{}).value||'',
+      notes:(function(){var n=document.getElementById('quick-notes').value.trim();var u=(document.getElementById('quick-urine')||{}).value||'';var s=(document.getElementById('quick-stool')||{}).value||'';if(u){n=(n?n+' | ':'')+'Urine: '+u;}if(s){n=(n?n+' | ':'')+'Stool: '+s;}return n;})(),
       dateStr:(document.getElementById('quick-cat').value==='ther'&&document.getElementById('quick-date')&&document.getElementById('quick-date').value)?document.getElementById('quick-date').value:fmtDate(new Date()),unscheduled:true,ts:serverTimestamp()
     });
     closeModal('modal-quick'); showToast('✓ Logged');
