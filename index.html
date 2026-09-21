@@ -1704,9 +1704,15 @@ function renderPresetGrid(gridId, inputId, cat, context) {
       btn.classList.add('selected');
       input.value = p.name;
       input.style.display = 'none';
-      if (context === 'add' && p.defaultTime && /^\d{1,2}:\d{2}$/.test(p.defaultTime)) {
-        var tEl = document.getElementById('add-times');
-        if (tEl && !tEl.value.trim()) { tEl.value = p.defaultTime; if (window.updateTimesList) updateTimesList(); }
+      if (context === 'add' && p.defaultTime) {
+        console.log('preset defaultTime:', JSON.stringify(p.defaultTime));
+        var dm = /^(\d{1,2}):(\d{2})$/.exec(String(p.defaultTime).trim());
+        if (dm) {
+          var norm = String(parseInt(dm[1])).padStart(2,'0') + ':' + dm[2];
+          var tEl = document.getElementById('add-times');
+          var cur = tEl.value ? tEl.value.split(',').map(function(t){return t.trim();}).filter(Boolean) : [];
+          if (cur.indexOf(norm) < 0) { cur.push(norm); cur.sort(); tEl.value = cur.join(', '); if (window.updateTimesList) updateTimesList(); }
+        }
       }
     };
     wrap.appendChild(btn);
@@ -2041,6 +2047,7 @@ window.editItem = function(id) {
   document.getElementById('add-cat').value=s.cat;
   document.getElementById('add-dose').value=s.dose||'';
   document.getElementById('add-times').value=(s.times||[]).join(', ');
+  if (window.updateTimesList) updateTimesList();
   document.getElementById('add-days').value=s.days;
   document.getElementById('add-grace').value=s.grace||30;
   document.getElementById('custom-days').style.display=s.days==='custom'?'block':'none';
