@@ -3092,8 +3092,15 @@ document.getElementById('settings-content').addEventListener('click', async func
     editRow.style.cssText = 'background:var(--cream);border-radius:8px;padding:12px;margin-bottom:6px;display:flex;flex-direction:column;gap:8px;border:1.5px solid var(--teal)';
     var timingOpts = ['Scheduled','As Needed','Discontinued'].map(function(t){return '<option'+(existing?.timing===t?' selected':'')+'>'+t+'</option>';}).join('');
     var routeOpts = ['PEG Tube','IV','Oral','Sublingual','Topical','Inhaled','Other'].map(function(r){return '<option'+(existing?.route===r?' selected':'')+'>'+r+'</option>';}).join('');
-    var hOpts = [1,2,3,4,5,6,7,8,9,10,11,12].map(function(h){return '<option'+(h===8?' selected':'')+'>'+h+'</option>';}).join('');
-    var mOpts = ['00','15','30','45'].map(function(m){return '<option>'+m+'</option>';}).join('');
+    var dtH = 8, dtM = '00', dtAP = 'AM';
+    var dtm = /^(\d{1,2}):(\d{2})$/.exec(existing?.defaultTime || '');
+    if (dtm) {
+      var h24v = parseInt(dtm[1]); dtM = dtm[2];
+      dtAP = h24v >= 12 ? 'PM' : 'AM';
+      dtH = h24v % 12 || 12;
+    }
+    var hOpts = [1,2,3,4,5,6,7,8,9,10,11,12].map(function(h){return '<option'+(h===dtH?' selected':'')+'>'+h+'</option>';}).join('');
+    var mOpts = ['00','15','30','45'].map(function(m){return '<option'+(m===dtM?' selected':'')+'>'+m+'</option>';}).join('');
     editRow.innerHTML =
       '<div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Edit Medication</div>'
       +'<input type="text" value="'+currentName.replace(/"/g,'&quot;')+'" data-editing-id="'+id+'" placeholder="Medication name" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
@@ -3106,7 +3113,7 @@ document.getElementById('settings-content').addEventListener('click', async func
       +'<div style="display:flex;gap:6px;align-items:center"><span style="font-size:12px;color:var(--muted);white-space:nowrap">Default time:</span>'
       +'<select class="ed-hr" style="border:1.5px solid var(--border);border-radius:8px;padding:7px;font-size:13px;background:#fff;outline:none">'+hOpts+'</select>'
       +'<select class="ed-min" style="border:1.5px solid var(--border);border-radius:8px;padding:7px;font-size:13px;background:#fff;outline:none">'+mOpts+'</select>'
-      +'<select class="ed-ampm" style="border:1.5px solid var(--border);border-radius:8px;padding:7px;font-size:13px;background:#fff;outline:none"><option>AM</option><option>PM</option></select></div>'
+      +'<select class="ed-ampm" style="border:1.5px solid var(--border);border-radius:8px;padding:7px;font-size:13px;background:#fff;outline:none"><option'+(dtAP==='AM'?' selected':'')+'>AM</option><option'+(dtAP==='PM'?' selected':'')+'>PM</option></select></div>'
       +'<input type="text" class="ed-instr" placeholder="Instructions / notes" value="'+(existing?.instructions||'').replace(/"/g,'&quot;')+'" style="border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:14px;font-family:var(--font-ui);outline:none;background:#fff">'
       +'<div style="display:flex;gap:8px"><button class="preset-save-btn" data-save-preset="'+id+'" style="flex:1;padding:10px">Save</button><button class="preset-cancel-btn" data-cancel-edit="true" style="flex:1;padding:10px">Cancel</button></div>';
     row.insertAdjacentElement('afterend', editRow);
