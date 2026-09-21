@@ -425,7 +425,7 @@
     </div>
   </div>
   <div id="sidebar-footer">
-    <button id="sidebar-add-btn" onclick="openQuickLog();closeSidebar()">+ Log Record</button>
+    <button id="sidebar-add-btn" onclick="openQuickLog();closeSidebar()">+ Add Detail</button>
     <div id="sidebar-user" onclick="showCgSelect && showCgSelect()">👤 <span id="sidebar-user-name">Caregiver</span></div>
   </div>
 </div>
@@ -2472,7 +2472,7 @@ function renderContacts() {
   });
   var html = '<div style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">'
     + '<h2 style="font-size:17px;font-weight:700">Contacts</h2>'
-    + '<button data-action="add-contact" style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Log Record</button>'
+    + '<button data-add-contact style="background:var(--teal);color:#fff;border:none;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer">+ Add Contact</button>'
     + '</div>';
   CONTACT_CATS.forEach(function(cat) {
     var items = grouped[cat];
