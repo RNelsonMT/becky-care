@@ -1704,6 +1704,10 @@ function renderPresetGrid(gridId, inputId, cat, context) {
       btn.classList.add('selected');
       input.value = p.name;
       input.style.display = 'none';
+      if (context === 'add' && p.defaultTime && /^\d{1,2}:\d{2}$/.test(p.defaultTime)) {
+        var tEl = document.getElementById('add-times');
+        if (tEl && !tEl.value.trim()) { tEl.value = p.defaultTime; if (window.updateTimesList) updateTimesList(); }
+      }
     };
     wrap.appendChild(btn);
     grid.appendChild(wrap);
@@ -2080,6 +2084,7 @@ window.saveScheduleItem = async function() {
   const timesRaw=document.getElementById('add-times').value;
   const times=timesRaw.split(',').map(t=>t.trim()).filter(t=>/^\d{1,2}:\d{2}$/.test(t));
   const days=document.getElementById('add-days').value;
+  if (!times.length && days !== 'once') { showToast('Add at least one scheduled time'); return; }
   let customDays=[];
   const onceDate=document.getElementById('add-once-date').value||'';
   if (days==='custom') document.querySelectorAll('#custom-days input[type=checkbox]:checked').forEach(cb=>customDays.push(parseInt(cb.value)));
