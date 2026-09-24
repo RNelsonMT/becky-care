@@ -514,10 +514,11 @@
     </div>
     <div class="filter-row" id="log-filter-row">
       <div class="filter-chip active" onclick="filterLog(this,'all')">All</div>
+      <div class="filter-chip" onclick="filterLog(this,'cath')">🔵 Bowel & Urine</div>
       <div class="filter-chip" onclick="filterLog(this,'med')">💊 Meds</div>
+      <div class="filter-chip" onclick="filterLog(this,'misc')">📝 Misc</div>
       <div class="filter-chip" onclick="filterLog(this,'vent')">🌬 Resp</div>
       <div class="filter-chip" onclick="filterLog(this,'feed')">🥤 Nutrition & Hydration</div>
-      <div class="filter-chip" onclick="filterLog(this,'cath')">🔵 Bowel</div>
       <div class="filter-chip" onclick="filterLog(this,'test')">🧪 Testing</div>
       <div class="filter-chip" onclick="filterLog(this,'ther')">🏃 Therapy</div>
     </div>
@@ -587,6 +588,7 @@
       <select id="log-caregiver">
         <option>Ron</option><option>Marcus</option><option>Connor</option>
         <option>Allie</option><option>Lisa</option><option>Erin</option>
+        <option>Vivian</option><option>Jamie</option>
         <option>Nurse / Staff</option><option>Other</option>
       </select>
     </div>
@@ -642,10 +644,11 @@
     <div class="form-group">
       <label>Category</label>
       <select id="add-cat" onchange="updateAddPresets()">
+        <option value="cath">🔵 Bowel & Urine</option>
         <option value="med">💊 Medication</option>
+        <option value="misc">📝 Miscellaneous</option>
         <option value="vent">🌬 Respiratory</option>
         <option value="feed">🥤 Nutrition & Hydration</option>
-        <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
         <option value="ther">🏃 Medical &amp; Therapy</option>
       </select>
@@ -737,10 +740,11 @@
     <div class="form-group">
       <label>Category</label>
       <select id="quick-cat" onchange="updateQuickPresets()">
+        <option value="cath">🔵 Bowel & Urine</option>
         <option value="med">💊 Medication</option>
+        <option value="misc">📝 Miscellaneous</option>
         <option value="vent">🌬 Respiratory</option>
         <option value="feed">🥤 Nutrition & Hydration</option>
-        <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
         <option value="ther">🏃 Medical &amp; Therapy</option>
       </select>
@@ -755,6 +759,7 @@
       <select id="quick-caregiver">
         <option>Ron</option><option>Marcus</option><option>Connor</option>
         <option>Allie</option><option>Lisa</option><option>Erin</option>
+        <option>Vivian</option><option>Jamie</option>
         <option>Nurse / Staff</option><option>Other</option>
       </select>
     </div>
@@ -799,10 +804,11 @@
     <div class="form-group">
       <label>Category</label>
       <select id="edit-log-cat">
+        <option value="cath">🔵 Bowel & Urine</option>
         <option value="med">💊 Medication</option>
+        <option value="misc">📝 Miscellaneous</option>
         <option value="vent">🌬 Respiratory</option>
         <option value="feed">🥤 Nutrition & Hydration</option>
-        <option value="cath">🔵 Bowel & Urine</option>
         <option value="test">🧪 Testing</option>
         <option value="ther">🏃 Medical &amp; Therapy</option>
       </select>
@@ -816,6 +822,7 @@
       <select id="edit-log-caregiver">
         <option>Ron</option><option>Marcus</option><option>Connor</option>
         <option>Allie</option><option>Lisa</option><option>Erin</option>
+        <option>Vivian</option><option>Jamie</option>
         <option>Nurse / Staff</option><option>Other</option>
       </select>
     </div>
@@ -926,10 +933,11 @@ const instructionsCol  = collection(db, 'instructions');
 
 /* ── CATEGORY CONFIG ─────────────────────────────────── */
 const CATS = {
+  cath: { label:'Bowel & Urine', icon:'🔵', color:'#9060d0', hdrBg:'#2e1a3a', hdrColor:'#b060f0' },
   med:  { label:'Medications',   icon:'💊', color:'#4da6d0', hdrBg:'#1e3a5f', hdrColor:'#7ec8e3' },
+  misc: { label:'Miscellaneous', icon:'📝', color:'#8a9aa8', hdrBg:'#2a3138', hdrColor:'#b8c6d0' },
   vent: { label:'Respiratory',   icon:'🌬', color:'#4dc896', hdrBg:'#1a3a2e', hdrColor:'#6ecfa0' },
   feed: { label:'Nutrition & Hydration',     icon:'🥤', color:'#e08840', hdrBg:'#3a2a1a', hdrColor:'#f0b060' },
-  cath: { label:'Bowel & Urine', icon:'🔵', color:'#9060d0', hdrBg:'#2e1a3a', hdrColor:'#b060f0' },
   test: { label:'Testing',       icon:'🧪', color:'#78b040', hdrBg:'#1a2e1a', hdrColor:'#a0d070' },
   ther: { label:'Medical & Therapy',        icon:'🏃', color:'#9060d0', hdrBg:'#2a1a3a', hdrColor:'#d090f0' },
 };
@@ -2283,7 +2291,7 @@ function renderQuickMeasurement(el, tabBar) {
     + '<div style="font-size:15px;font-weight:700;margin-bottom:12px">Record ' + mtype.label + '</div>'
     + valField
     + '<div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:12px">' + mtype.unit + '</div>'
-    + '<div style="display:flex;gap:8px;margin-bottom:10px"><select id="meas-cg" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;background:var(--cream);outline:none"><option>Ron</option><option>Marcus</option><option>Connor</option><option>Allie</option><option>Lisa</option><option>Erin</option><option>Nurse/Staff</option></select>'
+    + '<div style="display:flex;gap:8px;margin-bottom:10px"><select id="meas-cg" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;background:var(--cream);outline:none"><option>Ron</option><option>Marcus</option><option>Connor</option><option>Allie</option><option>Lisa</option><option>Erin</option><option>Vivian</option><option>Jamie</option><option>Nurse/Staff</option></select>'
     + '<input type="time" id="meas-time" value="' + nowTime() + '" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;background:var(--cream);outline:none"></div>'
     + '<input type="text" id="meas-notes" placeholder="Notes (optional)" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;margin-bottom:12px;background:var(--cream);outline:none;box-sizing:border-box">'
     + '<button onclick="saveMeasurement()" style="width:100%;padding:13px;background:var(--teal);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer">Save</button>'
@@ -2304,7 +2312,7 @@ function renderVitalsForm(el, tabBar) {
     + '<div class="vitals-field"><label>Weight (lbs)</label><input type="number" id="v-wt" placeholder="120" step="0.1"></div>'
     + '<div class="vitals-field"><label>Tube Feed In (mL)</label><input type="number" id="v-tfin" placeholder="300"></div>'
     + '</div>'
-    + '<div style="display:flex;gap:8px;margin-bottom:10px"><select id="v-cg" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;background:var(--cream);outline:none"><option>Ron</option><option>Marcus</option><option>Connor</option><option>Allie</option><option>Lisa</option><option>Erin</option><option>Nurse/Staff</option></select>'
+    + '<div style="display:flex;gap:8px;margin-bottom:10px"><select id="v-cg" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;background:var(--cream);outline:none"><option>Ron</option><option>Marcus</option><option>Connor</option><option>Allie</option><option>Lisa</option><option>Erin</option><option>Vivian</option><option>Jamie</option><option>Nurse/Staff</option></select>'
     + '<input type="time" id="v-time" value="' + nowTime() + '" style="flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;background:var(--cream);outline:none"></div>'
     + '<input type="text" id="v-notes" placeholder="General notes (optional)" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px;font-size:14px;margin-bottom:12px;background:var(--cream);outline:none;box-sizing:border-box">'
     + '<button onclick="saveVitals()" style="width:100%;padding:13px;background:var(--teal);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer">Save All Vitals</button>'
